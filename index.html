@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<title>ROZVRH</title>
+
+<style>
+body { font-family: Arial; padding:20px; }
+
+.header-table {
+  width:100%;
+  border-collapse: collapse;
+  margin:10px 0;
+  border:2px solid #000;
+}
+
+.header-table th,
+.header-table td {
+  border:1px solid #000;
+  text-align:center;
+  padding:6px;
+  font-weight:bold;
+}
+
+table {
+  border-collapse: collapse;
+  width:100%;
+  border:3px solid #000;
+  margin-top:15px;
+}
+
+td, th {
+  border:1px solid #ccc;
+  padding:4px;
+  text-align:center;
+  font-size:11px;
+}
+
+.hour-cell { width:40px; background:#eee; }
+.label { width:30px; background:#f5f5f5; }
+
+.plan-row td { background:#d0e7ff; }
+.real-row td { background:#d4edda; }
+.unavailable {
+  background:#f8d7da !important;
+  color:#721c24;
+  font-weight:bold;
+}
+.conflict {
+  background-color:#ffe5e5;
+  box-shadow: inset 0 0 0 2px red;
+}
+.conflict-global {
+  background-color:#fff3cd;
+}
+.conflict-plan {
+  box-shadow: inset 0 0 0 2px #dc3545;
+}
+.conflict-real {
+  box-shadow: inset 0 0 0 2px #1b5e20;
+}
+
+.class-header { background:#ddd; }
+
+.active-cell:hover { outline:2px solid blue; cursor:pointer; }
+
+.editing {
+  outline:3px solid orange !important;
+  background:#fff3cd !important;
+}
+
+.day-border {
+  border-left:3px solid #000 !important;
+}
+
+.menu {
+  position:absolute;
+  background:white;
+  border:1px solid #999;
+  z-index:1000;
+}
+.menu div { padding:5px; cursor:pointer; }
+.menu div:hover { background:#eee; }
+
+.trainer-panel {
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin:12px 0;
+}
+
+.trainer-panel-info {
+  width:100%;
+  font-size:12px;
+  color:#555;
+}
+
+.trainer-group-title {
+  width:100%;
+  font-weight:bold;
+  margin-top:8px;
+}
+
+.trainer-busy {
+  color:#c00;
+  opacity:0.7;
+}
+
+.trainer-item {
+  padding:6px 10px;
+  border:1px solid #999;
+  background:#f8f9fa;
+  border-radius:4px;
+  cursor:grab;
+  user-select:none;
+}
+
+.trainer-item:active {
+  cursor:grabbing;
+}
+
+.cell.drag-over {
+  outline:3px solid #0d6efd;
+  outline-offset:-3px;
+}
+
+.trainer-toolbar {
+  display:flex;
+  gap:8px;
+  align-items:center;
+  margin:12px 0 8px;
+}
+
+.trainer-search {
+  padding:6px 10px;
+  border:1px solid #999;
+  border-radius:4px;
+  min-width:220px;
+}
+
+.trainer-toggle {
+  padding:6px 10px;
+  border:1px solid #999;
+  background:#fff;
+  border-radius:4px;
+  cursor:pointer;
+}
+
+.trainer-toggle.active {
+  background:#e9ecef;
+}
+</style>
+</head>
+
+<body>
+
+<h2 id="pageTitle">ROZVRH</h2>
+
+<table class="header-table">
+<tr>
+  <th id="schoolHeader"></th>
+  <th id="cityHeader"></th>
+  <th id="yearHeader"></th>
+  <th id="weekFromHeader"></th>
+  <th id="weekNumberHeader"></th>
+</tr>
+<tr>
+  <td><select id="schoolSelect"></select></td>
+  <td id="city">-</td>
+  <td>
+    <select id="yearSelect" onchange="render()">
+      <option>1</option><option>2</option><option>3</option>
+      <option>4</option><option>5</option><option>6</option>
+      <option>7</option><option>8</option><option>9</option>
+    </select>
+  </td>
+  <td><input type="date" id="dateInput"></td>
+  <td id="weekNumber"></td>
+</tr>
+</table>
+
+<button onclick="changeWeek(-7)">←</button>
+<button onclick="changeWeek(7)">→</button>
+<button id="copyWeekButton" onclick="copyWeek()"></button>
+<button id="todayButton" onclick="goToday()"></button>
+<button id="schoolsButton" onclick="openSchools()"></button>
+<button id="trainersButton" onclick="openTrainers()">Trenéři</button>
+
+<div class="trainer-toolbar">
+  <input id="trainerSearch" class="trainer-search">
+  <button id="showAllTrainersButton" class="trainer-toggle" type="button"></button>
+</div>
+<div id="trainerPanel" class="trainer-panel"></div>
+<table id="table"></table>
+
+<script type="module">
+import { TEXTS } from "./texts.js";
+
+const pageTitle = document.getElementById("pageTitle");
+const schoolHeader = document.getElementById("schoolHeader");
+const cityHeader = document.getElementById("cityHeader");
+const yearHeader = document.getElementById("yearHeader");
+const weekFromHeader = document.getElementById("weekFromHeader");
+const weekNumberHeader = document.getElementById("weekNumberHeader");
+const schoolSelect = document.getElementById("schoolSelect");
+const city = document.getElementById("city");
+const yearSelect = document.getElementById("yearSelect");
+const dateInput = document.getElementById("dateInput");
+const weekNumber = document.getElementById("weekNumber");
+const copyWeekButton = document.getElementById("copyWeekButton");
+const todayButton = document.getElementById("todayButton");
+const schoolsButton = document.getElementById("schoolsButton");
+const trainersButton = document.getElementById("trainersButton");
+const trainerSearch = document.getElementById("trainerSearch");
+const showAllTrainersButton = document.getElementById("showAllTrainersButton");
+const trainerPanel = document.getElementById("trainerPanel");
+const table = document.getElementById("table");
+
+function load(key, def){
+  try {
+    const data = localStorage.getItem(key);
+    return data ? JSON.parse(data) : def;
+  } catch {
+    return def;
+  }
+}
+
+let trainers = load("trainers", []);
+let plans = load("plans", {});
+let reality = load("reality", {});
+let classes = ["A","B","C","D"];
+let currentDate = new Date();
+let showAll = false;
+let activeSchoolId = "";
+
+let menu = null;
+let activeCell = null;
+
+function normalizeSchool(school){
+  return {
+    ...school,
+    favoriteTrainers: school.favoriteTrainers || []
+  };
+}
+
+function getSchools(){
+  return load("schools", []).map(normalizeSchool);
+}
+
+function loadTrainers(){
+  return load("trainers", []);
+}
+
+function getVisibleTrainers(schoolId){
+  const trainers = loadTrainers();
+  const schools = getSchools();
+
+  if(showAll) return trainers;
+
+  const school = schools.find(s => s.id === schoolId);
+
+  // fallback pouze pokud škola neexistuje
+  if(!school) return trainers;
+
+  const fav = school.favoriteTrainers;
+
+  // pokud není pole → fallback (starší data)
+  if(!Array.isArray(fav)) return trainers;
+
+  // pokud je prázdné pole → žádní trenéři
+  if(fav.length === 0) return [];
+
+  // vrátí pouze vybrané trenéry
+  const result = trainers.filter(t => fav.includes(t.id));
+
+  console.log("schoolId:", schoolId);
+  console.log("favoriteTrainers:", fav);
+  console.log("result count:", result.length);
+
+  return result;
+}
+
+function initStaticTexts(){
+  schoolHeader.textContent = TEXTS.schools.title.slice(0, -1);
+  cityHeader.textContent = "Místo";
+  yearHeader.textContent = "Ročník";
+  weekFromHeader.textContent = "Týden od";
+  weekNumberHeader.textContent = "Týden č.";
+  copyWeekButton.textContent = TEXTS.schedule.copyWeek;
+  todayButton.textContent = "Dnes";
+  schoolsButton.textContent = TEXTS.schools.title;
+  trainersButton.textContent = TEXTS.trainers.title;
+  trainerSearch.placeholder = TEXTS.schedule.searchTrainer;
+  showAllTrainersButton.textContent = TEXTS.schedule.allTrainers;
+}
+
+function init(){
+  initStaticTexts();
+  loadSchools();
+  activeSchoolId = schoolSelect.value;
+  updateWeekInfo();
+  dateInput.onchange = onDateChange;
+  render();
+}
+
+function loadSchools(){
+  let schoolItems = getSchools();
+
+  schoolSelect.replaceChildren();
+
+  let placeholder = document.createElement("option");
+  placeholder.value = "";
+  placeholder.textContent = TEXTS.schedule.selectSchool;
+  schoolSelect.appendChild(placeholder);
+
+  schoolItems.forEach(s => {
+    let option = document.createElement("option");
+    option.value = s.id;
+    option.textContent = s.nazev;
+    schoolSelect.appendChild(option);
+  });
+
+  let saved = localStorage.getItem("selectedSchool");
+  if(saved && schoolSelect.value !== saved){
+    schoolSelect.value = saved;
+  }
+
+  updateSchoolUI();
+}
+
+function openSchools(){
+  window.location.href = "schools.html";
+}
+
+function openTrainers(){
+  window.location.href = "trainers.html";
+}
+
+schoolSelect.onchange = () => {
+  localStorage.setItem("selectedSchool", schoolSelect.value);
+  activeSchoolId = schoolSelect.value;
+  updateSchoolUI();
+  renderTrainerPanel();
+};
+
+function getSelectedSchool(){
+  let schools = getSchools();
+  return schools.find(s => s.id == schoolSelect.value);
+}
+
+function updateSchoolUI(){
+  let s = getSelectedSchool();
+  city.textContent = s?.mesto || TEXTS.common.placeholderDash;
+}
+
+function renderTrainerPanel(){
+  activeSchoolId = schoolSelect.value;
+  trainers = loadTrainers();
+  const visibleBase = getVisibleTrainers(activeSchoolId);
+  let visibleTrainers = visibleBase;
+  const search = trainerSearch.value.trim().toLowerCase();
+
+  if(search){
+    visibleTrainers = visibleBase.filter(trainer =>
+      `${trainer.jmeno || ""} ${trainer.prijmeni || ""}`
+        .toLowerCase()
+        .includes(search)
+    );
+  } else {
+    visibleTrainers = visibleBase.slice(0, 10);
+  }
+
+  let fragment = document.createDocumentFragment();
+
+  if(visibleBase.length > 10 && !search){
+    let info = document.createElement("div");
+    info.className = "trainer-panel-info";
+    info.textContent = `Zobrazeno 10 z ${visibleBase.length} trenérů – použij vyhledávání`;
+    fragment.appendChild(info);
+  }
+
+  if(!visibleTrainers.length){
+    let empty = document.createElement("div");
+    empty.textContent = "Žádní trenéři";
+    fragment.appendChild(empty);
+  } else {
+    const free = [];
+    const busy = [];
+
+    visibleTrainers.forEach(trainer => {
+      const isBusy = activeCell
+        ? isTrainerBusyGlobal(
+            trainer.id,
+            new Date(activeCell.dataset.date),
+            Number(activeCell.dataset.hour),
+            activeCell.dataset.type
+          )
+        : false;
+
+      if(isBusy){
+        busy.push(trainer);
+      } else {
+        free.push(trainer);
+      }
+    });
+
+    function renderGroup(title, list, isBusyGroup){
+      if(!list.length) return;
+
+      const header = document.createElement("div");
+      header.className = "trainer-group-title";
+      header.textContent = title;
+      fragment.appendChild(header);
+
+      list.forEach(trainer => {
+        const item = document.createElement("div");
+        item.className = "trainer-item";
+
+        if(isBusyGroup){
+          item.classList.add("trainer-busy");
+          item.title = "Obsazen v tomto čase";
+        }
+
+        item.textContent = `${trainer.jmeno} ${trainer.prijmeni}`;
+        item.draggable = true;
+        item.addEventListener("dragstart", (event) => {
+          event.dataTransfer.setData("text/plain", trainer.id);
+          event.dataTransfer.effectAllowed = "copy";
+        });
+        item.addEventListener("click", () => {
+          if(!activeCell) return;
+          assignTrainerToCell(trainer.id);
+        });
+        fragment.appendChild(item);
+      });
+    }
+
+    renderGroup("Volní trenéři", free, false);
+    renderGroup("Obsazení trenéři", busy, true);
+  }
+
+  trainerPanel.replaceChildren(fragment);
+  showAllTrainersButton.classList.toggle("active", showAll);
+  showAllTrainersButton.setAttribute("aria-pressed", String(showAll));
+}
+
+function closeMenu(){
+  if(menu){ menu.remove(); menu = null; }
+  if(activeCell) activeCell.classList.remove("editing");
+}
+
+document.addEventListener("click", (e) => {
+  if(menu && !menu.contains(e.target)){
+    closeMenu();
+  }
+});
+
+document.addEventListener("visibilitychange", () => {
+  if(document.visibilityState === "visible"){
+    renderTrainerPanel();
+    render();
+  }
+});
+
+function setActiveCell(cell){
+  if(activeCell) activeCell.classList.remove("editing");
+  activeCell = cell;
+  cell.classList.add("editing");
+}
+
+function assignTrainerToCell(trainerId){
+  if(!activeCell) return;
+
+  let { date, cls, hour, type } = activeCell.dataset;
+  if(!date || !cls || !hour || !type) return;
+
+  let cellDate = new Date(date);
+  let cellHour = Number(hour);
+
+  if(type === "plan"){
+    plans[getKey(cellDate, cls, cellHour)] = trainerId;
+    localStorage.setItem("plans", JSON.stringify(plans));
+  } else {
+    reality[getKey(cellDate, cls, cellHour)] = trainerId;
+    localStorage.setItem("reality", JSON.stringify(reality));
+  }
+
+  closeMenu();
+  render();
+}
+
+function openMenu(e, date, cls, h, type){
+  closeMenu();
+  e.stopPropagation();
+  setActiveCell(e.currentTarget);
+
+  menu = document.createElement("div");
+  menu.className = "menu";
+  menu.style.left = e.pageX + "px";
+  menu.style.top = e.pageY + "px";
+
+  const visibleBase = getVisibleTrainers(activeSchoolId);
+  let visibleTrainers = visibleBase;
+  const search = trainerSearch.value.trim().toLowerCase();
+
+  if(search){
+    visibleTrainers = visibleBase.filter(trainer =>
+      `${trainer.jmeno || ""} ${trainer.prijmeni || ""}`
+        .toLowerCase()
+        .includes(search)
+    );
+  } else {
+    visibleTrainers = visibleBase.slice(0, 10);
+  }
+
+  const free = [];
+  const busy = [];
+
+  visibleTrainers.forEach(trainer => {
+    const isBusy = activeCell
+      ? isTrainerBusyGlobal(
+          trainer.id,
+          new Date(activeCell.dataset.date),
+          Number(activeCell.dataset.hour),
+          activeCell.dataset.type
+        )
+      : false;
+
+    if(isBusy){
+      busy.push(trainer);
+    } else {
+      free.push(trainer);
+    }
+  });
+
+  function renderTrainerGroup(title, list, isBusyGroup){
+    if(!list.length) return;
+
+    let header = document.createElement("div");
+    header.className = "trainer-group-title";
+    header.textContent = title;
+    menu.appendChild(header);
+
+    list.forEach(trainer => {
+      let item = document.createElement("div");
+      if(isBusyGroup){
+        item.classList.add("trainer-busy");
+        item.title = "Obsazen v tomto čase";
+      }
+      item.textContent = `${trainer.jmeno} ${trainer.prijmeni}`;
+      item.addEventListener("click", () => {
+        assignTrainerToCell(trainer.id);
+      });
+      menu.appendChild(item);
+    });
+  }
+
+  renderTrainerGroup("Volní trenéři", free, false);
+  renderTrainerGroup("Obsazení trenéři", busy, true);
+
+  add(TEXTS.schedule.mail, "MAIL");
+  add(TEXTS.common.unavailable, "X");
+  add(TEXTS.common.delete, "");
+
+  function add(label, val){
+    let d = document.createElement("div");
+    d.textContent = label;
+    d.onclick = () => selectValue(val);
+    menu.appendChild(d);
+  }
+
+  function selectValue(val){
+    if(val === "MAIL"){
+      sendMail(date, cls, h);
+      return;
+    }
+
+    if(type === "plan"){
+      if(val){
+        plans[getKey(date, cls, h)] = val;
+      } else {
+        deleteStoredValue(plans, date, cls, h);
+      }
+      localStorage.setItem("plans", JSON.stringify(plans));
+    } else {
+      if(val){
+        reality[getKey(date, cls, h)] = val;
+      } else {
+        deleteStoredValue(reality, date, cls, h);
+      }
+      localStorage.setItem("reality", JSON.stringify(reality));
+    }
+
+    closeMenu();
+    render();
+  }
+
+  document.body.appendChild(menu);
+}
+
+function sendMail(date, cls, h){
+  let school = getSelectedSchool();
+
+  if(!school?.email){
+    alert(TEXTS.schedule.noEmail);
+    return;
+  }
+
+  let body = encodeURIComponent(
+`Dobrý den,
+
+nelze odučit:
+${date.toLocaleDateString()} / ${cls} / ${h}. hodina.`);
+
+  window.location.href = `mailto:${school.email}?subject=Neodučeno&body=${body}`;
+}
+
+function onDateChange(){
+  currentDate = new Date(dateInput.value);
+  updateWeekInfo();
+  render();
+}
+
+function changeWeek(o){
+  currentDate.setDate(currentDate.getDate() + o);
+  updateWeekInfo();
+  render();
+}
+
+function goToday(){
+  currentDate = new Date();
+  updateWeekInfo();
+  render();
+}
+
+function getMonday(d){
+  let date = new Date(d);
+  let day = date.getDay();
+  let diff = date.getDate() - day + (day == 0 ? -6 : 1);
+  return new Date(date.setDate(diff));
+}
+
+function getWeekNumber(d){
+  d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  let day = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - day);
+  let start = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  return Math.ceil((((d - start) / 86400000) + 1) / 7);
+}
+
+function updateWeekInfo(){
+  let m = getMonday(currentDate);
+  dateInput.valueAsDate = m;
+  weekNumber.textContent = getWeekNumber(m);
+}
+
+function formatDate(d){ return d.toISOString().split("T")[0]; }
+function getSelectedYear(){ return String(yearSelect.value); }
+function getLegacyKey(d, c, h){ return formatDate(d) + "_" + c + "_" + h; }
+function getKey(d, c, h){ return formatDate(d) + "_" + getSelectedYear() + "_" + c + "_" + h; }
+
+function parseKey(key){
+  let parts = key.split("_");
+
+  if(parts.length === 4){
+    let [date, year, cls, hour] = parts;
+    return { date, year, cls, hour: Number(hour) };
+  }
+
+  let [date, cls, hour] = parts;
+  return { date, year: null, cls, hour: Number(hour) };
+}
+
+function getStoredValue(store, d, c, h){
+  let key = getKey(d, c, h);
+  if(key in store) return store[key];
+
+  let legacyKey = getLegacyKey(d, c, h);
+  return store[legacyKey];
+}
+
+function deleteStoredValue(store, d, c, h){
+  delete store[getKey(d, c, h)];
+  delete store[getLegacyKey(d, c, h)];
+}
+
+function getName(id){
+  if(id === "X") return TEXTS.common.unavailableSymbol;
+
+  let t = trainers.find(t => t.id == id);
+  return t ? `${t.prijmeni} (${t.klub || TEXTS.common.placeholderDash})` : "";
+}
+
+function hasConflict(trainerId, date, cls, hour, type){
+  return isTrainerBusy(trainerId, date, cls, hour, type);
+}
+
+function isTrainerBusyGlobal(trainerId, date, hour, type){
+  const source = type === "plan" ? plans : reality;
+  let activeKey = null;
+  let activeLegacyKey = null;
+
+  if(activeCell?.dataset.date && activeCell?.dataset.cls && activeCell?.dataset.hour){
+    const d = new Date(activeCell.dataset.date);
+    const cls = activeCell.dataset.cls;
+    const hour = Number(activeCell.dataset.hour);
+
+    activeKey = getKey(d, cls, hour);
+    activeLegacyKey = getLegacyKey(d, cls, hour);
+  }
+
+  return Object.entries(source).some(([key, value]) => {
+    if(!value) return false;
+    if(key === activeKey || key === activeLegacyKey) return false;
+
+    const id = typeof value === "object" ? value.trainerId : value;
+    if(id !== trainerId) return false;
+
+    const parsed = parseKey(key);
+    if(!parsed) return false;
+
+    return (
+      parsed.date === formatDate(date) &&
+      Number(parsed.hour) === Number(hour)
+    );
+  });
+}
+
+function isTrainerBusy(trainerId, date, cls, hour, type){
+  let targetDate = formatDate(date);
+  let targetYear = getSelectedYear();
+  let currentKey = getKey(date, cls, hour);
+  let legacyKey = getLegacyKey(date, cls, hour);
+  let store = type === "plan" ? plans : reality;
+
+  for(let key in store){
+    let item = parseKey(key);
+    if(
+      key !== currentKey &&
+      key !== legacyKey &&
+      item.date === targetDate &&
+      item.hour === hour &&
+      (item.year ? item.year === targetYear : true) &&
+      store[key] === trainerId
+    ){
+      return true;
+    }
+  }
+
+  return false;
+}
+
+function render(){
+  loadSchools();
+  renderTrainerPanel();
+
+  let mondayDate = getMonday(currentDate);
+  let fragment = document.createDocumentFragment();
+
+  let headerRow1 = document.createElement("tr");
+  let hourHeader = document.createElement("th");
+  hourHeader.rowSpan = 2;
+  hourHeader.className = "hour-cell";
+  hourHeader.textContent = TEXTS.schedule.hourShort;
+  headerRow1.appendChild(hourHeader);
+
+  let labelHeader = document.createElement("th");
+  labelHeader.rowSpan = 2;
+  headerRow1.appendChild(labelHeader);
+
+  for(let dayIndex = 0; dayIndex < 5; dayIndex++){
+    let dayDate = new Date(mondayDate);
+    dayDate.setDate(dayDate.getDate() + dayIndex);
+
+    let dayHeader = document.createElement("th");
+    dayHeader.colSpan = 4;
+    dayHeader.append(TEXTS.schedule.days[dayIndex], document.createElement("br"), dayDate.toLocaleDateString());
+    headerRow1.appendChild(dayHeader);
+  }
+
+  let headerRow2 = document.createElement("tr");
+  for(let dayIndex = 0; dayIndex < 5; dayIndex++){
+    classes.forEach(c => {
+      let classHeader = document.createElement("th");
+      classHeader.className = "class-header";
+      classHeader.textContent = c;
+      headerRow2.appendChild(classHeader);
+    });
+  }
+
+  fragment.appendChild(headerRow1);
+  fragment.appendChild(headerRow2);
+
+  for(let hour = 1; hour <= 8; hour++){
+    let rowP = document.createElement("tr");
+    rowP.className = "plan-row";
+
+    let hourCell = document.createElement("td");
+    hourCell.rowSpan = 2;
+    hourCell.textContent = hour;
+    rowP.appendChild(hourCell);
+
+    let planLabel = document.createElement("td");
+    planLabel.textContent = TEXTS.schedule.plan;
+    rowP.appendChild(planLabel);
+
+    let rowS = document.createElement("tr");
+    rowS.className = "real-row";
+
+    let realLabel = document.createElement("td");
+    realLabel.textContent = TEXTS.schedule.reality;
+    rowS.appendChild(realLabel);
+
+    for(let dayIndex = 0; dayIndex < 5; dayIndex++){
+      let dayDate = new Date(mondayDate);
+      dayDate.setDate(dayDate.getDate() + dayIndex);
+
+      classes.forEach((cls, classIndex) => {
+        let border = classIndex === 0 ? "day-border" : "";
+        let planValue = getStoredValue(plans, dayDate, cls, hour);
+        let realityValue = getStoredValue(reality, dayDate, cls, hour);
+        let planConflict = planValue && planValue !== "X" && isTrainerBusy(planValue, dayDate, cls, hour, "plan");
+        let realityConflict = realityValue && realityValue !== "X" && isTrainerBusy(realityValue, dayDate, cls, hour, "real");
+        let planGlobalConflict = planValue && planValue !== "X" && hasConflict(planValue, dayDate, cls, hour, "plan");
+        let realityGlobalConflict = realityValue && realityValue !== "X" && hasConflict(realityValue, dayDate, cls, hour, "real");
+        let planClass = ["active-cell", border, planValue === "X" ? "unavailable" : "", planGlobalConflict ? "conflict-global" : "", planConflict ? "conflict" : "", planConflict ? "conflict-plan" : ""].filter(Boolean).join(" ");
+        let realityClass = [border, realityValue === "X" ? "unavailable" : "", realityGlobalConflict ? "conflict-global" : "", realityConflict ? "conflict" : "", realityConflict ? "conflict-real" : ""].filter(Boolean).join(" ");
+
+        let planCell = document.createElement("td");
+        planCell.className = ["cell", planClass].filter(Boolean).join(" ");
+        planCell.dataset.schoolId = schoolSelect.value;
+        planCell.dataset.date = formatDate(dayDate);
+        planCell.dataset.cls = cls;
+        planCell.dataset.hour = String(hour);
+        planCell.dataset.type = "plan";
+        planCell.textContent = getName(planValue);
+        planCell.title = planConflict ? "Konflikt – trenér už je jinde" : "";
+        planCell.addEventListener("click", (event) => {
+          activeSchoolId = event.currentTarget.dataset.schoolId || schoolSelect.value;
+          renderTrainerPanel();
+          openMenu(event, new Date(dayDate), cls, hour, "plan");
+        });
+        planCell.addEventListener("dragover", (event) => {
+          event.preventDefault();
+        });
+        planCell.addEventListener("dragenter", () => {
+          planCell.classList.add("drag-over");
+        });
+        planCell.addEventListener("dragleave", () => {
+          planCell.classList.remove("drag-over");
+        });
+        planCell.addEventListener("drop", (event) => {
+          event.preventDefault();
+          planCell.classList.remove("drag-over");
+
+          let trainerId = event.dataTransfer.getData("text/plain");
+          if(!trainerId) return;
+
+          if(hasConflict(trainerId, dayDate, cls, hour, "plan")){
+            alert(TEXTS.schedule.conflict);
+            return;
+          }
+
+          plans[getKey(dayDate, cls, hour)] = trainerId;
+          localStorage.setItem("plans", JSON.stringify(plans));
+          render();
+        });
+        rowP.appendChild(planCell);
+
+        let realCell = document.createElement("td");
+        realCell.className = ["cell", realityClass].filter(Boolean).join(" ");
+        realCell.dataset.schoolId = schoolSelect.value;
+        realCell.dataset.date = formatDate(dayDate);
+        realCell.dataset.cls = cls;
+        realCell.dataset.hour = String(hour);
+        realCell.dataset.type = "real";
+        realCell.textContent = getName(realityValue);
+        realCell.title = realityConflict ? "Konflikt – trenér už je jinde" : "";
+        realCell.addEventListener("click", (event) => {
+          activeSchoolId = event.currentTarget.dataset.schoolId || schoolSelect.value;
+          renderTrainerPanel();
+          openMenu(event, new Date(dayDate), cls, hour, "real");
+        });
+        realCell.addEventListener("dragover", (event) => {
+          event.preventDefault();
+        });
+        realCell.addEventListener("dragenter", () => {
+          realCell.classList.add("drag-over");
+        });
+        realCell.addEventListener("dragleave", () => {
+          realCell.classList.remove("drag-over");
+        });
+        realCell.addEventListener("drop", (event) => {
+          event.preventDefault();
+          realCell.classList.remove("drag-over");
+
+          let trainerId = event.dataTransfer.getData("text/plain");
+          if(!trainerId) return;
+
+          if(hasConflict(trainerId, dayDate, cls, hour, "real")){
+            alert(TEXTS.schedule.conflict);
+            return;
+          }
+
+          reality[getKey(dayDate, cls, hour)] = trainerId;
+          localStorage.setItem("reality", JSON.stringify(reality));
+          render();
+        });
+        rowS.appendChild(realCell);
+      });
+    }
+
+    fragment.appendChild(rowP);
+    fragment.appendChild(rowS);
+  }
+
+  table.replaceChildren(fragment);
+}
+
+function copyWeek(){
+  let monday = getMonday(currentDate);
+
+  for(let d = 0; d < 5; d++){
+    let date = new Date(monday);
+    date.setDate(date.getDate() + d);
+
+    let next = new Date(date);
+    next.setDate(next.getDate() + 7);
+
+    for(let h = 1; h <= 8; h++){
+      classes.forEach(cls => {
+        let from = getStoredValue(plans, date, cls, h);
+        let to = getKey(next, cls, h);
+        if(from) plans[to] = from;
+      });
+    }
+  }
+
+  localStorage.setItem("plans", JSON.stringify(plans));
+  alert(TEXTS.schedule.copied);
+}
+
+window.changeWeek = changeWeek;
+window.copyWeek = copyWeek;
+window.goToday = goToday;
+window.openSchools = openSchools;
+window.openTrainers = openTrainers;
+window.render = render;
+
+trainerSearch.addEventListener("input", renderTrainerPanel);
+showAllTrainersButton.addEventListener("click", () => {
+  showAll = !showAll;
+  renderTrainerPanel();
+});
+
+init();
+
+</script>
+
+</body>
+</html>

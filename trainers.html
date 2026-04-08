@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<title>Trenéři</title>
+
+<style>
+body { font-family: Arial; padding:20px; }
+
+input { margin:2px; }
+
+table {
+  border-collapse: collapse;
+  margin-top:10px;
+}
+
+td, th {
+  border:1px solid #ccc;
+  padding:5px 10px;
+  text-align:left;
+}
+
+.col-name {
+  width:30ch;
+}
+
+.col-klub {
+  width:30ch;
+}
+
+tr.active { background:#ffeeba; }
+
+tr:hover {
+  background:#f5f5f5;
+  cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<h2 id="pageTitle"></h2>
+<a id="backLink" href="index.html"></a><br><br>
+
+<input id="jmeno">
+<input id="prijmeni">
+<input id="telefon">
+<input id="email">
+<input id="ico">
+
+<br>
+
+<input id="ulice">
+<input id="mesto">
+<input id="psc">
+
+<br>
+
+<input id="klub">
+
+<br>
+
+<input id="poznamka">
+
+<button id="saveButton" onclick="add()"></button>
+
+<h3 id="detailTitle"></h3>
+<div id="detail"></div>
+
+<h3 id="listTitle"></h3>
+<table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th id="nameHeader" class="col-name"></th>
+      <th id="clubHeader" class="col-klub"></th>
+    </tr>
+  </thead>
+  <tbody id="list"></tbody>
+</table>
+
+<script type="module">
+import { TEXTS } from "./texts.js";
+
+const pageTitle = document.getElementById("pageTitle");
+const backLink = document.getElementById("backLink");
+const jmeno = document.getElementById("jmeno");
+const prijmeni = document.getElementById("prijmeni");
+const telefon = document.getElementById("telefon");
+const email = document.getElementById("email");
+const ico = document.getElementById("ico");
+const ulice = document.getElementById("ulice");
+const mesto = document.getElementById("mesto");
+const psc = document.getElementById("psc");
+const klub = document.getElementById("klub");
+const poznamka = document.getElementById("poznamka");
+const saveButton = document.getElementById("saveButton");
+const detailTitle = document.getElementById("detailTitle");
+const detail = document.getElementById("detail");
+const listTitle = document.getElementById("listTitle");
+const nameHeader = document.getElementById("nameHeader");
+const clubHeader = document.getElementById("clubHeader");
+const list = document.getElementById("list");
+
+let trainers = JSON.parse(localStorage.getItem("trainers")) || [];
+let editId = null;
+let selectedId = null;
+
+function initStaticTexts(){
+  pageTitle.textContent = TEXTS.trainers.title;
+  backLink.textContent = "Zpět";
+  jmeno.placeholder = "Jméno";
+  prijmeni.placeholder = "Příjmení";
+  telefon.placeholder = TEXTS.common.phone;
+  email.placeholder = TEXTS.common.email;
+  ico.placeholder = TEXTS.common.ico;
+  ulice.placeholder = "Ulice";
+  mesto.placeholder = "Město";
+  psc.placeholder = "PSČ";
+  klub.placeholder = TEXTS.trainers.club;
+  poznamka.placeholder = TEXTS.common.note;
+  saveButton.textContent = "Uložit";
+  detailTitle.textContent = "Detail";
+  detail.textContent = TEXTS.trainers.detailPrompt;
+  listTitle.textContent = "Seznam";
+  nameHeader.textContent = TEXTS.trainers.title.slice(0, -2);
+  clubHeader.textContent = TEXTS.trainers.club;
+}
+
+function add(){
+  if(!jmeno.value || !prijmeni.value) return;
+
+  let obj = {
+    id: editId || Date.now().toString(),
+    jmeno: jmeno.value,
+    prijmeni: prijmeni.value,
+    telefon: telefon.value,
+    email: email.value,
+    ico: ico.value,
+    ulice: ulice.value,
+    mesto: mesto.value,
+    psc: psc.value,
+    klub: klub.value,
+    poznamka: poznamka.value
+  };
+
+  if(editId){
+    trainers = trainers.map(t => t.id === editId ? obj : t);
+  } else {
+    trainers.push(obj);
+  }
+
+  localStorage.setItem("trainers", JSON.stringify(trainers));
+  clearForm();
+  render();
+}
+
+function edit(id){
+  let t = trainers.find(t => t.id === id);
+  if(!t) return;
+
+  jmeno.value = t.jmeno || "";
+  prijmeni.value = t.prijmeni || "";
+  telefon.value = t.telefon || "";
+  email.value = t.email || "";
+  ico.value = t.ico || "";
+  ulice.value = t.ulice || "";
+  mesto.value = t.mesto || "";
+  psc.value = t.psc || "";
+  klub.value = t.klub || "";
+  poznamka.value = t.poznamka || "";
+
+  editId = id;
+}
+
+function remove(id){
+  if(!confirm(TEXTS.trainers.removeConfirm)) return;
+
+  trainers = trainers.filter(t => t.id !== id);
+  localStorage.setItem("trainers", JSON.stringify(trainers));
+
+  detail.textContent = TEXTS.trainers.detailPrompt;
+  selectedId = null;
+  render();
+}
+
+function appendDetailTextLine(parent, text){
+  parent.append(text, document.createElement("br"));
+}
+
+function showDetail(id){
+  let t = trainers.find(t => t.id === id);
+  if(!t) return;
+
+  selectedId = id;
+
+  let detailFragment = document.createDocumentFragment();
+
+  let title = document.createElement("b");
+  title.textContent = `${t.prijmeni} ${t.jmeno}`;
+  detailFragment.append(title, document.createElement("br"));
+
+  appendDetailTextLine(detailFragment, `${TEXTS.trainers.club}: ${t.klub || TEXTS.common.placeholderDash}`);
+  appendDetailTextLine(detailFragment, `${TEXTS.common.ico}: ${t.ico || TEXTS.common.placeholderDash}`);
+  appendDetailTextLine(detailFragment, `${TEXTS.common.phone}: ${t.telefon || TEXTS.common.placeholderDash}`);
+
+  detailFragment.append(`${TEXTS.common.email}: `);
+  if(t.email){
+    let emailLink = document.createElement("a");
+    emailLink.href = `mailto:${t.email}`;
+    emailLink.textContent = t.email;
+    detailFragment.append(emailLink);
+  } else {
+    detailFragment.append(TEXTS.common.placeholderDash);
+  }
+  detailFragment.append(document.createElement("br"));
+
+  appendDetailTextLine(detailFragment, `${TEXTS.common.address}: ${t.ulice || TEXTS.common.placeholderDash}, ${t.mesto || TEXTS.common.placeholderDash}, ${t.psc || TEXTS.common.placeholderDash}`);
+  appendDetailTextLine(detailFragment, `${TEXTS.common.note}: ${t.poznamka || TEXTS.common.placeholderDash}`);
+  detailFragment.append(document.createElement("br"));
+
+  let editButton = document.createElement("button");
+  editButton.textContent = TEXTS.common.edit;
+  editButton.addEventListener("click", () => edit(t.id));
+  detailFragment.appendChild(editButton);
+
+  let removeButton = document.createElement("button");
+  removeButton.textContent = TEXTS.common.unavailableSymbol;
+  removeButton.addEventListener("click", () => remove(t.id));
+  detailFragment.appendChild(removeButton);
+
+  detail.replaceChildren(detailFragment);
+  render();
+}
+
+function clearForm(){
+  jmeno.value = "";
+  prijmeni.value = "";
+  telefon.value = "";
+  email.value = "";
+  ico.value = "";
+  ulice.value = "";
+  mesto.value = "";
+  psc.value = "";
+  klub.value = "";
+  poznamka.value = "";
+  editId = null;
+}
+
+function render(){
+  let listFragment = document.createDocumentFragment();
+
+  trainers
+    .sort((a, b) => {
+      if(a.prijmeni < b.prijmeni) return -1;
+      if(a.prijmeni > b.prijmeni) return 1;
+      return a.jmeno.localeCompare(b.jmeno);
+    })
+    .forEach((t, i) => {
+      let row = document.createElement("tr");
+      if(t.id === selectedId) row.className = "active";
+      row.addEventListener("click", () => showDetail(t.id));
+
+      let orderCell = document.createElement("td");
+      orderCell.textContent = i + 1;
+      row.appendChild(orderCell);
+
+      let nameCell = document.createElement("td");
+      nameCell.className = "col-name";
+      nameCell.textContent = `${t.prijmeni} ${t.jmeno}`;
+      row.appendChild(nameCell);
+
+      let clubCell = document.createElement("td");
+      clubCell.className = "col-klub";
+      clubCell.textContent = t.klub || TEXTS.common.placeholderDash;
+      row.appendChild(clubCell);
+
+      listFragment.appendChild(row);
+    });
+
+  list.replaceChildren(listFragment);
+}
+
+window.add = add;
+
+initStaticTexts();
+render();
+
+</script>
+
+</body>
+</html>

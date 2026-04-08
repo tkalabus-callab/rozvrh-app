@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<title>Školy</title>
+
+<style>
+body { font-family: Arial; padding:20px; }
+
+input { margin:2px; width:180px; }
+
+.favorite-trainers {
+  margin:12px 0;
+  padding:10px;
+  border:1px solid #ccc;
+  max-width:760px;
+}
+
+.favorite-trainers-title {
+  font-weight:bold;
+  margin-bottom:8px;
+}
+
+.favorite-trainers-list {
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px 14px;
+}
+
+.favorite-trainer-item {
+  display:flex;
+  align-items:center;
+  gap:6px;
+  min-width:220px;
+}
+
+table {
+  border-collapse: collapse;
+  margin-top:10px;
+}
+
+td, th {
+  border:1px solid #ccc;
+  padding:5px 10px;
+  text-align:left;
+}
+
+.col-name { width:40ch; }
+.col-city { width:25ch; }
+
+tr.active { background:#ffeeba; }
+
+tr:hover {
+  background:#f5f5f5;
+  cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<h2 id="pageTitle"></h2>
+<a id="backLink" href="index.html"></a><br><br>
+
+<input id="nazev">
+<input id="ulice">
+<input id="mesto">
+<input id="psc">
+<br>
+<input id="ico">
+<input id="kontakt">
+<input id="email">
+<input id="telefon">
+<br>
+<input id="poznamka" style="width:370px">
+
+<div id="favoriteTrainersBox" class="favorite-trainers">
+  <div id="favoriteTrainersTitle" class="favorite-trainers-title"></div>
+  <div id="favoriteTrainersList" class="favorite-trainers-list"></div>
+</div>
+
+<br><br>
+<button id="saveButton" onclick="add()"></button>
+
+<h3 id="detailTitle"></h3>
+<div id="detail"></div>
+
+<h3 id="listTitle"></h3>
+<table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th id="nameHeader" class="col-name"></th>
+      <th id="cityHeader" class="col-city"></th>
+    </tr>
+  </thead>
+  <tbody id="list"></tbody>
+</table>
+
+<script type="module">
+import { TEXTS } from "./texts.js";
+
+const pageTitle = document.getElementById("pageTitle");
+const backLink = document.getElementById("backLink");
+const nazev = document.getElementById("nazev");
+const ulice = document.getElementById("ulice");
+const mesto = document.getElementById("mesto");
+const psc = document.getElementById("psc");
+const ico = document.getElementById("ico");
+const kontakt = document.getElementById("kontakt");
+const email = document.getElementById("email");
+const telefon = document.getElementById("telefon");
+const poznamka = document.getElementById("poznamka");
+const favoriteTrainersTitle = document.getElementById("favoriteTrainersTitle");
+const favoriteTrainersList = document.getElementById("favoriteTrainersList");
+const saveButton = document.getElementById("saveButton");
+const detailTitle = document.getElementById("detailTitle");
+const detail = document.getElementById("detail");
+const listTitle = document.getElementById("listTitle");
+const nameHeader = document.getElementById("nameHeader");
+const cityHeader = document.getElementById("cityHeader");
+const list = document.getElementById("list");
+
+let schools = JSON.parse(localStorage.getItem("schools")) || [];
+let editId = null;
+let selectedId = null;
+
+function normalizeSchool(school){
+  return {
+    ...school,
+    favoriteTrainers: school.favoriteTrainers || []
+  };
+}
+
+function normalizeSchools(items){
+  return items.map(normalizeSchool);
+}
+
+schools = normalizeSchools(schools);
+
+function loadTrainers(){
+  try {
+    return JSON.parse(localStorage.getItem("trainers")) || [];
+  } catch {
+    return [];
+  }
+}
+
+function initStaticTexts(){
+  pageTitle.textContent = TEXTS.schools.title;
+  backLink.textContent = "Zpět";
+  nazev.placeholder = "Název školy";
+  ulice.placeholder = "Ulice";
+  mesto.placeholder = "Město";
+  psc.placeholder = "PSČ";
+  ico.placeholder = TEXTS.common.ico;
+  kontakt.placeholder = `${TEXTS.schools.contact}ní osoba`;
+  email.placeholder = TEXTS.common.email;
+  telefon.placeholder = TEXTS.common.phone;
+  poznamka.placeholder = TEXTS.common.note;
+  saveButton.textContent = "Uložit";
+  detailTitle.textContent = "Detail";
+  detail.textContent = TEXTS.schools.detailPrompt;
+  listTitle.textContent = "Seznam";
+  nameHeader.textContent = "Název školy";
+  cityHeader.textContent = "Město";
+}
+
+favoriteTrainersTitle.textContent = TEXTS.schools.favoriteTrainers;
+
+function getSelectedFavoriteTrainerIds(){
+  return Array.from(
+    favoriteTrainersList.querySelectorAll('input[type="checkbox"]:checked')
+  ).map(input => input.value);
+}
+
+function updateFavoriteTrainerLimitState(){
+  const checked = favoriteTrainersList.querySelectorAll('input[type="checkbox"]:checked');
+  const unchecked = favoriteTrainersList.querySelectorAll('input[type="checkbox"]:not(:checked)');
+  const limitReached = checked.length >= 10;
+
+  unchecked.forEach(input => {
+    input.disabled = limitReached;
+  });
+}
+
+function renderFavoriteTrainerOptions(selectedIds = []){
+  let trainers = loadTrainers();
+  let fragment = document.createDocumentFragment();
+
+  trainers
+    .slice()
+    .sort((a, b) => {
+      if(a.prijmeni < b.prijmeni) return -1;
+      if(a.prijmeni > b.prijmeni) return 1;
+      return (a.jmeno || "").localeCompare(b.jmeno || "");
+    })
+    .forEach(trainer => {
+      let label = document.createElement("label");
+      label.className = "favorite-trainer-item";
+
+      let checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.value = trainer.id;
+      checkbox.checked = selectedIds.includes(trainer.id);
+      label.appendChild(checkbox);
+
+      let text = document.createElement("span");
+      text.textContent = `${trainer.prijmeni} ${trainer.jmeno}`;
+      label.appendChild(text);
+
+      fragment.appendChild(label);
+    });
+
+  favoriteTrainersList.replaceChildren(fragment);
+  updateFavoriteTrainerLimitState();
+
+  let firstChecked = favoriteTrainersList.querySelector('input[type="checkbox"]:checked');
+  if(firstChecked){
+    firstChecked.scrollIntoView({ block: "nearest" });
+  }
+}
+
+favoriteTrainersList.addEventListener("change", (e) => {
+  if(e.target.type !== "checkbox") return;
+
+  const checked = favoriteTrainersList.querySelectorAll('input[type="checkbox"]:checked');
+
+  if(checked.length > 10){
+    e.target.checked = false;
+    alert("Maximálně 10 trenérů");
+  }
+
+  updateFavoriteTrainerLimitState();
+});
+
+function add(){
+  if(!nazev.value) return;
+
+  let obj = {
+    id: editId || Date.now().toString(),
+    nazev: nazev.value,
+    ulice: ulice.value,
+    mesto: mesto.value,
+    psc: psc.value,
+    ico: ico.value,
+    kontakt: kontakt.value,
+    email: email.value,
+    telefon: telefon.value,
+    poznamka: poznamka.value,
+    favoriteTrainers: getSelectedFavoriteTrainerIds()
+  };
+
+  if(editId){
+    schools = schools.map(s => s.id === editId ? obj : s);
+  } else {
+    schools.push(obj);
+  }
+
+  localStorage.setItem("schools", JSON.stringify(schools));
+  clearForm();
+  render();
+}
+
+function edit(id){
+  let s = schools.find(s => s.id === id);
+  if(!s) return;
+
+  nazev.value = s.nazev || "";
+  ulice.value = s.ulice || "";
+  mesto.value = s.mesto || "";
+  psc.value = s.psc || "";
+  ico.value = s.ico || "";
+  kontakt.value = s.kontakt || "";
+  email.value = s.email || "";
+  telefon.value = s.telefon || "";
+  poznamka.value = s.poznamka || "";
+  renderFavoriteTrainerOptions(s.favoriteTrainers || []);
+
+  editId = id;
+}
+
+function remove(id){
+  if(!confirm(TEXTS.schools.removeConfirm)) return;
+
+  schools = schools.filter(s => s.id !== id);
+  localStorage.setItem("schools", JSON.stringify(schools));
+
+  detail.textContent = TEXTS.schools.detailPrompt;
+  selectedId = null;
+  render();
+}
+
+function appendDetailTextLine(parent, text){
+  parent.append(text, document.createElement("br"));
+}
+
+function showDetail(id){
+  let s = schools.find(s => s.id === id);
+  if(!s) return;
+
+  selectedId = id;
+
+  let detailFragment = document.createDocumentFragment();
+
+  let title = document.createElement("b");
+  title.textContent = s.nazev;
+  detailFragment.append(title, document.createElement("br"));
+
+  appendDetailTextLine(detailFragment, `${TEXTS.common.address}: ${s.ulice || TEXTS.common.placeholderDash}, ${s.mesto || TEXTS.common.placeholderDash}, ${s.psc || TEXTS.common.placeholderDash}`);
+  appendDetailTextLine(detailFragment, `${TEXTS.common.ico}: ${s.ico || TEXTS.common.placeholderDash}`);
+  appendDetailTextLine(detailFragment, `${TEXTS.schools.contact}: ${s.kontakt || TEXTS.common.placeholderDash}`);
+  appendDetailTextLine(detailFragment, `${TEXTS.common.phone}: ${s.telefon || TEXTS.common.placeholderDash}`);
+
+  detailFragment.append(`${TEXTS.common.email}: `);
+  if(s.email){
+    let emailLink = document.createElement("a");
+    emailLink.href = `mailto:${s.email}`;
+    emailLink.textContent = s.email;
+    detailFragment.append(emailLink);
+  } else {
+    detailFragment.append(TEXTS.common.placeholderDash);
+  }
+  detailFragment.append(document.createElement("br"));
+
+  appendDetailTextLine(detailFragment, `${TEXTS.common.note}: ${s.poznamka || TEXTS.common.placeholderDash}`);
+  detailFragment.append(document.createElement("br"));
+
+  let favoriteTrainerNames = loadTrainers()
+    .filter(trainer => (s.favoriteTrainers || []).includes(trainer.id))
+    .map(trainer => `${trainer.prijmeni} ${trainer.jmeno}`);
+  appendDetailTextLine(
+    detailFragment,
+    `${TEXTS.schools.favoriteTrainers}: ${favoriteTrainerNames.length ? favoriteTrainerNames.join(", ") : TEXTS.common.placeholderDash}`
+  );
+  detailFragment.append(document.createElement("br"));
+
+  let editButton = document.createElement("button");
+  editButton.textContent = TEXTS.common.edit;
+  editButton.addEventListener("click", () => edit(s.id));
+  detailFragment.appendChild(editButton);
+
+  let removeButton = document.createElement("button");
+  removeButton.textContent = TEXTS.common.unavailableSymbol;
+  removeButton.addEventListener("click", () => remove(s.id));
+  detailFragment.appendChild(removeButton);
+
+  detail.replaceChildren(detailFragment);
+  render();
+}
+
+function clearForm(){
+  nazev.value = "";
+  ulice.value = "";
+  mesto.value = "";
+  psc.value = "";
+  ico.value = "";
+  kontakt.value = "";
+  email.value = "";
+  telefon.value = "";
+  poznamka.value = "";
+  renderFavoriteTrainerOptions([]);
+  editId = null;
+}
+
+function render(){
+  let listFragment = document.createDocumentFragment();
+
+  schools
+    .sort((a, b) => a.nazev.localeCompare(b.nazev))
+    .forEach((s, i) => {
+      let row = document.createElement("tr");
+      if(s.id === selectedId) row.className = "active";
+      row.addEventListener("click", () => showDetail(s.id));
+
+      let orderCell = document.createElement("td");
+      orderCell.textContent = i + 1;
+      row.appendChild(orderCell);
+
+      let nameCell = document.createElement("td");
+      nameCell.className = "col-name";
+      nameCell.textContent = s.nazev;
+      row.appendChild(nameCell);
+
+      let cityCell = document.createElement("td");
+      cityCell.className = "col-city";
+      cityCell.textContent = s.mesto || TEXTS.common.placeholderDash;
+      row.appendChild(cityCell);
+
+      listFragment.appendChild(row);
+    });
+
+  list.replaceChildren(listFragment);
+}
+
+window.add = add;
+
+initStaticTexts();
+renderFavoriteTrainerOptions([]);
+render();
+
+</script>
+
+</body>
+</html>
