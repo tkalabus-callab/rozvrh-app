@@ -186,6 +186,11 @@ td, th {
 <button id="schoolsButton" onclick="openSchools()"></button>
 <button id="trainersButton" onclick="openTrainers()">Trenéři</button>
 
+<div style="margin-top:12px;">
+  <label for="managerSelect">Manažer:</label>
+  <select id="managerSelect"></select>
+</div>
+
 <div class="trainer-toolbar">
   <input id="trainerSearch" class="trainer-search">
   <button id="showAllTrainersButton" class="trainer-toggle" type="button"></button>
@@ -195,6 +200,7 @@ td, th {
 
 <script type="module">
 import { TEXTS } from "./texts.js";
+import { loadManagers, createManager, getManagerById } from "./managers.js";
 
 const pageTitle = document.getElementById("pageTitle");
 const schoolHeader = document.getElementById("schoolHeader");
@@ -211,6 +217,7 @@ const copyWeekButton = document.getElementById("copyWeekButton");
 const todayButton = document.getElementById("todayButton");
 const schoolsButton = document.getElementById("schoolsButton");
 const trainersButton = document.getElementById("trainersButton");
+const managerSelect = document.getElementById("managerSelect");
 const trainerSearch = document.getElementById("trainerSearch");
 const showAllTrainersButton = document.getElementById("showAllTrainersButton");
 const trainerPanel = document.getElementById("trainerPanel");
@@ -232,6 +239,7 @@ let classes = ["A","B","C","D"];
 let currentDate = new Date();
 let showAll = false;
 let activeSchoolId = "";
+let selectedManagerId = "";
 
 let menu = null;
 let activeCell = null;
@@ -296,11 +304,43 @@ function initStaticTexts(){
 
 function init(){
   initStaticTexts();
+  initManagers();
   loadSchools();
   activeSchoolId = schoolSelect.value;
   updateWeekInfo();
   dateInput.onchange = onDateChange;
   render();
+}
+
+function initManagers(){
+  let managerItems = loadManagers();
+
+  if(managerItems.length === 0){
+    createManager({ name: "Demo školník", schoolIds: [] });
+    managerItems = loadManagers();
+  }
+
+  managerSelect.replaceChildren();
+
+  managerItems.forEach(manager => {
+    let option = document.createElement("option");
+    option.value = manager.id;
+    option.textContent = manager.name || "-";
+    managerSelect.appendChild(option);
+  });
+
+  selectedManagerId = managerSelect.value || "";
+  logSelectedManager();
+}
+
+function logSelectedManager(){
+  if(!selectedManagerId){
+    console.log("Vybraný manažer:", null);
+    return;
+  }
+
+  const selectedManager = getManagerById(selectedManagerId);
+  console.log("Vybraný manažer:", selectedManager);
 }
 
 function loadSchools(){
@@ -341,6 +381,11 @@ schoolSelect.onchange = () => {
   activeSchoolId = schoolSelect.value;
   updateSchoolUI();
   renderTrainerPanel();
+};
+
+managerSelect.onchange = () => {
+  selectedManagerId = managerSelect.value;
+  logSelectedManager();
 };
 
 function getSelectedSchool(){
