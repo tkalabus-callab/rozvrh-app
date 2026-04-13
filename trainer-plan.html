@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<title>Plán trenéra</title>
+<style>
+.day-block {
+  margin-bottom: 12px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.day-title {
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+#trainerPlanActions {
+  display: flex;
+  gap: 8px;
+  margin: 12px 0;
+  flex-wrap: wrap;
+}
+</style>
+</head>
+<body>
+
+<h1>Plán trenéra</h1>
+<div id="trainerPlanHeader"></div>
+<div id="trainerPlanActions">
+  <button id="exportTrainerPlanPdfButton" type="button">Export PDF</button>
+  <button id="exportTrainerPlanExcelButton" type="button">Export Excel</button>
+  <button id="emailTrainerPlanButton" type="button">Poslat e-mailem</button>
+  <button id="backToScheduleButton" type="button">Zpět do rozvrhu</button>
+</div>
+<div id="trainerPlanContent"></div>
+
+<script>
+const trainerPlanHeader = document.getElementById("trainerPlanHeader");
+const trainerPlanContent = document.getElementById("trainerPlanContent");
+const exportTrainerPlanExcelButton = document.getElementById("exportTrainerPlanExcelButton");
+const backToScheduleButton = document.getElementById("backToScheduleButton");
+
+function formatDate(date){
+  return new Date(date).toISOString().split("T")[0];
+}
+
+function normalizeDateKey(date){
+  return formatDate(date);
+}
+
+function getMonday(date){
+  const value = new Date(date);
+  const day = value.getDay();
+  const diff = value.getDate() - day + (day === 0 ? -6 : 1);
+  return new Date(value.setDate(diff));
+}
+
+function getWeekRange(anchorDate){
+  const start = getMonday(anchorDate);
+  const end = new Date(start);
+  end.setDate(end.getDate() + 6);
+  return { start, end };
+}
+
+function getMonthRange(anchorDate){
+  const value = new Date(anchorDate);
+  const start = new Date(value.getFullYear(), value.getMonth(), 1);
+  const end = new Date(value.getFullYear(), value.getMonth() + 1, 0);
+  return { start, end };
+}
+
+function isDateInRange(dateStr, start, end){
+  const value = normalizeDateKey(dateStr);
+  return value >= normalizeDateKey(start) && value <= normalizeDateKey(end);
+}
+
+function load(key, fallback){
+  try {
+    const data = localStorage.getItem(key);
+    return data ? JSON.parse(data) : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function parseKey(key){
+  const parts = key.split("_");
+
+  if(parts.length === 4){
+    const [date, year, cls, hour] = parts;
+    return { date, year, cls, hour: Number(hour) };
+  }
+
+  const [date, cls, hour] = parts;
+  return { date, year: null, cls, hour: Number(hour) };
+}
+
+function getTrainerById(trainerId){
+  return load("trainers", []).find(trainer => String(trainer.id) === String(trainerId)) || null;
+}
+
+function getSchoolById(schoolId){
+  return load("schools", []).find(school => String(school.id) === String(schoolId)) || null;
+}
+
+function getStoredTrainerId(value){
+  return value && typeof value === "object" ? value.trainerId : value;
+}
+
+function normalizePlanEntry(key, value){
+  const parsed = parseKey(key);
+  const isObjectValue = !!value && typeof value === "object";
+
+  return {
+    trainerId: getStoredTrainerId(value),
+    schoolId: isObjectValue ? String(value.schoolId ?? "") : "",
+    date: isObjectValue ? value.date || parsed.date : parsed.date,
+    year: isObjectValue ? value.year || parsed.year || "" : parsed.year || "",
+    className: isObjectValue ? value.className || parsed.cls : parsed.cls,
+    hour: isObjectValue ? Number(value.hour ?? parsed.hour) : parsed.hour
+  };
+}
+
+function getTrainerPlanEntriesForPeriod(trainerId, periodType, anchorDate){
+  const plans = load("plans", {});
+  const range = periodType === "month"
+    ? getMonthRange(anchorDate)
+    : getWeekRange(anchorDate);
+
+  return Object.entries(plans)
+    .map(([key, value]) => {
+      const entry = normalizePlanEntry(key, value);
+
+      if(String(entry.trainerId) !== String(trainerId)) return null;
+      if(!entry.date || !isDateInRange(entry.date, range.start, range.end)) return null;
+
+      return {
+        date: entry.date,
+        schoolId: entry.schoolId,
+        year: entry.year,
+        className: entry.className,
+        hour: entry.hour
+      };
+    })
+    .filter(Boolean)
+    .sort((a, b) => {
+      if(a.date !== b.date) return a.date.localeCompare(b.date);
+      if(Number(a.hour) !== Number(b.hour)) return Number(a.hour) - Number(b.hour);
+      return String(a.className).localeCompare(String(b.className));
+    });
+}
+
+function sanitizeCsvValue(value){
+  return String(value ?? "-")
+    .replace(/"/g, "\"\"")
+    .replace(/\r?\n/g, " ");
+}
+
+function sanitizeFileNamePart(value, fallback){
+  return String(value || fallback || "value")
+    .replace(/[<>:"/\\|?*\x00-\x1F]/g, "-")
+    .trim() || fallback || "value";
+}
+
+function exportTrainerPlanCsv(){
+  const params = new URLSearchParams(window.location.search);
+  const trainerId = params.get("trainerId") || "unknown";
+  const periodType = params.get("periodType") || "week";
+  const periodDate = params.get("periodDate") || "unknown";
+  const entries = getTrainerPlanEntriesForPeriod(trainerId, periodType, periodDate);
+  const rows = [
+    "Datum;Hodina;Škola;Ročník;Třída",
+    ...entries.map(entry => {
+      const school = getSchoolById(entry.schoolId);
+      const values = [
+        entry.date || "-",
+        entry.hour || "-",
+        school?.nazev || "-",
+        entry.year || "-",
+        entry.className || "-"
+      ];
+
+      return values.map(value => `"${sanitizeCsvValue(value)}"`).join(";");
+    })
+  ];
+  const csvContent = "\uFEFF" + rows.join("\r\n");
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  const fileName = `trainer-plan-${sanitizeFileNamePart(trainerId, "unknown")}-${sanitizeFileNamePart(periodType, "week")}-${sanitizeFileNamePart(periodDate, "unknown")}.csv`;
+
+  link.href = url;
+  link.download = fileName;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
+function renderTrainerPlanPage(){
+  const params = new URLSearchParams(window.location.search);
+  const trainerId = params.get("trainerId") || "";
+  const periodType = params.get("periodType") || "week";
+  const periodDate = params.get("periodDate") || "";
+  const trainer = getTrainerById(trainerId);
+
+  if(!trainer){
+    trainerPlanHeader.textContent = "";
+    trainerPlanContent.textContent = "Trenér nebyl nalezen.";
+    return;
+  }
+
+  if(!periodDate){
+    trainerPlanHeader.textContent = "";
+    trainerPlanContent.textContent = "Chybí datum období.";
+    return;
+  }
+
+  const trainerName = `${trainer.jmeno || ""} ${trainer.prijmeni || ""}`.trim() || trainer.name || "-";
+  const periodDateValue = new Date(periodDate);
+  const weekRange = getWeekRange(periodDate);
+  const periodLabel = periodType === "month"
+    ? `${String(periodDateValue.getMonth() + 1).padStart(2, "0")}/${periodDateValue.getFullYear()}`
+    : `týden ${weekRange.start.toLocaleDateString("cs-CZ")} - ${weekRange.end.toLocaleDateString("cs-CZ")}`;
+
+  trainerPlanHeader.innerHTML = `<strong>${trainerName}</strong><br>Období: ${periodLabel}`;
+
+  const entries = getTrainerPlanEntriesForPeriod(trainerId, periodType, periodDate);
+
+  if(!entries.length){
+    trainerPlanContent.textContent = "Pro zvolené období nebyl nalezen žádný plán.";
+    return;
+  }
+
+  const parts = [];
+  let currentDayLines = [];
+  let lastDate = "";
+
+  entries.forEach(entry => {
+    if(entry.date !== lastDate){
+      if(lastDate){
+        parts.push(`<div class="day-block"><div class="day-title">${new Date(lastDate).toLocaleDateString("cs-CZ")}</div>${currentDayLines.join("")}</div>`);
+      }
+      currentDayLines = [];
+      lastDate = entry.date;
+    }
+
+    const school = getSchoolById(entry.schoolId);
+    currentDayLines.push(`<div>${entry.hour}. hodina - ${school?.nazev || "-"} - ročník ${entry.year || "-"} - třída ${entry.className || "-"}</div>`);
+  });
+
+  if(lastDate){
+    parts.push(`<div class="day-block"><div class="day-title">${new Date(lastDate).toLocaleDateString("cs-CZ")}</div>${currentDayLines.join("")}</div>`);
+  }
+
+  trainerPlanContent.innerHTML = parts.join("");
+}
+
+renderTrainerPlanPage();
+
+exportTrainerPlanExcelButton.addEventListener("click", exportTrainerPlanCsv);
+
+backToScheduleButton.addEventListener("click", () => {
+  window.location.href = "index.html";
+});
+</script>
+
+</body>
+</html>
+

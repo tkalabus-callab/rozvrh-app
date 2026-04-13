@@ -48,10 +48,10 @@ td, th {
 .col-name { width:40ch; }
 .col-city { width:25ch; }
 
-tr.active { background:#ffeeba; }
+tr.active { background:#ffeeba !important; }
 
 tr:hover {
-  background:#f5f5f5;
+  background:#f5f5f5 !important;
   cursor:pointer;
 }
 </style>
@@ -60,7 +60,9 @@ tr:hover {
 <body>
 
 <h2 id="pageTitle"></h2>
-<a id="backLink" href="index.html"></a><br><br>
+<a id="backLink" href="index.html"></a>
+ |
+<a href="caretakers.html">Školníci</a><br><br>
 
 <input id="nazev">
 <input id="ulice">
@@ -72,6 +74,9 @@ tr:hover {
 <input id="email">
 <input id="telefon">
 <br>
+<label for="assignedCaretakerId">Školník</label>
+<select id="assignedCaretakerId"></select>
+<br>
 <input id="poznamka" style="width:370px">
 
 <div id="favoriteTrainersBox" class="favorite-trainers">
@@ -81,16 +86,21 @@ tr:hover {
 
 <br><br>
 <button id="saveButton" onclick="add()"></button>
+<button id="removeCaretakerButton">Odebrat školníka</button>
 
 <h3 id="detailTitle"></h3>
 <div id="detail"></div>
 
 <h3 id="listTitle"></h3>
+<label for="caretakerFilterSelect">Filtr školník</label>
+<select id="caretakerFilterSelect"></select>
+<br><br>
 <table>
   <thead>
     <tr>
       <th>#</th>
       <th id="nameHeader" class="col-name"></th>
+      <th>Školník</th>
       <th id="cityHeader" class="col-city"></th>
     </tr>
   </thead>
@@ -110,13 +120,16 @@ const ico = document.getElementById("ico");
 const kontakt = document.getElementById("kontakt");
 const email = document.getElementById("email");
 const telefon = document.getElementById("telefon");
+const assignedCaretakerId = document.getElementById("assignedCaretakerId");
 const poznamka = document.getElementById("poznamka");
 const favoriteTrainersTitle = document.getElementById("favoriteTrainersTitle");
 const favoriteTrainersList = document.getElementById("favoriteTrainersList");
 const saveButton = document.getElementById("saveButton");
+const removeCaretakerButton = document.getElementById("removeCaretakerButton");
 const detailTitle = document.getElementById("detailTitle");
 const detail = document.getElementById("detail");
 const listTitle = document.getElementById("listTitle");
+const caretakerFilterSelect = document.getElementById("caretakerFilterSelect");
 const nameHeader = document.getElementById("nameHeader");
 const cityHeader = document.getElementById("cityHeader");
 const list = document.getElementById("list");
@@ -129,7 +142,8 @@ function normalizeSchool(school){
   return {
     ...school,
     favoriteTrainers: school.favoriteTrainers || [],
-    assignedTrainerId: school.assignedTrainerId ?? null
+    assignedTrainerId: school.assignedTrainerId ?? null,
+    assignedCaretakerId: school.assignedCaretakerId || ""
   };
 }
 
@@ -145,6 +159,49 @@ function loadTrainers(){
   } catch {
     return [];
   }
+}
+
+function loadCaretakers(){
+  try {
+    return JSON.parse(localStorage.getItem("caretakers") || "[]");
+  } catch {
+    return [];
+  }
+}
+
+function getCaretakerNameById(caretakerId){
+  if (!caretakerId) return "Bez školníka";
+
+  const caretakers = loadCaretakers();
+  const item = caretakers.find(c => String(c.id) === String(caretakerId));
+
+  if (!item) return "Bez školníka";
+
+  const fullName = `${item.prijmeni || ""} ${item.jmeno || ""}`.trim();
+  return fullName || item.name || "Bez školníka";
+}
+
+function getCaretakerColorById(caretakerId){
+  if (!caretakerId) return "#ddd";
+
+  const caretakers = loadCaretakers();
+  const item = caretakers.find(c => String(c.id) === String(caretakerId));
+
+  return item?.color || "#ddd";
+}
+
+function lightenColor(hex, amount = 0.85){
+  if (!hex || hex.length < 7) return "";
+
+  const r = parseInt(hex.substring(1,3),16);
+  const g = parseInt(hex.substring(3,5),16);
+  const b = parseInt(hex.substring(5,7),16);
+
+  const newR = Math.round(r + (255 - r) * amount);
+  const newG = Math.round(g + (255 - g) * amount);
+  const newB = Math.round(b + (255 - b) * amount);
+
+  return `rgb(${newR}, ${newG}, ${newB})`;
 }
 
 function initStaticTexts(){
@@ -222,6 +279,110 @@ function renderFavoriteTrainerOptions(selectedIds = []){
   }
 }
 
+function renderCaretakerSelect(selectedId = ""){
+  const select = document.getElementById("assignedCaretakerId");
+  if (!select) return;
+
+  const caretakers = loadCaretakers();
+  select.innerHTML = "";
+
+  const emptyOption = document.createElement("option");
+  emptyOption.value = "";
+  emptyOption.textContent = "Bez školníka";
+  select.appendChild(emptyOption);
+
+  caretakers.forEach(caretaker => {
+    const option = document.createElement("option");
+    option.value = String(caretaker.id);
+
+    const surname = caretaker.prijmeni || "";
+    const name = caretaker.jmeno || "";
+    const fullName = `${surname} ${name}`.trim();
+
+    option.textContent = fullName || caretaker.name || "-";
+    option.selected = String(selectedId || "") === String(caretaker.id);
+    select.appendChild(option);
+  });
+}
+
+function renderCaretakerFilter(){
+  const select = document.getElementById("caretakerFilterSelect");
+  if (!select) return;
+
+  const caretakers = loadCaretakers();
+  select.innerHTML = "";
+
+  const allOption = document.createElement("option");
+  allOption.value = "";
+  allOption.textContent = "Všichni školníci";
+  select.appendChild(allOption);
+
+  caretakers.forEach(c => {
+    const option = document.createElement("option");
+    option.value = String(c.id);
+
+    const fullName = `${c.prijmeni || ""} ${c.jmeno || ""}`.trim();
+    option.textContent = fullName || c.name || "-";
+
+    select.appendChild(option);
+  });
+}
+
+function applyIncomingCaretakerFilter(){
+  const select = document.getElementById("caretakerFilterSelect");
+  if (!select) return;
+
+  const incomingId = localStorage.getItem("schoolsCaretakerFilter");
+  if (!incomingId) return;
+
+  const exists = Array.from(select.options).some(option => String(option.value) === String(incomingId));
+  if (exists) {
+    select.value = String(incomingId);
+  }
+
+  localStorage.removeItem("schoolsCaretakerFilter");
+}
+
+function sortSchools(items){
+  return items.slice().sort((a, b) => a.nazev.localeCompare(b.nazev));
+}
+
+function assignSchoolToCaretaker(schoolId, caretakerId){
+  const index = schools.findIndex(s => s.id === schoolId);
+  if (index === -1) return;
+
+  schools[index].assignedCaretakerId = caretakerId || "";
+  localStorage.setItem("schools", JSON.stringify(schools));
+
+  if (selectedId === schoolId) {
+    showDetail(schoolId);
+  } else {
+    render();
+  }
+}
+
+function highlightGroup(headerRow){
+  let next = headerRow.nextElementSibling;
+
+  headerRow.style.background = "#cfe2ff";
+
+  while (next && !next.dataset.groupHeader) {
+    next.style.background = "#e7f1ff";
+    next = next.nextElementSibling;
+  }
+}
+
+function clearHighlight(headerRow){
+  let next = headerRow.nextElementSibling;
+
+  headerRow.style.background = getCaretakerColorById(headerRow.dataset.caretakerId || "");
+
+  while (next && !next.dataset.groupHeader) {
+    next.style.background = "";
+    next = next.nextElementSibling;
+  }
+}
+
 favoriteTrainersList.addEventListener("change", (e) => {
   if(e.target.type !== "checkbox") return;
 
@@ -254,7 +415,8 @@ function add(){
     telefon: telefon.value,
     poznamka: poznamka.value,
     favoriteTrainers: getSelectedFavoriteTrainerIds(),
-    assignedTrainerId: existingSchool?.assignedTrainerId ?? null
+    assignedTrainerId: existingSchool?.assignedTrainerId ?? null,
+    assignedCaretakerId: document.getElementById("assignedCaretakerId")?.value || ""
   };
 
   if(editId){
@@ -282,8 +444,23 @@ function edit(id){
   telefon.value = s.telefon || "";
   poznamka.value = s.poznamka || "";
   renderFavoriteTrainerOptions(s.favoriteTrainers || []);
+  renderCaretakerSelect(s.assignedCaretakerId || "");
 
   editId = id;
+}
+
+function removeCaretakerFromSchool(){
+  if(!editId) return;
+
+  const index = schools.findIndex(s => s.id === editId);
+  if(index === -1) return;
+
+  schools[index].assignedCaretakerId = "";
+
+  localStorage.setItem("schools", JSON.stringify(schools));
+
+  showDetail(editId);
+  render();
 }
 
 function remove(id){
@@ -364,19 +541,81 @@ function clearForm(){
   kontakt.value = "";
   email.value = "";
   telefon.value = "";
+  assignedCaretakerId.value = "";
   poznamka.value = "";
   renderFavoriteTrainerOptions([]);
+  renderCaretakerSelect("");
   editId = null;
 }
 
 function render(){
   let listFragment = document.createDocumentFragment();
+  const selectedCaretakerId = document.getElementById("caretakerFilterSelect")?.value || "";
+  const filtered = selectedCaretakerId
+    ? schools.filter(s => String(s.assignedCaretakerId) === String(selectedCaretakerId))
+    : schools;
+  const groups = {};
 
-  schools
-    .sort((a, b) => a.nazev.localeCompare(b.nazev))
-    .forEach((s, i) => {
+  filtered.forEach(s => {
+    const key = s.assignedCaretakerId || "";
+    if (!groups[key]) groups[key] = [];
+    groups[key].push(s);
+  });
+
+  const sortedKeys = Object.keys(groups).sort((a, b) => {
+    return getCaretakerNameById(a).localeCompare(getCaretakerNameById(b), "cs");
+  });
+
+  sortedKeys.forEach(key => {
+    const groupName = getCaretakerNameById(key);
+
+    const headerRow = document.createElement("tr");
+    headerRow.style.background = getCaretakerColorById(key);
+    headerRow.dataset.caretakerId = key;
+    headerRow.dataset.groupHeader = "true";
+    headerRow.addEventListener("dragover", (event) => {
+      event.preventDefault();
+    });
+    headerRow.addEventListener("dragenter", () => {
+      highlightGroup(headerRow);
+    });
+    headerRow.addEventListener("dragleave", () => {
+      clearHighlight(headerRow);
+    });
+    headerRow.addEventListener("drop", (event) => {
+      event.preventDefault();
+      clearHighlight(headerRow);
+
+      const schoolId = event.dataTransfer.getData("text/plain");
+      if (!schoolId) return;
+
+      assignSchoolToCaretaker(schoolId, headerRow.dataset.caretakerId);
+    });
+
+    const headerCell = document.createElement("td");
+    headerCell.colSpan = 4;
+    headerCell.textContent = groupName;
+
+    headerRow.appendChild(headerCell);
+    listFragment.appendChild(headerRow);
+
+    const groupSchools = groups[key]
+      .slice()
+      .sort((a, b) => a.nazev.localeCompare(b.nazev, "cs"));
+
+    groupSchools.forEach((s, i) => {
       let row = document.createElement("tr");
+      const baseColor = getCaretakerColorById(s.assignedCaretakerId);
+      const lightColor = lightenColor(baseColor);
+      row.draggable = true;
+      row.addEventListener("dragstart", (event) => {
+        event.dataTransfer.setData("text/plain", s.id);
+        event.dataTransfer.effectAllowed = "move";
+      });
       if(s.id === selectedId) row.className = "active";
+      if (lightColor && !row.classList.contains("active")) {
+        row.style.background = lightColor;
+      }
       row.addEventListener("click", () => showDetail(s.id));
 
       let orderCell = document.createElement("td");
@@ -388,6 +627,10 @@ function render(){
       nameCell.textContent = s.nazev;
       row.appendChild(nameCell);
 
+      const caretakerCell = document.createElement("td");
+      caretakerCell.textContent = getCaretakerNameById(s.assignedCaretakerId);
+      row.appendChild(caretakerCell);
+
       let cityCell = document.createElement("td");
       cityCell.className = "col-city";
       cityCell.textContent = s.mesto || TEXTS.common.placeholderDash;
@@ -395,6 +638,7 @@ function render(){
 
       listFragment.appendChild(row);
     });
+  });
 
   list.replaceChildren(listFragment);
 }
@@ -403,6 +647,15 @@ window.add = add;
 
 initStaticTexts();
 renderFavoriteTrainerOptions([]);
+renderCaretakerSelect("");
+renderCaretakerFilter();
+applyIncomingCaretakerFilter();
+if (removeCaretakerButton) {
+  removeCaretakerButton.addEventListener("click", removeCaretakerFromSchool);
+}
+if (caretakerFilterSelect) {
+  caretakerFilterSelect.addEventListener("change", render);
+}
 render();
 
 </script>

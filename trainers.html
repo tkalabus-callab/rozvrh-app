@@ -74,6 +74,8 @@ tr:hover {
       <th>#</th>
       <th id="nameHeader" class="col-name"></th>
       <th id="clubHeader" class="col-klub"></th>
+      <th id="availabilityHeader"></th>
+      <th id="actionHeader"></th>
     </tr>
   </thead>
   <tbody id="list"></tbody>
@@ -100,9 +102,25 @@ const detail = document.getElementById("detail");
 const listTitle = document.getElementById("listTitle");
 const nameHeader = document.getElementById("nameHeader");
 const clubHeader = document.getElementById("clubHeader");
+const availabilityHeader = document.getElementById("availabilityHeader");
+const actionHeader = document.getElementById("actionHeader");
 const list = document.getElementById("list");
+const selectionParam = new URLSearchParams(window.location.search).get("selection");
 
 let trainers = JSON.parse(localStorage.getItem("trainers")) || [];
+let availabilityContext = JSON.parse(sessionStorage.getItem("trainerAvailabilityContext") || "null");
+let returnContext = JSON.parse(sessionStorage.getItem("scheduleReturnContext") || "null");
+const isSelectionMode = selectionParam === "1";
+const hasSelectionContext = !!(
+  availabilityContext?.date &&
+  availabilityContext?.hour &&
+  availabilityContext?.cls &&
+  availabilityContext?.type &&
+  returnContext?.date &&
+  returnContext?.hour &&
+  returnContext?.cls &&
+  returnContext?.type
+);
 let editId = null;
 let selectedId = null;
 
@@ -125,6 +143,8 @@ function initStaticTexts(){
   listTitle.textContent = "Seznam";
   nameHeader.textContent = TEXTS.trainers.title.slice(0, -2);
   clubHeader.textContent = TEXTS.trainers.club;
+  availabilityHeader.textContent = "STAV";
+  actionHeader.textContent = "Akce";
 }
 
 function add(){
@@ -247,6 +267,81 @@ function clearForm(){
   editId = null;
 }
 
+function getStoredTrainerId(value){
+  return typeof value === "object" ? value?.trainerId : value;
+}
+
+function parseScheduleKey(key){
+  let parts = key.split("_");
+  if(parts.length === 4){
+    return { date: parts[0], year: parts[1], cls: parts[2], hour: parts[3] };
+  }
+  if(parts.length === 3){
+    return { date: parts[0], cls: parts[1], hour: parts[2] };
+  }
+  return null;
+}
+
+function isTrainerBusyForAvailabilityContext(trainerId){
+  if(!availabilityContext?.date || !availabilityContext?.hour || !availabilityContext?.type) return false;
+
+  const source = availabilityContext.type === "plan"
+    ? JSON.parse(localStorage.getItem("plans") || "{}")
+    : JSON.parse(localStorage.getItem("reality") || "{}");
+
+  return Object.entries(source).some(([key, value]) => {
+    if(String(getStoredTrainerId(value)) !== String(trainerId)) return false;
+    if(key === getScheduleKeyFromAvailabilityContext() || key === getLegacyScheduleKeyFromAvailabilityContext()) return false;
+
+    const parsed = parseScheduleKey(key);
+    if(!parsed) return false;
+
+    return parsed.date === availabilityContext.date &&
+      Number(parsed.hour) === Number(availabilityContext.hour);
+  });
+}
+
+function getScheduleKeyFromAvailabilityContext(){
+  if(!availabilityContext?.date || !availabilityContext?.cls || !availabilityContext?.hour) return "";
+  return `${availabilityContext.date}_${availabilityContext.year || ""}_${availabilityContext.cls}_${availabilityContext.hour}`;
+}
+
+function getLegacyScheduleKeyFromAvailabilityContext(){
+  if(!availabilityContext?.date || !availabilityContext?.cls || !availabilityContext?.hour) return "";
+  return `${availabilityContext.date}_${availabilityContext.cls}_${availabilityContext.hour}`;
+}
+
+function createPlanStoredValue(trainerId){
+  return {
+    trainerId,
+    schoolId: availabilityContext?.schoolId || "",
+    date: availabilityContext?.date || "",
+    year: availabilityContext?.year || "",
+    className: availabilityContext?.cls || "",
+    hour: Number(availabilityContext?.hour)
+  };
+}
+
+function chooseTrainer(trainerId){
+  if(!isSelectionMode || !hasSelectionContext) return;
+
+  const key = getScheduleKeyFromAvailabilityContext();
+  if(!key || !availabilityContext?.type) return;
+
+  if(availabilityContext.type === "plan"){
+    const plans = JSON.parse(localStorage.getItem("plans") || "{}");
+    plans[key] = createPlanStoredValue(trainerId);
+    localStorage.setItem("plans", JSON.stringify(plans));
+  } else {
+    const reality = JSON.parse(localStorage.getItem("reality") || "{}");
+    reality[key] = trainerId;
+    localStorage.setItem("reality", JSON.stringify(reality));
+  }
+
+  sessionStorage.setItem("recentlyUpdatedScheduleCell", JSON.stringify(availabilityContext));
+  window.location.href = "index.html";
+}
+
 function render(){
   let listFragment = document.createDocumentFragment();
 
@@ -257,6 +352,7 @@ function render(){
       return a.jmeno.localeCompare(b.jmeno);
     })
     .forEach((t, i) => {
+      const isBusy = isTrainerBusyForAvailabilityContext(t.id);
       let row = document.createElement("tr");
       if(t.id === selectedId) row.className = "active";
       row.addEventListener("click", () => showDetail(t.id));
@@ -274,6 +370,21 @@ function render(){
       clubCell.className = "col-klub";
       clubCell.textContent = t.klub || TEXTS.common.placeholderDash;
       row.appendChild(clubCell);
+
+      let availabilityCell = document.createElement("td");
+      availabilityCell.textContent = isSelectionMode ? (isBusy ? "🔴" : "🟢") : "—";
+      row.appendChild(availabilityCell);
+
+      let actionCell = document.createElement("td");
+      let chooseButton = document.createElement("button");
+      chooseButton.textContent = "Zvolit";
+      chooseButton.disabled = !isSelectionMode || !hasSelectionContext || isBusy;
+      chooseButton.addEventListener("click", (event) => {
+        event.stopPropagation();
+        chooseTrainer(t.id);
+      });
+      actionCell.appendChild(chooseButton);
+      row.appendChild(actionCell);
 
       listFragment.appendChild(row);
     });

@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<title>Školníci</title>
+
+<style>
+body { font-family: Arial; padding:20px; }
+
+input { margin:2px; width:180px; }
+
+textarea {
+  margin:2px;
+  width:370px;
+  height:70px;
+  font-family: Arial;
+}
+
+table {
+  border-collapse: collapse;
+  margin-top:10px;
+  width:100%;
+  max-width:900px;
+}
+
+td, th {
+  border:1px solid #ccc;
+  padding:5px 10px;
+  text-align:left;
+}
+
+tr.active { background:#ffeeba; }
+
+tr:hover {
+  background:#f5f5f5;
+  cursor:pointer;
+}
+
+.buttons {
+  margin:10px 0;
+}
+
+.buttons button,
+.buttons a {
+  margin-right:6px;
+}
+</style>
+</head>
+
+<body>
+
+<h2>Školníci</h2>
+<a href="index.html">Zpět na rozvrh</a>
+<br><br>
+
+<input id="jmeno" placeholder="Jméno">
+<input id="prijmeni" placeholder="Příjmení">
+<br>
+<input id="telefon" placeholder="Telefon">
+<input id="email" placeholder="Email">
+<br>
+<input id="barva" type="color" value="#d9ead3">
+<br>
+<label for="defaultSchoolId">Výchozí škola</label>
+<select id="defaultSchoolId"></select>
+<br>
+<textarea id="poznamka" placeholder="Poznámka"></textarea>
+
+<div class="buttons">
+  <button id="saveButton">Přidat / Uložit</button>
+  <button id="newButton">Nový</button>
+  <button id="deleteButton">Smazat</button>
+  <button id="openSchoolsButton">Zobrazit školy</button>
+  <button id="clearCaretakerRoleButton">Zrušit režim školníka</button>
+</div>
+
+<h3>Seznam</h3>
+<table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Školník</th>
+      <th>Počet škol</th>
+    </tr>
+  </thead>
+  <tbody id="list"></tbody>
+</table>
+
+<script>
+const STORAGE_KEY = "caretakers";
+const CARETAKER_ROLE_STORAGE_KEY = "caretakerId";
+
+const jmeno = document.getElementById("jmeno");
+const prijmeni = document.getElementById("prijmeni");
+const telefon = document.getElementById("telefon");
+const email = document.getElementById("email");
+const barva = document.getElementById("barva");
+const defaultSchoolId = document.getElementById("defaultSchoolId");
+const poznamka = document.getElementById("poznamka");
+const saveButton = document.getElementById("saveButton");
+const newButton = document.getElementById("newButton");
+const deleteButton = document.getElementById("deleteButton");
+const openSchoolsButton = document.getElementById("openSchoolsButton");
+const clearCaretakerRoleButton = document.getElementById("clearCaretakerRoleButton");
+const list = document.getElementById("list");
+
+let caretakers = loadCaretakers();
+let editId = null;
+let selectedId = null;
+
+function loadCaretakers(){
+  try {
+    const items = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+    if(!Array.isArray(items)) return [];
+
+    return items.map(item => ({
+      id: String(item.id || ""),
+      jmeno: item.jmeno || "",
+      prijmeni: item.prijmeni || "",
+      telefon: item.telefon || "",
+      email: item.email || "",
+      color: item.color || "#d9ead3",
+      defaultSchoolId: item.defaultSchoolId || "",
+      poznamka: item.poznamka || ""
+    })).filter(item => item.id);
+  } catch {
+    return [];
+  }
+}
+
+function loadSchools(){
+  try {
+    return JSON.parse(localStorage.getItem("schools") || "[]");
+  } catch {
+    return [];
+  }
+}
+
+function saveCaretakers(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(caretakers));
+}
+
+function sortCaretakers(items){
+  return items.slice().sort((a, b) => {
+    const surnameCompare = (a.prijmeni || "").localeCompare(b.prijmeni || "", "cs");
+    if(surnameCompare !== 0) return surnameCompare;
+    return (a.jmeno || "").localeCompare(b.jmeno || "", "cs");
+  });
+}
+
+function getDisplayName(caretaker){
+  const fullName = `${caretaker.prijmeni || ""} ${caretaker.jmeno || ""}`.trim();
+  return fullName || "-";
+}
+
+function getDisplayValue(value){
+  return value || "-";
+}
+
+function getListText(caretaker){
+  return `${getDisplayName(caretaker)} - ${getDisplayValue(caretaker.telefon)} - ${getDisplayValue(caretaker.email)}`;
+}
+
+function getAssignedSchoolCount(caretakerId){
+  const schools = loadSchools();
+  return schools.filter(s => String(s.assignedCaretakerId || "") === String(caretakerId)).length;
+}
+
+function hasAssignedSchools(caretakerId){
+  const schools = loadSchools();
+  return schools.some(s => String(s.assignedCaretakerId || "") === String(caretakerId));
+}
+
+function renderDefaultSchoolSelect(caretakerId = "", selectedSchoolId = ""){
+  const schools = !caretakerId
+    ? []
+    : loadSchools()
+        .filter(s => String(s.assignedCaretakerId || "") === String(caretakerId || ""))
+        .sort((a, b) => (safeName(a)).localeCompare(safeName(b), "cs"));
+
+  defaultSchoolId.replaceChildren();
+
+  const emptyOption = document.createElement("option");
+  emptyOption.value = "";
+  emptyOption.textContent = "— bez výchozí školy —";
+  defaultSchoolId.appendChild(emptyOption);
+
+  schools.forEach(school => {
+    const option = document.createElement("option");
+    option.value = String(school.id || "");
+    option.textContent = safeName(school);
+    option.selected = String(selectedSchoolId || "") === String(school.id || "");
+    defaultSchoolId.appendChild(option);
+  });
+
+  defaultSchoolId.disabled = !schools.length;
+  defaultSchoolId.title = !schools.length ? "Školník nemá přiřazené školy" : "";
+  defaultSchoolId.value = schools.some(s => String(s.id || "") === String(selectedSchoolId || ""))
+    ? String(selectedSchoolId || "")
+    : "";
+}
+
+function safeName(school){
+  return school?.nazev || "-";
+}
+
+function getActiveCaretakerRoleId(){
+  return localStorage.getItem(CARETAKER_ROLE_STORAGE_KEY) || "";
+}
+
+function setActiveCaretakerRoleId(caretakerId){
+  localStorage.setItem(CARETAKER_ROLE_STORAGE_KEY, String(caretakerId || ""));
+  window.location.href = "index.html";
+}
+
+function clearActiveCaretakerRoleId(){
+  localStorage.removeItem(CARETAKER_ROLE_STORAGE_KEY);
+}
+
+function isActiveCaretakerRole(caretakerId){
+  return String(getActiveCaretakerRoleId()) === String(caretakerId || "");
+}
+
+function clearForm(){
+  jmeno.value = "";
+  prijmeni.value = "";
+  telefon.value = "";
+  email.value = "";
+  barva.value = "#d9ead3";
+  renderDefaultSchoolSelect("", "");
+  poznamka.value = "";
+  editId = null;
+  selectedId = null;
+  render();
+}
+
+function loadToForm(id){
+  const caretaker = caretakers.find(item => item.id === id);
+  if(!caretaker) return;
+
+  jmeno.value = caretaker.jmeno || "";
+  prijmeni.value = caretaker.prijmeni || "";
+  telefon.value = caretaker.telefon || "";
+  email.value = caretaker.email || "";
+  barva.value = caretaker.color || "#d9ead3";
+  renderDefaultSchoolSelect(caretaker.id, caretaker.defaultSchoolId || "");
+  poznamka.value = caretaker.poznamka || "";
+
+  editId = caretaker.id;
+  selectedId = caretaker.id;
+  render();
+}
+
+function saveCurrent(){
+  const caretakerId = editId || Date.now().toString();
+  const availableDefaultSchoolIds = loadSchools()
+    .filter(s => String(s.assignedCaretakerId || "") === String(caretakerId))
+    .map(s => String(s.id || ""));
+  const caretaker = {
+    id: caretakerId,
+    jmeno: jmeno.value.trim(),
+    prijmeni: prijmeni.value.trim(),
+    telefon: telefon.value.trim(),
+    email: email.value.trim(),
+    color: barva.value || "#d9ead3",
+    defaultSchoolId: availableDefaultSchoolIds.includes(String(defaultSchoolId.value || ""))
+      ? String(defaultSchoolId.value || "")
+      : "",
+    poznamka: poznamka.value.trim()
+  };
+
+  if(editId){
+    caretakers = caretakers.map(item => item.id === editId ? caretaker : item);
+  } else {
+    caretakers.push(caretaker);
+  }
+
+  saveCaretakers();
+  editId = caretaker.id;
+  selectedId = caretaker.id;
+  renderDefaultSchoolSelect(caretaker.id, caretaker.defaultSchoolId || "");
+  render();
+}
+
+function removeCurrent(){
+  if(!editId) return;
+  if (hasAssignedSchools(editId)) {
+    alert("Tento školník má přiřazené školy. Nejprve změň přiřazeného školníka u těchto škol v databázi škol.");
+    return;
+  }
+  if(!confirm("Smazat školníka?")) return;
+
+  caretakers = caretakers.filter(item => item.id !== editId);
+  saveCaretakers();
+  clearForm();
+}
+
+function openSchoolsForCaretaker(){
+  if(!editId) return;
+  localStorage.setItem("schoolsCaretakerFilter", editId);
+  window.location.href = "schools.html";
+}
+
+function render(){
+  const fragment = document.createDocumentFragment();
+  const sorted = sortCaretakers(caretakers);
+
+  sorted.forEach((caretaker, index) => {
+    const row = document.createElement("tr");
+    if(caretaker.id === selectedId) row.className = "active";
+    row.addEventListener("click", () => loadToForm(caretaker.id));
+
+    const orderCell = document.createElement("td");
+    orderCell.textContent = index + 1;
+    row.appendChild(orderCell);
+
+    const textCell = document.createElement("td");
+    textCell.textContent = getListText(caretaker);
+
+    const profileButton = document.createElement("button");
+    profileButton.textContent = isActiveCaretakerRole(caretaker.id) ? "Aktivní profil" : "Použít jako profil";
+    profileButton.disabled = isActiveCaretakerRole(caretaker.id);
+    profileButton.style.marginLeft = "8px";
+    profileButton.addEventListener("click", (event) => {
+      event.stopPropagation();
+      setActiveCaretakerRoleId(caretaker.id);
+      render();
+    });
+
+    textCell.appendChild(profileButton);
+    row.appendChild(textCell);
+
+    const countCell = document.createElement("td");
+    countCell.textContent = String(getAssignedSchoolCount(caretaker.id));
+    row.appendChild(countCell);
+
+    fragment.appendChild(row);
+  });
+
+  list.replaceChildren(fragment);
+}
+
+saveButton.addEventListener("click", saveCurrent);
+newButton.addEventListener("click", clearForm);
+deleteButton.addEventListener("click", removeCurrent);
+openSchoolsButton.addEventListener("click", openSchoolsForCaretaker);
+clearCaretakerRoleButton.addEventListener("click", () => {
+  clearActiveCaretakerRoleId();
+  render();
+});
+
+render();
+</script>
+
+</body>
+</html>

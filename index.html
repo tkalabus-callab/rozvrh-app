@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="cs">
 <head>
 <meta charset="UTF-8">
@@ -41,10 +41,43 @@ td, th {
 
 .plan-row td { background:#d0e7ff; }
 .real-row td { background:#d4edda; }
+.plan-row td,
+.real-row td {
+  border-bottom-color:#b8c0c8;
+}
+.plan-row td {
+  border-top:2px solid #8f98a1;
+}
+.real-row td {
+  border-bottom:2px solid #8f98a1;
+}
 .unavailable {
-  background:#f8d7da !important;
-  color:#721c24;
-  font-weight:bold;
+  background:#ffeb3b !important;
+  color:#3a2f00;
+  font-weight:800;
+  border:1px solid #b88a00;
+  box-shadow:inset 0 0 0 2px rgba(58, 47, 0, 0.18);
+  text-align:center;
+  font-size:19px;
+}
+.cell-unavailable {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  height:100%;
+}
+.cell-unavailable-icon {
+  font-size:18px;
+  line-height:1;
+}
+.cell-unavailable-text {
+  display:flex;
+  flex-direction:column;
+  line-height:1.1;
+  font-size:10px;
+  color:#000;
+  font-weight:600;
 }
 .conflict {
   background-color:#ffe5e5;
@@ -61,10 +94,110 @@ td, th {
 }
 
 .class-header { background:#ddd; }
+.today-column {
+  position: relative;
+  box-shadow: inset 0 0 0 9999px rgba(0, 0, 0, 0.04);
+}
+th.today-column::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #f0c040;
+}
+#table tr:first-child th.today-column {
+  background: rgba(255, 220, 120, 0.35);
+}
+
+#table tr:first-child th:nth-of-type(3),
+#table tr:nth-child(2) th:nth-of-type(n+1):nth-of-type(-n+4),
+.plan-row td:nth-of-type(n+3):nth-of-type(-n+6),
+.real-row td:nth-of-type(n+2):nth-of-type(-n+5) {
+  background-image: linear-gradient(rgba(0,0,0,0.02), rgba(0,0,0,0.02));
+  box-shadow: inset 1px 0 0 rgba(0,0,0,0.05), inset -1px 0 0 rgba(0,0,0,0.05);
+}
+
+#table tr:first-child th:nth-of-type(4),
+#table tr:nth-child(2) th:nth-of-type(n+5):nth-of-type(-n+8),
+.plan-row td:nth-of-type(n+7):nth-of-type(-n+10),
+.real-row td:nth-of-type(n+6):nth-of-type(-n+9) {
+  background-image: linear-gradient(rgba(60,90,140,0.025), rgba(60,90,140,0.025));
+  box-shadow: inset 1px 0 0 rgba(0,0,0,0.05), inset -1px 0 0 rgba(0,0,0,0.05);
+}
+
+#table tr:first-child th:nth-of-type(5),
+#table tr:nth-child(2) th:nth-of-type(n+9):nth-of-type(-n+12),
+.plan-row td:nth-of-type(n+11):nth-of-type(-n+14),
+.real-row td:nth-of-type(n+10):nth-of-type(-n+13) {
+  background-image: linear-gradient(rgba(0,0,0,0.02), rgba(0,0,0,0.02));
+  box-shadow: inset 1px 0 0 rgba(0,0,0,0.05), inset -1px 0 0 rgba(0,0,0,0.05);
+}
+
+#table tr:first-child th:nth-of-type(6),
+#table tr:nth-child(2) th:nth-of-type(n+13):nth-of-type(-n+16),
+.plan-row td:nth-of-type(n+15):nth-of-type(-n+18),
+.real-row td:nth-of-type(n+14):nth-of-type(-n+17) {
+  background-image: linear-gradient(rgba(60,90,140,0.025), rgba(60,90,140,0.025));
+  box-shadow: inset 1px 0 0 rgba(0,0,0,0.05), inset -1px 0 0 rgba(0,0,0,0.05);
+}
+
+#table tr:first-child th:nth-of-type(7),
+#table tr:nth-child(2) th:nth-of-type(n+17):nth-of-type(-n+20),
+.plan-row td:nth-of-type(n+19):nth-of-type(-n+22),
+.real-row td:nth-of-type(n+18):nth-of-type(-n+21) {
+  background-image: linear-gradient(rgba(0,0,0,0.02), rgba(0,0,0,0.02));
+  box-shadow: inset 1px 0 0 rgba(0,0,0,0.05), inset -1px 0 0 rgba(0,0,0,0.05);
+}
+
+#table tr:first-child th:nth-of-type(3),
+#table tr:nth-child(2) th:nth-of-type(1),
+.plan-row td:nth-of-type(3),
+.real-row td:nth-of-type(2),
+#table tr:first-child th:nth-of-type(4),
+#table tr:nth-child(2) th:nth-of-type(5),
+.plan-row td:nth-of-type(7),
+.real-row td:nth-of-type(6),
+#table tr:first-child th:nth-of-type(5),
+#table tr:nth-child(2) th:nth-of-type(9),
+.plan-row td:nth-of-type(11),
+.real-row td:nth-of-type(10),
+#table tr:first-child th:nth-of-type(6),
+#table tr:nth-child(2) th:nth-of-type(13),
+.plan-row td:nth-of-type(15),
+.real-row td:nth-of-type(14),
+#table tr:first-child th:nth-of-type(7),
+#table tr:nth-child(2) th:nth-of-type(17),
+.plan-row td:nth-of-type(19),
+.real-row td:nth-of-type(18) {
+  border-left:3px solid #000;
+}
+
+#table tr:first-child th:nth-of-type(3),
+#table tr:nth-child(2) th:nth-of-type(4),
+.plan-row td:nth-of-type(6),
+.real-row td:nth-of-type(5),
+#table tr:first-child th:nth-of-type(4),
+#table tr:nth-child(2) th:nth-of-type(8),
+.plan-row td:nth-of-type(10),
+.real-row td:nth-of-type(9),
+#table tr:first-child th:nth-of-type(5),
+#table tr:nth-child(2) th:nth-of-type(12),
+.plan-row td:nth-of-type(14),
+.real-row td:nth-of-type(13),
+#table tr:first-child th:nth-of-type(6),
+#table tr:nth-child(2) th:nth-of-type(16),
+.plan-row td:nth-of-type(18),
+.real-row td:nth-of-type(17),
+#table tr:first-child th:nth-of-type(7),
+#table tr:nth-child(2) th:nth-of-type(20),
+.plan-row td:nth-of-type(22),
+.real-row td:nth-of-type(21) {
+  border-right:3px solid #000;
+}
 
 .active-cell:hover { outline:2px solid blue; cursor:pointer; }
-
-.cell, .active-cell { pointer-events: auto; }
 
 .editing {
   outline:3px solid orange !important;
@@ -78,11 +211,41 @@ td, th {
 .menu {
   position:absolute;
   background:white;
-  border:1px solid #999;
-  z-index:1000;
+  border:1px solid #d0d7de;
+  min-width:220px;
+  box-shadow:0 4px 14px rgba(15, 23, 42, 0.08);
+  z-index:1100;
+  overflow:hidden;
 }
-.menu div { padding:5px; cursor:pointer; }
-.menu div:hover { background:#eee; }
+.menu .trainer-search {
+  display:block;
+  width:calc(100% - 16px);
+  margin:8px;
+  min-width:0;
+  box-sizing:border-box;
+  border:1px solid #d0d7de;
+  border-radius:6px;
+  background:#fff;
+}
+.menu-item {
+  display:flex;
+  align-items:center;
+  min-height:40px;
+  padding:0 12px;
+  cursor:pointer;
+  background:#fff;
+}
+.menu-item + .menu-item {
+  border-top:1px solid #eef2f6;
+}
+.menu-item:hover { background:#f5f5f5; }
+.menu .trainer-search + .menu-item {
+  border-top:1px solid #eef2f6;
+}
+.menu-item-unavailable {
+  color:#8a1c1c;
+  font-weight:600;
+}
 
 .trainer-panel {
   display:flex;
@@ -126,6 +289,18 @@ td, th {
   outline-offset:-3px;
 }
 
+.conflict-attempt {
+  outline: 3px solid #c62828;
+  outline-offset: -3px;
+  background: rgba(198, 40, 40, 0.18) !important;
+}
+
+.recently-updated-cell {
+  outline:3px solid #0d6efd !important;
+  outline-offset:-3px;
+  box-shadow:inset 0 0 0 2px rgba(13, 110, 253, 0.22);
+}
+
 .cell.status-plan-missing {
   background:#f8d7da;
 }
@@ -163,6 +338,49 @@ td, th {
 .trainer-toggle.active {
   background:#e9ecef;
 }
+
+#trainerToolsContainer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+#scheduleArea {
+  position: relative;
+}
+
+#scheduleOverlayMessage {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(40, 0, 0, 0.14);
+  color: #7f0000;
+  font-size: 18px;
+  font-weight: 700;
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+  z-index: 5;
+}
+
+#scheduleOverlayMessage.visible {
+  opacity: 1;
+}
+
+#scheduleOverlayMessage.error {
+  color: #b00020;
+}
+
+#trainerSchoolScopeLabel {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 4px;
+}
 </style>
 </head>
 
@@ -174,6 +392,7 @@ td, th {
 <tr>
   <th id="schoolHeader"></th>
   <th id="cityHeader"></th>
+  <th id="caretakerHeader">Školník</th>
   <th id="yearHeader"></th>
   <th id="weekFromHeader"></th>
   <th id="weekNumberHeader"></th>
@@ -181,6 +400,7 @@ td, th {
 <tr>
   <td><select id="schoolSelect"></select></td>
   <td id="city">-</td>
+  <td id="caretaker">-</td>
   <td>
     <select id="yearSelect" onchange="render()">
       <option>1</option><option>2</option><option>3</option>
@@ -193,32 +413,61 @@ td, th {
 </tr>
 </table>
 
+<div id="caretakerRoleInfo" style="margin-top:8px; display:none; padding:10px 12px; border-radius:8px; font-weight:bold;"></div>
+
 <button onclick="changeWeek(-7)">←</button>
 <button onclick="changeWeek(7)">→</button>
 <button id="copyWeekButton" onclick="copyWeek()"></button>
 <button id="todayButton" onclick="goToday()"></button>
 <button id="schoolsButton" onclick="openSchools()"></button>
 <button id="trainersButton" onclick="openTrainers()">Trenéři</button>
+<button id="caretakersButton" onclick="openCaretakers()">Školníci</button>
 
-<div style="margin-top:12px;">
+<div id="trainerToolsContainer">
+  <select id="trainerFilterSelect"></select>
+  <span id="trainerSchoolScopeLabel">Všechny školy</span>
+  <select id="trainerPeriodType">
+    <option value="week">Týden</option>
+    <option value="month">Měsíc</option>
+  </select>
+  <input type="date" id="trainerPeriodDate">
+  <button id="showTrainerPlanButton" type="button">Zobrazit plán</button>
+</div>
+<div id="trainerPlanPreview" style="margin-top:10px;"></div>
+
+<div id="managerFilterWrap" style="margin-top:12px; display:none;">
   <label for="managerSelect">Manažer:</label>
-  <select id="managerSelect"></select>
+  <select id="managerSelect">
+    <option value="">Všichni manažeři</option>
+  </select>
+</div>
+
+<div id="caretakerFilterWrap" style="margin-top:12px; display:none;">
+  <label for="trainerSelect">Školníci:</label>
+  <select id="trainerSelect" multiple size="5"></select>
 </div>
 
 <div class="trainer-toolbar">
   <input id="trainerSearch" class="trainer-search">
   <button id="showAllTrainersButton" class="trainer-toggle" type="button"></button>
 </div>
-<div id="trainerPanel" class="trainer-panel"></div>
-<table id="table"></table>
+<div id="scheduleArea">
+  <div id="trainerPanel" class="trainer-panel"></div>
+  <div id="scheduleOverlayMessage" aria-live="polite"></div>
+  <table id="table"></table>
+</div>
 
 <script type="module">
 import { TEXTS } from "./texts.js";
 import { loadManagers, createManager, getManagerById } from "./managers.js";
 
 window.onerror = function(msg, url, line, col, error) {
-  console.error("GLOBAL ERROR:", { msg, url, line, col, error });
+  console.error("[GLOBAL ERROR]", { msg, url, line, col, error });
 };
+
+window.addEventListener("unhandledrejection", (event) => {
+  console.error("[UNHANDLED PROMISE]", event.reason);
+});
 
 const pageTitle = document.getElementById("pageTitle");
 const schoolHeader = document.getElementById("schoolHeader");
@@ -228,18 +477,34 @@ const weekFromHeader = document.getElementById("weekFromHeader");
 const weekNumberHeader = document.getElementById("weekNumberHeader");
 const schoolSelect = document.getElementById("schoolSelect");
 const city = document.getElementById("city");
+const caretaker = document.getElementById("caretaker");
+const headerTable = document.querySelector(".header-table");
+const caretakerRoleInfo = document.getElementById("caretakerRoleInfo");
 const yearSelect = document.getElementById("yearSelect");
 const dateInput = document.getElementById("dateInput");
+const trainerPeriodDate = document.getElementById("trainerPeriodDate");
 const weekNumber = document.getElementById("weekNumber");
 const copyWeekButton = document.getElementById("copyWeekButton");
 const todayButton = document.getElementById("todayButton");
 const schoolsButton = document.getElementById("schoolsButton");
 const trainersButton = document.getElementById("trainersButton");
+const caretakersButton = document.getElementById("caretakersButton");
 const managerSelect = document.getElementById("managerSelect");
 const trainerSearch = document.getElementById("trainerSearch");
+const trainerFilterSelect = document.getElementById("trainerFilterSelect");
+const trainerPeriodType = document.getElementById("trainerPeriodType");
 const showAllTrainersButton = document.getElementById("showAllTrainersButton");
+const showTrainerPlanButton = document.getElementById("showTrainerPlanButton");
+const trainerPlanPreview = document.getElementById("trainerPlanPreview");
 const trainerPanel = document.getElementById("trainerPanel");
+const scheduleOverlayMessage = document.getElementById("scheduleOverlayMessage");
 const table = document.getElementById("table");
+const CARETAKER_ID_STORAGE_KEY = "caretakerId";
+const LAST_SCHOOL_BY_CARETAKER_KEY = "lastSchoolByCaretaker";
+const LAST_DATE_BY_CARETAKER_KEY = "lastDateByCaretaker";
+const TRAINER_FILTER_TRAINER_ID_KEY = "trainerFilterTrainerId";
+const TRAINER_FILTER_PERIOD_TYPE_KEY = "trainerFilterPeriodType";
+const TRAINER_FILTER_PERIOD_DATE_KEY = "trainerFilterPeriodDate";
 
 function load(key, def){
   try {
@@ -247,6 +512,45 @@ function load(key, def){
     return data ? JSON.parse(data) : def;
   } catch {
     return def;
+  }
+}
+
+function ensureAssignedManagerIds(){
+  const schools = JSON.parse(localStorage.getItem('schools') || '[]');
+
+  schools.forEach(s => {
+    if (!('assignedManagerId' in s)) {
+      s.assignedManagerId = '';
+    }
+
+    if (!('assignedCaretakerId' in s)) {
+      s.assignedCaretakerId = s.assignedTrainerId ?? '';
+    }
+  });
+
+  localStorage.setItem('schools', JSON.stringify(schools));
+}
+
+function saveFilters() {
+  localStorage.setItem('filters', JSON.stringify({
+    trainerIds: getSelectedCaretakerIds(),
+    managerId: document.getElementById('managerSelect')?.value || ''
+  }));
+}
+
+function loadFilters() {
+  const filters = JSON.parse(localStorage.getItem('filters') || '{}');
+  const trainerSelect = document.getElementById('trainerSelect');
+  const managerSelect = document.getElementById('managerSelect');
+
+  if (trainerSelect && trainerSelect.options.length) {
+    Array.from(trainerSelect.options).forEach(o => {
+      o.selected = (filters.trainerIds || []).includes(o.value);
+    });
+  }
+
+  if (managerSelect && managerSelect.options.length) {
+    managerSelect.value = filters.managerId || '';
   }
 }
 
@@ -261,12 +565,20 @@ let selectedManagerId = "";
 
 let menu = null;
 let activeCell = null;
+let statusMessageTimeout = null;
+let suppressMenuAutoCloseUntil = 0;
+let reopenAvailableOnlyContext = null;
+let temporarySchoolTrainerIds = {};
+let openMenuAvailableOnly = false;
+let openMenuPromptText = "";
+let openMenuMode = "";
+let openMenuSearch = "";
 
 function normalizeSchool(school){
   return {
     ...school,
     favoriteTrainers: school.favoriteTrainers || [],
-    assignedTrainerId: school.assignedTrainerId ?? null
+    assignedCaretakerId: school.assignedCaretakerId ?? null
   };
 }
 
@@ -278,13 +590,141 @@ function loadTrainers(){
   return load("trainers", []);
 }
 
+function getTrainerById(trainerId){
+  return loadTrainers().find(t => String(t.id) === String(trainerId)) || null;
+}
+
+function loadCaretakers(){
+  return load("caretakers", []);
+}
+
 function getSelectedTrainerId(){
   const trainerSelectEl = document.getElementById("trainerSelect");
   const selectedTrainerId = trainerSelectEl ? trainerSelectEl.value : "";
   return selectedTrainerId;
 }
 
-function getVisibleTrainersLegacyUnused(schoolId){
+function getSelectedCaretakerIds() {
+  const select = document.getElementById('trainerSelect');
+  if(!select) return [];
+  return Array.from(select.selectedOptions).map(o => o.value);
+}
+
+function enforceTrainerLimit() {
+  const select = document.getElementById('trainerSelect');
+  if(!select) return;
+
+  const selected = Array.from(select.selectedOptions);
+
+  if (selected.length > 5) {
+    selected[selected.length - 1].selected = false;
+    alert('Maximálně 5 školníků');
+  }
+}
+
+function getCaretakerSchoolIds(caretakerIds){
+  const schools = JSON.parse(localStorage.getItem('schools') || '[]');
+
+  if (!caretakerIds || !caretakerIds.length) {
+    return schools.map(s => s.id);
+  }
+
+  return schools
+    .filter(s => caretakerIds.includes(String(s.assignedCaretakerId)))
+    .map(s => s.id);
+}
+
+function getManagerSchoolIds(managerId) {
+  const schools = JSON.parse(localStorage.getItem('schools') || '[]');
+
+  return schools
+    .filter(s => !managerId || String(s.assignedManagerId) === String(managerId))
+    .map(s => s.id);
+}
+
+function getFilteredSchoolIds() {
+  const schools = JSON.parse(localStorage.getItem('schools') || '[]');
+  return schools.map(s => s.id);
+}
+
+function getRoleCaretakerId(){
+  return localStorage.getItem(CARETAKER_ID_STORAGE_KEY) || "";
+}
+
+function loadLastSchoolMap(){
+  try {
+    return JSON.parse(localStorage.getItem(LAST_SCHOOL_BY_CARETAKER_KEY)) || {};
+  } catch {
+    return {};
+  }
+}
+
+function saveLastSchoolMap(map){
+  localStorage.setItem(LAST_SCHOOL_BY_CARETAKER_KEY, JSON.stringify(map));
+}
+
+function saveLastSchoolForCaretaker(caretakerId, schoolId){
+  if (!caretakerId || !schoolId) return;
+  const map = loadLastSchoolMap();
+  map[String(caretakerId)] = String(schoolId);
+  saveLastSchoolMap(map);
+}
+
+function getLastSchoolForCaretaker(caretakerId){
+  if (!caretakerId) return "";
+  const map = loadLastSchoolMap();
+  return map[String(caretakerId)] || "";
+}
+
+function loadLastDateMap(){
+  try {
+    return JSON.parse(localStorage.getItem(LAST_DATE_BY_CARETAKER_KEY)) || {};
+  } catch {
+    return {};
+  }
+}
+
+function saveLastDateMap(map){
+  localStorage.setItem(LAST_DATE_BY_CARETAKER_KEY, JSON.stringify(map));
+}
+
+function saveLastDateForCaretaker(caretakerId, dateValue){
+  if (!caretakerId || !dateValue) return;
+  const map = loadLastDateMap();
+  map[String(caretakerId)] = String(dateValue);
+  saveLastDateMap(map);
+}
+
+function getLastDateForCaretaker(caretakerId){
+  if (!caretakerId) return "";
+  const map = loadLastDateMap();
+  return map[String(caretakerId)] || "";
+}
+
+function getDefaultSchoolForCaretaker(caretakerId){
+  if (!caretakerId) return "";
+  const caretaker = getCaretakerById(caretakerId);
+  return caretaker?.defaultSchoolId || "";
+}
+
+function getCaretakerById(id){
+  return loadCaretakers().find(c => String(c.id) === String(id)) || null;
+}
+
+function isCaretakerRoleMode(){
+  return !!getRoleCaretakerId();
+}
+
+function getSchoolsForCurrentRole(allSchools){
+  if (!isCaretakerRoleMode()) {
+    return allSchools;
+  }
+
+  const caretakerId = getRoleCaretakerId();
+  return allSchools.filter(s => String(s.assignedCaretakerId || "") === String(caretakerId));
+}
+
+function getVisibleTrainersLegacyUnused(){
   const trainers = loadTrainers();
   const schools = getSchools();
 
@@ -292,18 +732,18 @@ function getVisibleTrainersLegacyUnused(schoolId){
 
   const school = schools.find(s => s.id === schoolId);
 
-  // fallback pouze pokud škola neexistuje
+  // fallback pouze pokud Ĺˇkola neexistuje
   if(!school) return trainers;
 
   const fav = school.favoriteTrainers;
 
-  // pokud není pole → fallback (starší data)
+  // pokud nenĂ­ pole â†’ fallback (starĹˇĂ­ data)
   if(!Array.isArray(fav)) return trainers;
 
-  // pokud je prázdné pole → žádní trenéři
+  // pokud je prĂˇzdnĂ© pole â†’ ĹľĂˇdnĂ­ trenĂ©Ĺ™i
   if(fav.length === 0) return [];
 
-  // vrátí pouze vybrané trenéry
+  // vrĂˇtĂ­ pouze vybranĂ© trenĂ©ry
   const result = trainers.filter(t => fav.includes(t.id));
 
   console.log("schoolId:", schoolId);
@@ -316,20 +756,92 @@ function getVisibleTrainersLegacyUnused(schoolId){
 function getVisibleTrainers(schoolId){
   const trainers = loadTrainers();
   const schools = getSchools();
-
-  if(showAll) return trainers;
-
-  const school = schools.find(s => s.id === schoolId);
-  console.log({
-    selectedTrainerId: getSelectedTrainerId(),
-    schoolAssigned: school?.assignedTrainerId ?? null
-  });
-
+  const school = schools.find(s => String(s.id) === String(schoolId));
   if(!school) return trainers;
 
-  if(!school.assignedTrainerId) return trainers;
+  const fav = Array.isArray(school.favoriteTrainers) ? school.favoriteTrainers.map(String) : null;
+  const temporaryIds = temporarySchoolTrainerIds[String(schoolId)] || [];
+  const mergedIds = fav ? Array.from(new Set([...fav, ...temporaryIds])) : temporaryIds;
 
-  return trainers.filter(trainer => trainer.id === school.assignedTrainerId);
+  if(!fav) return trainers;
+  if(mergedIds.length === 0) return [];
+
+  return trainers.filter(t => mergedIds.includes(String(t.id)));
+}
+
+function addTemporaryTrainerForSchool(schoolId, trainerId){
+  if(!schoolId || !trainerId) return;
+  const key = String(schoolId);
+  const current = temporarySchoolTrainerIds[key] || [];
+  const value = String(trainerId);
+  if(current.includes(value)) return;
+  temporarySchoolTrainerIds[key] = [...current, value];
+}
+
+function resetTemporarySchoolTrainers(){
+  temporarySchoolTrainerIds = {};
+}
+
+function showStatusMessage(text, type = ""){
+  if(!scheduleOverlayMessage) return;
+
+  scheduleOverlayMessage.textContent = text || "";
+  scheduleOverlayMessage.className = [text ? "visible" : "", type || ""].filter(Boolean).join(" ");
+
+  if(statusMessageTimeout){
+    clearTimeout(statusMessageTimeout);
+  }
+
+  if(text){
+    statusMessageTimeout = setTimeout(() => {
+      scheduleOverlayMessage.textContent = "";
+      scheduleOverlayMessage.className = "";
+      statusMessageTimeout = null;
+    }, 2200);
+  } else {
+    statusMessageTimeout = null;
+  }
+}
+
+function highlightConflictAttemptCell(cell){
+  if(!cell) return;
+
+  if(cell.conflictAttemptTimeout){
+    clearTimeout(cell.conflictAttemptTimeout);
+  }
+
+  cell.classList.remove("conflict-attempt");
+  void cell.offsetWidth;
+  cell.classList.add("conflict-attempt");
+
+  cell.conflictAttemptTimeout = setTimeout(() => {
+    cell.classList.remove("conflict-attempt");
+    cell.conflictAttemptTimeout = null;
+  }, 2000);
+}
+
+function renderTrainerSelect(){
+  return;
+}
+
+function loadTrainerFilterOptions(){
+  const trainerFilterSelect = document.getElementById("trainerFilterSelect");
+  if(!trainerFilterSelect) return;
+
+  const trainerItems = loadTrainers();
+  trainerFilterSelect.replaceChildren();
+
+  const defaultOption = document.createElement("option");
+  defaultOption.value = "";
+  defaultOption.textContent = "-- trenér --";
+  trainerFilterSelect.appendChild(defaultOption);
+
+  trainerItems.forEach(trainer => {
+    const option = document.createElement("option");
+    option.value = String(trainer.id);
+    option.textContent = `${trainer.jmeno || ""} ${trainer.prijmeni || ""}`.trim() || trainer.name || "";
+    trainerFilterSelect.appendChild(option);
+  });
 }
 
 function initStaticTexts(){
@@ -346,14 +858,147 @@ function initStaticTexts(){
   showAllTrainersButton.textContent = TEXTS.schedule.allTrainers;
 }
 
+function renderCaretakerRoleInfo(){
+  if (!caretakerRoleInfo) return;
+
+  const caretakerId = getRoleCaretakerId();
+  const caretakerItem = getCaretakerById(caretakerId);
+
+  if (!caretakerId || !caretakerItem) {
+    caretakerRoleInfo.style.display = "none";
+    caretakerRoleInfo.replaceChildren();
+    return;
+  }
+
+  const caretakerName = `${caretakerItem.prijmeni || ""} ${caretakerItem.jmeno || ""}`.trim() || caretakerItem.name || "-";
+  const caretakerColor = getCaretakerColorById(caretakerId);
+  const lightColor = lightenColor(caretakerColor, 0.82);
+
+  caretakerRoleInfo.style.display = "block";
+  caretakerRoleInfo.style.background = lightColor || "#f5f5f5";
+  caretakerRoleInfo.style.border = `2px solid ${caretakerColor || "#999"}`;
+  caretakerRoleInfo.style.borderLeft = `10px solid ${caretakerColor || "#999"}`;
+  caretakerRoleInfo.textContent = `REŽIM ŠKOLNÍKA: ${caretakerName}`;
+
+  const button = document.createElement("button");
+  button.textContent = "Ukončit režim";
+  button.style.marginLeft = "8px";
+  button.addEventListener("click", () => {
+    localStorage.removeItem("caretakerId");
+    location.reload();
+  });
+
+  caretakerRoleInfo.appendChild(button);
+}
+
+function syncTrainerPeriodDateFromMainDate(){
+  if(!trainerPeriodDate || trainerPeriodDate.value) return;
+  if(!dateInput || !dateInput.value) return;
+  trainerPeriodDate.value = dateInput.value;
+}
+
+function saveTrainerToolsState(){
+  if(trainerFilterSelect){
+    localStorage.setItem(TRAINER_FILTER_TRAINER_ID_KEY, trainerFilterSelect.value || "");
+  }
+
+  if(trainerPeriodType){
+    localStorage.setItem(TRAINER_FILTER_PERIOD_TYPE_KEY, trainerPeriodType.value || "");
+  }
+
+  if(trainerPeriodDate){
+    localStorage.setItem(TRAINER_FILTER_PERIOD_DATE_KEY, trainerPeriodDate.value || "");
+  }
+}
+
+function loadTrainerToolsState(){
+  const savedTrainerId = localStorage.getItem(TRAINER_FILTER_TRAINER_ID_KEY);
+  const savedPeriodType = localStorage.getItem(TRAINER_FILTER_PERIOD_TYPE_KEY);
+  const savedPeriodDate = localStorage.getItem(TRAINER_FILTER_PERIOD_DATE_KEY);
+
+  if(trainerFilterSelect && savedTrainerId){
+    trainerFilterSelect.value = savedTrainerId;
+  }
+
+  if(trainerPeriodType && savedPeriodType){
+    trainerPeriodType.value = savedPeriodType;
+  }
+
+  if(trainerPeriodDate && savedPeriodDate){
+    trainerPeriodDate.value = savedPeriodDate;
+  }
+}
+
 function init(){
+  console.log("[INIT] start");
+  ensureAssignedManagerIds();
+  console.log("[INIT] ensureAssignedManagerIds OK");
+
   initStaticTexts();
+  console.log("[INIT] initStaticTexts OK");
+  renderCaretakerRoleInfo();
+  console.log("[INIT] renderCaretakerRoleInfo OK");
+
   initManagers();
+  console.log("[INIT] initManagers OK");
+
   loadSchools();
+  console.log("[INIT] loadSchools OK");
+  loadTrainerFilterOptions();
+  console.log("[INIT] loadTrainerFilterOptions OK");
+
+  loadFilters();
+  console.log("[INIT] loadFilters OK");
+
+  restoreScheduleReturnContext();
+  console.log("[INIT] restoreScheduleReturnContext OK");
+
   activeSchoolId = schoolSelect.value;
+  console.log("[INIT] activeSchoolId =", activeSchoolId);
+
+  if (isCaretakerRoleMode() && !sessionStorage.getItem("recentlyUpdatedScheduleCell")) {
+    const savedDate = getLastDateForCaretaker(getRoleCaretakerId());
+    if (savedDate && !Number.isNaN(new Date(savedDate).getTime())) {
+      currentDate = new Date(savedDate);
+    }
+  }
+
   updateWeekInfo();
+  console.log("[INIT] updateWeekInfo OK");
+  syncTrainerPeriodDateFromMainDate();
+  console.log("[INIT] syncTrainerPeriodDateFromMainDate OK");
+  loadTrainerToolsState();
+  console.log("[INIT] loadTrainerToolsState OK");
+
   dateInput.onchange = onDateChange;
+  console.log("[INIT] dateInput.onchange OK");
+
   renderScheduleSafe();
+  console.log("[INIT] renderScheduleSafe OK");
+
+  console.log("[INIT] done");
+}
+
+function restoreScheduleReturnContext(){
+  const context = JSON.parse(sessionStorage.getItem("scheduleReturnContext") || "null");
+  if(!context) return;
+
+  sessionStorage.removeItem("scheduleReturnContext");
+
+  if(context.schoolId){
+    schoolSelect.value = String(context.schoolId);
+    localStorage.setItem("selectedSchool", schoolSelect.value);
+    activeSchoolId = schoolSelect.value;
+    updateSchoolUI();
+  }
+
+  if(context.year){
+    yearSelect.value = String(context.year);
+  }
+
+  if(context.date && !Number.isNaN(new Date(context.date).getTime())){
+    currentDate = new Date(context.date);
+  }
 }
 
 function initManagers(){
@@ -364,7 +1009,7 @@ function initManagers(){
     managerItems = loadManagers();
   }
 
-  managerSelect.replaceChildren();
+  managerSelect.innerHTML = '<option value="">Všichni manažeři</option>';
 
   managerItems.forEach(manager => {
     let option = document.createElement("option");
@@ -379,16 +1024,23 @@ function initManagers(){
 
 function logSelectedManager(){
   if(!selectedManagerId){
-    console.log("Vybraný manažer:", null);
+    console.log("VybranĂ˝ manaĹľer:", null);
     return;
   }
 
   const selectedManager = getManagerById(selectedManagerId);
-  console.log("Vybraný manažer:", selectedManager);
+  console.log("VybranĂ˝ manaĹľer:", selectedManager);
 }
 
 function loadSchools(){
-  let schoolItems = getSchools();
+  let allSchools = getSchools();
+  allSchools = getSchoolsForCurrentRole(allSchools);
+  const roleCaretakerId = getRoleCaretakerId();
+  const allowedSchoolIds = getFilteredSchoolIds();
+  const visibleSchools = allSchools.filter(s =>
+    allowedSchoolIds.includes(s.id)
+  );
+  let schoolItems = visibleSchools;
 
   schoolSelect.replaceChildren();
 
@@ -405,10 +1057,39 @@ function loadSchools(){
   });
 
   let saved = localStorage.getItem("selectedSchool");
-  if(saved && schoolSelect.value !== saved){
-    schoolSelect.value = saved;
+  let current = schoolSelect.value || saved || "";
+  let availableIds = schoolItems.map(s => String(s.id));
+
+  if (isCaretakerRoleMode()) {
+    const currentSchoolId = schoolSelect.value && availableIds.includes(String(schoolSelect.value))
+      ? String(schoolSelect.value)
+      : "";
+    const lastSchoolId = getLastSchoolForCaretaker(roleCaretakerId);
+    const defaultSchoolId = getDefaultSchoolForCaretaker(roleCaretakerId);
+
+    if (currentSchoolId) {
+      schoolSelect.value = currentSchoolId;
+    } else if (lastSchoolId && availableIds.includes(String(lastSchoolId))) {
+      schoolSelect.value = String(lastSchoolId);
+    } else if (defaultSchoolId && availableIds.includes(String(defaultSchoolId))) {
+      schoolSelect.value = String(defaultSchoolId);
+    } else if (schoolItems.length > 0) {
+      schoolSelect.value = String(schoolItems[0].id);
+    } else {
+      schoolSelect.value = "";
+    }
+  } else if (current && availableIds.includes(String(current))) {
+    schoolSelect.value = String(current);
+  } else if (availableIds.length) {
+    schoolSelect.value = String(availableIds[0]);
+  } else {
+    schoolSelect.value = "";
   }
 
+  localStorage.setItem("selectedSchool", schoolSelect.value);
+  activeSchoolId = schoolSelect.value;
+  schoolSelect.disabled = isCaretakerRoleMode();
+  schoolSelect.title = isCaretakerRoleMode() ? "Režim školníka – nelze měnit školu" : "";
   updateSchoolUI();
 }
 
@@ -417,37 +1098,94 @@ function openSchools(){
 }
 
 function openTrainers(){
+  sessionStorage.removeItem("trainerAvailabilityContext");
+  sessionStorage.removeItem("scheduleReturnContext");
+  sessionStorage.removeItem("recentlyUpdatedScheduleCell");
   window.location.href = "trainers.html";
+}
+
+function openCaretakers(){
+  window.location.href = "caretakers.html";
 }
 
 schoolSelect.onchange = () => {
   localStorage.setItem("selectedSchool", schoolSelect.value);
   activeSchoolId = schoolSelect.value;
+  if (isCaretakerRoleMode()) {
+    saveLastSchoolForCaretaker(getRoleCaretakerId(), schoolSelect.value);
+  }
   updateSchoolUI();
   renderTrainerPanel();
 };
 
-managerSelect.onchange = () => {
-  selectedManagerId = managerSelect.value;
-  logSelectedManager();
-};
-
 function getSelectedSchool(){
-  let schools = getSchools();
+  let schools = getSchoolsForCurrentRole(getSchools());
   return schools.find(s => s.id == schoolSelect.value);
+}
+
+function getCaretakerNameById(caretakerId){
+  if (!caretakerId) return TEXTS.common?.placeholderDash || "-";
+
+  const caretakers = loadCaretakers();
+  const caretakerItem = caretakers.find(c => String(c.id) === String(caretakerId));
+
+  if (!caretakerItem) return TEXTS.common?.placeholderDash || "-";
+
+  const fullName = `${caretakerItem.prijmeni || ""} ${caretakerItem.jmeno || ""}`.trim();
+  return fullName || caretakerItem.name || TEXTS.common?.placeholderDash || "-";
+}
+
+function getCaretakerColorById(caretakerId){
+  if (!caretakerId) return "";
+
+  const caretakers = loadCaretakers();
+  const caretakerItem = caretakers.find(c => String(c.id) === String(caretakerId));
+
+  return caretakerItem?.color || "";
+}
+
+function lightenColor(hex, amount = 0.88){
+  if (!hex || typeof hex !== "string" || hex.length < 7) return "";
+
+  const r = parseInt(hex.substring(1,3), 16);
+  const g = parseInt(hex.substring(3,5), 16);
+  const b = parseInt(hex.substring(5,7), 16);
+
+  const newR = Math.round(r + (255 - r) * amount);
+  const newG = Math.round(g + (255 - g) * amount);
+  const newB = Math.round(b + (255 - b) * amount);
+
+  return `rgb(${newR}, ${newG}, ${newB})`;
 }
 
 function updateSchoolUI(){
   let s = getSelectedSchool();
+  const caretakerId = s?.assignedCaretakerId || "";
+  const caretakerColor = getCaretakerColorById(caretakerId);
+  const lightColor = lightenColor(caretakerColor);
+
   city.textContent = s?.mesto || TEXTS.common.placeholderDash;
+  caretaker.textContent = getCaretakerNameById(caretakerId);
+
+  caretaker.style.background = caretakerColor || "";
+  caretaker.style.color = caretakerColor ? "#000" : "";
+
+  if (headerTable) {
+    headerTable.style.background = lightColor || "";
+  }
 }
 
 function renderTrainerPanel(){
   activeSchoolId = schoolSelect.value;
   trainers = loadTrainers();
-  const visibleBase = getVisibleTrainers(activeSchoolId);
-  let visibleTrainers = visibleBase;
   const search = trainerSearch.value.trim().toLowerCase();
+  const localVisibleBase = getVisibleTrainers(activeSchoolId);
+  const visibleBase = search
+    ? loadTrainers()
+    : showAll
+      ? loadTrainers()
+      : [];
+  let visibleTrainers = visibleBase;
 
   if(search){
     visibleTrainers = visibleBase.filter(trainer =>
@@ -456,19 +1194,19 @@ function renderTrainerPanel(){
         .includes(search)
     );
   } else {
-    visibleTrainers = visibleBase.slice(0, 10);
+    visibleTrainers = showAll ? visibleBase : visibleBase.slice(0, 10);
   }
 
   let fragment = document.createDocumentFragment();
 
-  if(visibleBase.length > 10 && !search){
+  if(visibleBase.length > 10 && !search && !showAll){
     let info = document.createElement("div");
     info.className = "trainer-panel-info";
     info.textContent = `Zobrazeno 10 z ${visibleBase.length} trenérů – použij vyhledávání`;
     fragment.appendChild(info);
   }
 
-  if(!visibleTrainers.length){
+  if(!visibleTrainers.length && (search || showAll)){
     let empty = document.createElement("div");
     empty.textContent = "Žádní trenéři";
     fragment.appendChild(empty);
@@ -535,10 +1273,34 @@ function renderTrainerPanel(){
 
 function closeMenu(){
   if(menu){ menu.remove(); menu = null; }
+  openMenuAvailableOnly = false;
+  openMenuPromptText = "";
+  openMenuMode = "";
+  openMenuSearch = "";
   if(activeCell) activeCell.classList.remove("editing");
 }
 
+function refreshOpenMenu(){
+  if(!menu || !activeCell) return;
+  const rect = activeCell.getBoundingClientRect();
+  openMenu(
+    null,
+    new Date(activeCell.dataset.date),
+    activeCell.dataset.cls,
+    Number(activeCell.dataset.hour),
+    activeCell.dataset.type,
+    openMenuAvailableOnly,
+    openMenuPromptText,
+    {
+      cell: activeCell,
+      left: rect.left + window.scrollX,
+      top: rect.bottom + window.scrollY,
+    }
+  );
+}
+
 document.addEventListener("click", (e) => {
+  if(Date.now() < suppressMenuAutoCloseUntil) return;
   if(menu && !menu.contains(e.target)){
     closeMenu();
   }
@@ -566,8 +1328,14 @@ function assignTrainerToCell(trainerId){
   let cellDate = new Date(date);
   let cellHour = Number(hour);
 
+  if(trainerId && trainerId !== "X" && hasConflict(trainerId, cellDate, cls, cellHour, type)){
+    showStatusMessage("Tento trenér už je ve stejný čas naplánovaný jinde.", "error");
+    highlightConflictAttemptCell(activeCell);
+    return;
+  }
+
   if(type === "plan"){
-    plans[getKey(cellDate, cls, cellHour)] = trainerId;
+    plans[getKey(cellDate, cls, cellHour)] = createPlanStoredValue(trainerId, cellDate, cls, cellHour);
     localStorage.setItem("plans", JSON.stringify(plans));
   } else {
     reality[getKey(cellDate, cls, cellHour)] = trainerId;
@@ -578,19 +1346,44 @@ function assignTrainerToCell(trainerId){
   renderScheduleSafe();
 }
 
-function openMenu(e, date, cls, h, type){
+function openMenu(e, date, cls, h, type, availableOnly = false, promptText = "", anchorOptions = null){
   closeMenu();
-  e.stopPropagation();
-  setActiveCell(e.currentTarget);
+  e?.stopPropagation?.();
+  const anchorCell = anchorOptions?.cell || anchorOptions?.anchorCell || e?.currentTarget;
+  openMenuAvailableOnly = availableOnly;
+  openMenuPromptText = promptText;
+  openMenuMode = availableOnly ? "availableSearch" : "";
+  openMenuSearch = "";
+  if(availableOnly === true){
+    console.log("AVAILABLE_ONLY_MENU", {
+      availableOnly,
+      date,
+      cls,
+      h,
+      type,
+      activeCell,
+      anchorCell,
+      anchorOptions
+    });
+  }
+  if(!anchorCell) return;
+  setActiveCell(anchorCell);
 
   menu = document.createElement("div");
   menu.className = "menu";
-  menu.style.left = e.pageX + "px";
-  menu.style.top = e.pageY + "px";
+  const anchorLeft = anchorOptions?.left ?? anchorOptions?.anchorLeft ?? e?.pageX ?? 0;
+  const anchorTop = anchorOptions?.top ?? anchorOptions?.anchorTop ?? e?.pageY ?? 0;
+  menu.style.left = anchorLeft + "px";
+  menu.style.top = anchorTop + "px";
 
-  const visibleBase = getVisibleTrainers(activeSchoolId);
-  let visibleTrainers = visibleBase;
   const search = trainerSearch.value.trim().toLowerCase();
+  const localVisibleBase = getVisibleTrainers(activeSchoolId);
+  const visibleBase = search
+    ? loadTrainers()
+    : showAll
+      ? loadTrainers()
+      : [];
+  let visibleTrainers = visibleBase;
 
   if(search){
     visibleTrainers = visibleBase.filter(trainer =>
@@ -599,7 +1392,7 @@ function openMenu(e, date, cls, h, type){
         .includes(search)
     );
   } else {
-    visibleTrainers = visibleBase.slice(0, 10);
+    visibleTrainers = showAll ? visibleBase : visibleBase.slice(0, 10);
   }
 
   const free = [];
@@ -632,30 +1425,149 @@ function openMenu(e, date, cls, h, type){
 
     list.forEach(trainer => {
       let item = document.createElement("div");
+      item.className = "menu-item";
       if(isBusyGroup){
         item.classList.add("trainer-busy");
-        item.title = "Obsazen v tomto čase";
+          item.title = "Obsazen v tomto čase";
       }
-      item.textContent = `${trainer.jmeno} ${trainer.prijmeni}`;
+      item.textContent = `${trainer.prijmeni || ""} ${trainer.jmeno || ""}`.trim();
       item.addEventListener("click", () => {
-        assignTrainerToCell(trainer.id);
+        selectValue(trainer.id);
       });
       menu.appendChild(item);
     });
   }
 
-  renderTrainerGroup("Volní trenéři", free, false);
-  renderTrainerGroup("Obsazení trenéři", busy, true);
-
-  add(TEXTS.schedule.mail, "MAIL");
-  add(TEXTS.common.unavailable, "X");
-  add(TEXTS.common.delete, "");
-
   function add(label, val){
     let d = document.createElement("div");
+    d.className = "menu-item";
+    if(val === "X") d.classList.add("menu-item-unavailable");
     d.textContent = label;
     d.onclick = () => selectValue(val);
     menu.appendChild(d);
+  }
+
+  function addAction(label, onClick){
+    let d = document.createElement("div");
+    d.className = "menu-item";
+    d.textContent = label;
+    d.onclick = (event) => {
+      event.stopPropagation();
+      onClick();
+    };
+    menu.appendChild(d);
+  }
+
+  function renderFlatTrainerList(list){
+    list.forEach(trainer => {
+      let item = document.createElement("div");
+      item.className = "menu-item";
+      item.textContent = `${trainer.prijmeni || ""} ${trainer.jmeno || ""}`.trim();
+      item.addEventListener("click", () => {
+        selectValue(trainer.id);
+      });
+      menu.appendChild(item);
+    });
+  }
+
+  function renderMenuTrainerOptions(availableOnly = false, promptText = ""){
+    menu.replaceChildren();
+
+    let source = openMenuMode === "availableSearch"
+      ? getAvailableTrainersForCell(date, cls, h, type)
+      : openMenuMode === "search"
+        ? loadTrainers()
+        : [];
+    let filteredVisibleTrainers = source;
+
+    if(openMenuMode === "search" || openMenuMode === "availableSearch"){
+      if(openMenuMode === "availableSearch"){
+        let header = document.createElement("div");
+        header.className = "trainer-group-title";
+        header.textContent = "Volní trenéři";
+        menu.appendChild(header);
+      }
+      let searchInput = document.createElement("input");
+      searchInput.className = "trainer-search";
+      searchInput.placeholder = TEXTS.schedule.searchTrainer;
+      searchInput.value = openMenuSearch;
+      searchInput.addEventListener("click", (event) => event.stopPropagation());
+      searchInput.addEventListener("input", () => {
+        openMenuSearch = searchInput.value;
+        renderMenuTrainerOptions(false, promptText);
+        let refreshedInput = menu.querySelector("input");
+        if(refreshedInput){
+          refreshedInput.focus();
+          refreshedInput.setSelectionRange(openMenuSearch.length, openMenuSearch.length);
+        }
+      });
+      menu.appendChild(searchInput);
+      const query = openMenuSearch.trim().toLowerCase();
+      if(openMenuMode === "search" && query.length === 0){
+        filteredVisibleTrainers = [];
+      } else if(openMenuMode === "search" && query.length === 1){
+        filteredVisibleTrainers = source.filter(trainer =>
+          (trainer.prijmeni || "").toLowerCase().startsWith(query)
+        );
+      } else {
+        filteredVisibleTrainers = source.filter(trainer =>
+          `${trainer.jmeno || ""} ${trainer.prijmeni || ""}`
+            .toLowerCase()
+            .includes(query)
+        );
+      }
+    }
+
+    if(promptText){
+      let prompt = document.createElement("div");
+      prompt.className = "trainer-group-title";
+      prompt.textContent = promptText;
+      menu.appendChild(prompt);
+    }
+
+    if(openMenuMode === "search" || openMenuMode === "availableSearch") {
+      renderFlatTrainerList(filteredVisibleTrainers);
+    } else {
+      addAction(TEXTS.schedule.searchTrainer, () => {
+        openMenuMode = "search";
+        openMenuSearch = "";
+        renderMenuTrainerOptions(false, promptText);
+        let searchInput = menu.querySelector("input");
+        if(searchInput) searchInput.focus();
+      });
+      addAction("Všichni volní trenéři", () => {
+        sessionStorage.setItem("trainerAvailabilityContext", JSON.stringify({
+          date: formatDate(date),
+          hour: h,
+          type,
+          schoolId: activeSchoolId,
+          cls,
+          year: getSelectedYear()
+        }));
+        sessionStorage.setItem("scheduleReturnContext", JSON.stringify({
+          schoolId: activeSchoolId,
+          year: getSelectedYear(),
+          date: dateInput.value || formatDate(date),
+          cls,
+          hour: h,
+          type
+        }));
+        closeMenu();
+        window.location.href = "trainers.html?selection=1";
+      });
+      add("❌ Nelze obsadit", "X");
+      add(TEXTS.schedule.mail, "MAIL");
+      addAction("Zrušit záznam", () => {
+        selectValue("");
+      });
+      return;
+    }
+
+    add("❌ Nelze obsadit", "X");
+    add(TEXTS.schedule.mail, "MAIL");
+    addAction("Zrušit záznam", () => {
+      selectValue("");
+    });
   }
 
   function selectValue(val){
@@ -664,9 +1576,58 @@ function openMenu(e, date, cls, h, type){
       return;
     }
 
+    if(
+      val &&
+      val !== "X" &&
+      !availableOnly &&
+      openMenuMode === "search" &&
+      !localVisibleBase.some(trainer => String(trainer.id) === String(val))
+    ){
+      addTemporaryTrainerForSchool(activeSchoolId, val);
+    }
+
+    if(val && val !== "X" && hasConflict(val, date, cls, h, type)){
+      showStatusMessage("Tento trenér už je ve stejný čas naplánovaný jinde.", "error");
+      highlightConflictAttemptCell(activeCell);
+      reopenAvailableOnlyContext = {
+        cell: activeCell,
+        date,
+        cls,
+        h,
+        type,
+        promptText: "Vyberte jiného volného trenéra.",
+      };
+      if(menu){
+        menu.remove();
+        menu = null;
+      }
+      suppressMenuAutoCloseUntil = Date.now() + 300;
+      setTimeout(() => {
+        if(!reopenAvailableOnlyContext) return;
+        const context = reopenAvailableOnlyContext;
+        reopenAvailableOnlyContext = null;
+        const rect = context.cell?.getBoundingClientRect();
+        openMenu(
+          null,
+          context.date,
+          context.cls,
+          context.h,
+          context.type,
+          true,
+          context.promptText,
+          {
+            cell: context.cell,
+            left: (rect?.left ?? 0) + window.scrollX,
+            top: (rect?.bottom ?? 0) + window.scrollY,
+          }
+        );
+      }, 50);
+      return;
+    }
+
     if(type === "plan"){
       if(val){
-        plans[getKey(date, cls, h)] = val;
+        plans[getKey(date, cls, h)] = createPlanStoredValue(val, date, cls, h);
       } else {
         deleteStoredValue(plans, date, cls, h);
       }
@@ -683,6 +1644,8 @@ function openMenu(e, date, cls, h, type){
     closeMenu();
     renderScheduleSafe();
   }
+
+  renderMenuTrainerOptions(availableOnly, promptText);
 
   document.body.appendChild(menu);
 }
@@ -706,19 +1669,31 @@ ${date.toLocaleDateString()} / ${cls} / ${h}. hodina.`);
 
 function onDateChange(){
   currentDate = new Date(dateInput.value);
+  resetTemporarySchoolTrainers();
+  if (isCaretakerRoleMode() && dateInput.value) {
+    saveLastDateForCaretaker(getRoleCaretakerId(), dateInput.value);
+  }
   updateWeekInfo();
   renderScheduleSafe();
 }
 
 function changeWeek(o){
   currentDate.setDate(currentDate.getDate() + o);
+  resetTemporarySchoolTrainers();
   updateWeekInfo();
+  if (isCaretakerRoleMode() && dateInput.value) {
+    saveLastDateForCaretaker(getRoleCaretakerId(), dateInput.value);
+  }
   renderScheduleSafe();
 }
 
 function goToday(){
   currentDate = new Date();
+  resetTemporarySchoolTrainers();
   updateWeekInfo();
+  if (isCaretakerRoleMode() && dateInput.value) {
+    saveLastDateForCaretaker(getRoleCaretakerId(), dateInput.value);
+  }
   renderScheduleSafe();
 }
 
@@ -737,6 +1712,19 @@ function getWeekNumber(d){
   return Math.ceil((((d - start) / 86400000) + 1) / 7);
 }
 
+function getTodayDayIndexInDisplayedWeek(mondayDate){
+  const today = new Date();
+  const todayValue = formatDate(today);
+
+  for(let dayIndex = 0; dayIndex < 5; dayIndex++){
+    let dayDate = new Date(mondayDate);
+    dayDate.setDate(dayDate.getDate() + dayIndex);
+    if(formatDate(dayDate) === todayValue) return dayIndex;
+  }
+
+  return -1;
+}
+
 function updateWeekInfo(){
   let m = getMonday(currentDate);
   dateInput.valueAsDate = m;
@@ -744,9 +1732,56 @@ function updateWeekInfo(){
 }
 
 function formatDate(d){ return d.toISOString().split("T")[0]; }
+function normalizeDateKey(date){ return formatDate(new Date(date)); }
 function getSelectedYear(){ return String(yearSelect.value); }
 function getLegacyKey(d, c, h){ return formatDate(d) + "_" + c + "_" + h; }
 function getKey(d, c, h){ return formatDate(d) + "_" + getSelectedYear() + "_" + c + "_" + h; }
+
+function getWeekRange(anchorDate){
+  const start = getMonday(new Date(anchorDate));
+  const end = new Date(start);
+  end.setDate(end.getDate() + 6);
+  return { start, end };
+}
+
+function getMonthRange(anchorDate){
+  const date = new Date(anchorDate);
+  const start = new Date(date.getFullYear(), date.getMonth(), 1);
+  const end = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+  return { start, end };
+}
+
+function isDateInRange(dateStr, start, end){
+  const value = normalizeDateKey(dateStr);
+  return value >= normalizeDateKey(start) && value <= normalizeDateKey(end);
+}
+
+function getTrainerPlanPeriodRange(periodType, anchorDate){
+  const date = new Date(anchorDate);
+  if(Number.isNaN(date.getTime())) return null;
+
+  if(periodType === "month"){
+    const start = new Date(date.getFullYear(), date.getMonth(), 1);
+    const end = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+    return { start, end };
+  }
+
+  const start = getMonday(date);
+  const end = new Date(start);
+  end.setDate(end.getDate() + 4);
+  return { start, end };
+}
+
+function getTrainerPlanPeriodLabel(periodType, anchorDate){
+  const date = new Date(anchorDate);
+  if(Number.isNaN(date.getTime())) return "";
+
+  if(periodType === "month"){
+    return `${String(date.getMonth() + 1).padStart(2, "0")}/${date.getFullYear()}`;
+  }
+
+  return `týden ${getWeekNumber(date)}`;
+}
 
 function parseKey(key){
   let parts = key.split("_");
@@ -768,16 +1803,211 @@ function getStoredValue(store, d, c, h){
   return store[legacyKey];
 }
 
+function getStoredTrainerId(value){
+  return typeof value === "object" ? value?.trainerId : value;
+}
+
+function createPlanStoredValue(trainerId, date, cls, hour){
+  if(!trainerId || trainerId === "X") return trainerId;
+
+  return {
+    trainerId,
+    schoolId: schoolSelect?.value || "",
+    date: formatDate(date),
+    year: getSelectedYear(),
+    className: cls,
+    hour: Number(hour)
+  };
+}
+
 function deleteStoredValue(store, d, c, h){
   delete store[getKey(d, c, h)];
   delete store[getLegacyKey(d, c, h)];
 }
 
 function getName(id){
-  if(id === "X") return TEXTS.common.unavailableSymbol;
+  id = getStoredTrainerId(id);
+  if(id === "X") return "X";
 
   let t = trainers.find(t => t.id == id);
   return t ? `${t.prijmeni} (${t.klub || TEXTS.common.placeholderDash})` : "";
+}
+
+function formatTrainerPlanSubject(trainer, periodType, anchorDate){
+  const trainerName = `${trainer?.jmeno || ""} ${trainer?.prijmeni || ""}`.trim() || trainer?.name || "";
+
+  if(periodType === "month"){
+    return `Plán výuky na ${getTrainerPlanPeriodLabel(periodType, anchorDate)} - ${trainerName}`;
+  }
+
+  return `Plán výuky na ${getTrainerPlanPeriodLabel(periodType, anchorDate)} - ${trainerName}`;
+}
+
+function formatTrainerPlanBody(trainer, periodType, anchorDate, entries){
+  const trainerName = `${trainer?.jmeno || ""} ${trainer?.prijmeni || ""}`.trim() || trainer?.name || "";
+  const periodLabel = getTrainerPlanPeriodLabel(periodType, anchorDate);
+  const lines = [
+    `Dobrý den${trainerName ? ` ${trainerName}` : ""},`,
+    "",
+    `posíláme plán výuky pro období ${periodLabel}.`,
+    ""
+  ];
+
+  if(!entries.length){
+    lines.push("V tomto období nemáte evidovanou žádnou plánovanou výuku.");
+    return lines.join("\n");
+  }
+
+  let lastDate = "";
+
+  entries.forEach(entry => {
+    if(entry.date !== lastDate){
+      if(lastDate) lines.push("");
+      lines.push(entry.dateLabel);
+      lastDate = entry.date;
+    }
+
+    lines.push(`- ${entry.school} | ročník ${entry.year} | třída ${entry.cls} | ${entry.hour}. hodina`);
+  });
+
+  return lines.join("\n");
+}
+
+function buildTrainerMailtoLink(trainerId, periodType, anchorDate){
+  const trainer = getTrainerById(trainerId);
+  if(!trainer || !trainer.email) return "";
+
+  const range = getTrainerPlanPeriodRange(periodType, anchorDate);
+  if(!range) return "";
+
+  const plansStore = load("plans", {});
+  const schools = getSchools();
+  const selectedSchool = getSelectedSchool();
+  const fallbackSchoolName = selectedSchool?.nazev || TEXTS.common?.placeholderDash || "-";
+  const entries = Object.entries(plansStore)
+    .map(([key, value]) => {
+      const parsed = parseKey(key);
+      const normalizedTrainerId = typeof value === "object" ? value.trainerId : value;
+
+      if(String(normalizedTrainerId) !== String(trainerId)) return null;
+      if(!parsed?.date || !parsed?.cls || !parsed?.hour) return null;
+
+      const entryDate = new Date(parsed.date);
+      if(Number.isNaN(entryDate.getTime())) return null;
+      if(entryDate < range.start || entryDate > range.end) return null;
+
+      const school = schools.find(s => String(s.id) === String(selectedSchool?.id));
+
+      return {
+        date: parsed.date,
+        dateLabel: entryDate.toLocaleDateString("cs-CZ"),
+        school: school?.nazev || fallbackSchoolName,
+        year: parsed.year || getSelectedYear(),
+        cls: parsed.cls,
+        hour: parsed.hour
+      };
+    })
+    .filter(Boolean)
+    .sort((a, b) => {
+      if(a.date !== b.date) return a.date.localeCompare(b.date);
+      if(String(a.year) !== String(b.year)) return String(a.year).localeCompare(String(b.year));
+      if(a.cls !== b.cls) return a.cls.localeCompare(b.cls);
+      return Number(a.hour) - Number(b.hour);
+    });
+
+  const subject = formatTrainerPlanSubject(trainer, periodType, anchorDate);
+  const body = formatTrainerPlanBody(trainer, periodType, anchorDate, entries);
+
+  return `mailto:${trainer.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
+
+function getTrainerPlanEntriesForPeriod(trainerId, periodType, anchorDate){
+  const plansStore = load("plans", {});
+  const range = periodType === "month"
+    ? getMonthRange(anchorDate)
+    : getWeekRange(anchorDate);
+  const currentSchoolId = String(schoolSelect?.value || "");
+
+  return Object.entries(plansStore)
+    .map(([key, value]) => {
+      const parsed = parseKey(key);
+      const normalizedTrainerId = typeof value === "object" ? value.trainerId : value;
+      const resolvedSchoolId = typeof value === "object"
+        ? String(value.schoolId ?? value.school?.id ?? value.school?.schoolId ?? "")
+        : "";
+
+      if(String(normalizedTrainerId) !== String(trainerId)) return null;
+      if(!parsed?.date || !isDateInRange(parsed.date, range.start, range.end)) return null;
+
+      return {
+        date: parsed.date,
+        schoolId: resolvedSchoolId || currentSchoolId,
+        year: value?.year || parsed.year || "",
+        className: value?.className || parsed.cls,
+        hour: value?.hour || parsed.hour,
+        value
+      };
+    })
+    .filter(Boolean)
+    .sort((a, b) => {
+      if(a.date !== b.date) return a.date.localeCompare(b.date);
+      return Number(a.hour) - Number(b.hour);
+    });
+}
+
+function renderTrainerPlanPreview(){
+  if(!trainerPlanPreview) return;
+
+  const trainerId = trainerFilterSelect?.value || "";
+  const periodType = trainerPeriodType?.value || "week";
+  const anchorDate = trainerPeriodDate?.value || "";
+
+  if(!trainerId){
+    trainerPlanPreview.innerHTML = "Vyberte trenéra.";
+    return;
+  }
+
+  if(!anchorDate){
+    trainerPlanPreview.innerHTML = "Vyberte datum období.";
+    return;
+  }
+
+  const schools = getSchools();
+  const entries = getTrainerPlanEntriesForPeriod(trainerId, periodType, anchorDate);
+
+  if(!entries.length){
+    trainerPlanPreview.innerHTML = "Pro zvolené období nebyl nalezen žádný plán.";
+    return;
+  }
+
+  const parts = [
+    `<strong>Škola: všechny školy</strong>`,
+    ""
+  ];
+  let lastDate = "";
+
+  entries.forEach(entry => {
+    if(entry.date !== lastDate){
+      if(lastDate) parts.push("");
+      parts.push(`<strong>${new Date(entry.date).toLocaleDateString("cs-CZ")}</strong>`);
+      lastDate = entry.date;
+    }
+
+    const school = schools.find(s => String(s.id) === String(entry.schoolId));
+    parts.push(`${entry.hour}. hodina - ${(school?.nazev || "-")} - ročník ${entry.year || "-"} - třída ${entry.className || "-"}`);
+  });
+
+  trainerPlanPreview.innerHTML = parts.join("<br>");
+}
+
+function openTrainerPlanPage(){
+  const params = new URLSearchParams({
+    trainerId: trainerFilterSelect?.value || "",
+    periodType: trainerPeriodType?.value || "week",
+    periodDate: trainerPeriodDate?.value || ""
+  });
+
+  window.location.href = `trainer-plan.html?${params.toString()}`;
 }
 
 function hasVisibleValue(value){
@@ -820,11 +2050,18 @@ function buildCellTitle(baseTooltip, conflictTooltip){
 }
 
 function hasConflict(trainerId, date, cls, hour, type){
-  return isTrainerBusy(trainerId, date, cls, hour, type);
+  return isTrainerBusy(getStoredTrainerId(trainerId), date, cls, hour, type);
+}
+
+function getAvailableTrainersForCell(date, cls, hour, type){
+  return loadTrainers().filter(trainer =>
+    !hasConflict(trainer.id, date, cls, hour, type)
+  );
 }
 
 function isTrainerBusyGlobal(trainerId, date, hour, type){
   const source = type === "plan" ? plans : reality;
+  trainerId = getStoredTrainerId(trainerId);
   let activeKey = null;
   let activeLegacyKey = null;
 
@@ -855,6 +2092,7 @@ function isTrainerBusyGlobal(trainerId, date, hour, type){
 }
 
 function isTrainerBusy(trainerId, date, cls, hour, type){
+  trainerId = getStoredTrainerId(trainerId);
   let targetDate = formatDate(date);
   let targetYear = getSelectedYear();
   let currentKey = getKey(date, cls, hour);
@@ -869,7 +2107,7 @@ function isTrainerBusy(trainerId, date, cls, hour, type){
       item.date === targetDate &&
       item.hour === hour &&
       (item.year ? item.year === targetYear : true) &&
-      store[key] === trainerId
+      getStoredTrainerId(store[key]) === trainerId
     ){
       return true;
     }
@@ -880,9 +2118,29 @@ function isTrainerBusy(trainerId, date, cls, hour, type){
 
 function renderScheduleCore(){
   loadSchools();
+  const visibleSchools = getSchoolsForCurrentRole(getSchools());
+  const allowedSchoolIds = getFilteredSchoolIds().filter(id =>
+    visibleSchools.some(s => String(s.id) === String(id))
+  );
+
+  if(allowedSchoolIds.length){
+    if(!allowedSchoolIds.includes(schoolSelect.value)){
+      schoolSelect.value = allowedSchoolIds[0];
+      localStorage.setItem("selectedSchool", schoolSelect.value);
+      activeSchoolId = schoolSelect.value;
+      updateSchoolUI();
+    }
+  } else if (schoolSelect.value) {
+    schoolSelect.value = "";
+    localStorage.setItem("selectedSchool", schoolSelect.value);
+    activeSchoolId = schoolSelect.value;
+    updateSchoolUI();
+  }
+
   renderTrainerPanel();
 
   let mondayDate = getMonday(currentDate);
+  const todayDayIndex = getTodayDayIndexInDisplayedWeek(mondayDate);
   let fragment = document.createDocumentFragment();
 
   let headerRow1 = document.createElement("tr");
@@ -902,6 +2160,7 @@ function renderScheduleCore(){
 
     let dayHeader = document.createElement("th");
     dayHeader.colSpan = 4;
+    if(dayIndex === todayDayIndex) dayHeader.classList.add("today-column");
     dayHeader.append(TEXTS.schedule.days[dayIndex], document.createElement("br"), dayDate.toLocaleDateString());
     headerRow1.appendChild(dayHeader);
   }
@@ -911,6 +2170,7 @@ function renderScheduleCore(){
     classes.forEach(c => {
       let classHeader = document.createElement("th");
       classHeader.className = "class-header";
+      if(dayIndex === todayDayIndex) classHeader.classList.add("today-column");
       classHeader.textContent = c;
       headerRow2.appendChild(classHeader);
     });
@@ -947,24 +2207,30 @@ function renderScheduleCore(){
         let border = classIndex === 0 ? "day-border" : "";
         let planValue = getStoredValue(plans, dayDate, cls, hour);
         let realityValue = getStoredValue(reality, dayDate, cls, hour);
+        let planTrainerId = getStoredTrainerId(planValue);
         let comparisonStatus = getPlanRealityStatus(planValue, realityValue);
-        let planConflict = planValue && planValue !== "X" && isTrainerBusy(planValue, dayDate, cls, hour, "plan");
+        let planConflict = planTrainerId && planTrainerId !== "X" && isTrainerBusy(planTrainerId, dayDate, cls, hour, "plan");
         let realityConflict = realityValue && realityValue !== "X" && isTrainerBusy(realityValue, dayDate, cls, hour, "real");
-        let planGlobalConflict = planValue && planValue !== "X" && hasConflict(planValue, dayDate, cls, hour, "plan");
+        let planGlobalConflict = planTrainerId && planTrainerId !== "X" && hasConflict(planTrainerId, dayDate, cls, hour, "plan");
         let realityGlobalConflict = realityValue && realityValue !== "X" && hasConflict(realityValue, dayDate, cls, hour, "real");
-        let planClass = ["active-cell", border, comparisonStatus.className, planValue === "X" ? "unavailable" : "", planGlobalConflict ? "conflict-global" : "", planConflict ? "conflict" : "", planConflict ? "conflict-plan" : ""].filter(Boolean).join(" ");
+        let planClass = ["active-cell", border, comparisonStatus.className, planTrainerId === "X" ? "unavailable" : "", planGlobalConflict ? "conflict-global" : "", planConflict ? "conflict" : "", planConflict ? "conflict-plan" : ""].filter(Boolean).join(" ");
         let realityClass = [border, comparisonStatus.className, realityValue === "X" ? "unavailable" : "", realityGlobalConflict ? "conflict-global" : "", realityConflict ? "conflict" : "", realityConflict ? "conflict-real" : ""].filter(Boolean).join(" ");
 
         let planCell = document.createElement("td");
         planCell.className = ["cell", planClass].filter(Boolean).join(" ");
+        if(dayIndex === todayDayIndex) planCell.classList.add("today-column");
         planCell.dataset.schoolId = schoolSelect.value;
         planCell.dataset.date = formatDate(dayDate);
         planCell.dataset.cls = cls;
         planCell.dataset.hour = String(hour);
         planCell.dataset.type = "plan";
-        planCell.textContent = getName(planValue);
+        if(planTrainerId === "X"){
+          planCell.innerHTML = '<div class="cell-unavailable"><div class="cell-unavailable-icon">🚫</div><div class="cell-unavailable-text"><div>Nelze</div><div>obsadit</div></div></div>';
+        } else {
+          planCell.textContent = getName(planValue);
+        }
         planCell.title = buildCellTitle(
-          comparisonStatus.tooltip,
+          planTrainerId === "X" ? "Nelze obsadit" : comparisonStatus.tooltip,
           planConflict ? "Konflikt – trenér už je jinde" : ""
         );
         planCell.addEventListener("click", (event) => {
@@ -993,11 +2259,41 @@ function renderScheduleCore(){
           if(!trainerId) return;
 
           if(hasConflict(trainerId, dayDate, cls, hour, "plan")){
-            alert(TEXTS.schedule.conflict);
+            showStatusMessage("Tento trenér už je ve stejný čas naplánovaný jinde.", "error");
+            highlightConflictAttemptCell(planCell);
+            reopenAvailableOnlyContext = {
+              cell: planCell,
+              date: new Date(dayDate),
+              cls,
+              h: hour,
+              type: "plan",
+              promptText: "Vyberte jiného volného trenéra.",
+            };
+            suppressMenuAutoCloseUntil = Date.now() + 300;
+            setTimeout(() => {
+              if(!reopenAvailableOnlyContext) return;
+              const context = reopenAvailableOnlyContext;
+              reopenAvailableOnlyContext = null;
+              const rect = context.cell?.getBoundingClientRect();
+              openMenu(
+                null,
+                context.date,
+                context.cls,
+                context.h,
+                context.type,
+                true,
+                context.promptText,
+                {
+                  cell: context.cell,
+                  left: (rect?.left ?? 0) + window.scrollX,
+                  top: (rect?.bottom ?? 0) + window.scrollY,
+                }
+              );
+            }, 50);
             return;
           }
 
-          plans[getKey(dayDate, cls, hour)] = trainerId;
+          plans[getKey(dayDate, cls, hour)] = createPlanStoredValue(trainerId, dayDate, cls, hour);
           localStorage.setItem("plans", JSON.stringify(plans));
           renderScheduleSafe();
         });
@@ -1005,14 +2301,19 @@ function renderScheduleCore(){
 
         let realCell = document.createElement("td");
         realCell.className = ["cell", realityClass].filter(Boolean).join(" ");
+        if(dayIndex === todayDayIndex) realCell.classList.add("today-column");
         realCell.dataset.schoolId = schoolSelect.value;
         realCell.dataset.date = formatDate(dayDate);
         realCell.dataset.cls = cls;
         realCell.dataset.hour = String(hour);
         realCell.dataset.type = "real";
-        realCell.textContent = getName(realityValue);
+        if(realityValue === "X"){
+          realCell.innerHTML = '<div class="cell-unavailable"><div class="cell-unavailable-icon">🚫</div><div class="cell-unavailable-text"><div>Nelze</div><div>obsadit</div></div></div>';
+        } else {
+          realCell.textContent = getName(realityValue);
+        }
         realCell.title = buildCellTitle(
-          comparisonStatus.tooltip,
+          realityValue === "X" ? "Nelze obsadit" : comparisonStatus.tooltip,
           realityConflict ? "Konflikt – trenér už je jinde" : ""
         );
         realCell.addEventListener("click", (event) => {
@@ -1041,7 +2342,37 @@ function renderScheduleCore(){
           if(!trainerId) return;
 
           if(hasConflict(trainerId, dayDate, cls, hour, "real")){
-            alert(TEXTS.schedule.conflict);
+            showStatusMessage("Tento trenér už je ve stejný čas naplánovaný jinde.", "error");
+            highlightConflictAttemptCell(realCell);
+            reopenAvailableOnlyContext = {
+              cell: realCell,
+              date: new Date(dayDate),
+              cls,
+              h: hour,
+              type: "real",
+              promptText: "Vyberte jiného volného trenéra.",
+            };
+            suppressMenuAutoCloseUntil = Date.now() + 300;
+            setTimeout(() => {
+              if(!reopenAvailableOnlyContext) return;
+              const context = reopenAvailableOnlyContext;
+              reopenAvailableOnlyContext = null;
+              const rect = context.cell?.getBoundingClientRect();
+              openMenu(
+                null,
+                context.date,
+                context.cls,
+                context.h,
+                context.type,
+                true,
+                context.promptText,
+                {
+                  cell: context.cell,
+                  left: (rect?.left ?? 0) + window.scrollX,
+                  top: (rect?.bottom ?? 0) + window.scrollY,
+                }
+              );
+            }, 50);
             return;
           }
 
@@ -1060,19 +2391,35 @@ function renderScheduleCore(){
   table.replaceChildren(fragment);
 }
 
-function renderScheduleSafe(){
-  try {
-    renderScheduleCore();
-  } catch (e) {
-    console.error("renderSchedule crashed:", e);
-  }
+function highlightRecentlyUpdatedCell(){
+  const context = JSON.parse(sessionStorage.getItem("recentlyUpdatedScheduleCell") || "null");
+  if(!context?.date || !context?.cls || !context?.hour || !context?.type) return;
+
+  sessionStorage.removeItem("recentlyUpdatedScheduleCell");
+
+  const cell = table.querySelector(
+    `[data-date="${context.date}"][data-cls="${context.cls}"][data-hour="${context.hour}"][data-type="${context.type}"]`
+  );
+  if(!cell) return;
+
+  cell.scrollIntoView({ behavior: "smooth", block: "center" });
+  cell.classList.add("recently-updated-cell");
+  setTimeout(() => {
+    cell.classList.remove("recently-updated-cell");
+  }, 2500);
 }
 
-function renderTrainerSelect(){}
-function renderManagerSelect(){ initManagers(); }
-function renderSchedule(){ renderScheduleSafe(); }
-function renderStats(){}
-function renderDashboard(){}
+function renderScheduleSafe(){
+  console.log("[RENDER] renderScheduleSafe start");
+  try {
+    renderScheduleCore();
+    highlightRecentlyUpdatedCell();
+    console.log("[RENDER] renderScheduleCore OK");
+  } catch (e) {
+    console.error("[RENDER] renderSchedule crashed:", e);
+    throw e;
+  }
+}
 
 function copyWeek(){
   let monday = getMonday(currentDate);
@@ -1088,7 +2435,7 @@ function copyWeek(){
       classes.forEach(cls => {
         let from = getStoredValue(plans, date, cls, h);
         let to = getKey(next, cls, h);
-        if(from) plans[to] = from;
+        if(from) plans[to] = createPlanStoredValue(getStoredTrainerId(from), next, cls, h);
       });
     }
   }
@@ -1102,26 +2449,50 @@ window.copyWeek = copyWeek;
 window.goToday = goToday;
 window.openSchools = openSchools;
 window.openTrainers = openTrainers;
+window.openCaretakers = openCaretakers;
 window.render = renderScheduleSafe;
 
-trainerSearch.addEventListener("input", renderTrainerPanel);
-showAllTrainersButton.addEventListener("click", () => {
-  showAll = !showAll;
+trainerSearch.addEventListener("input", () => {
   renderTrainerPanel();
+  refreshOpenMenu();
 });
+showAllTrainersButton.addEventListener("click", () => {
+  showAll = true;
+  renderTrainerPanel();
+  refreshOpenMenu();
+});
+yearSelect.addEventListener("change", resetTemporarySchoolTrainers);
+if(trainerFilterSelect){
+  trainerFilterSelect.addEventListener("change", saveTrainerToolsState);
+}
+if(trainerPeriodType){
+  trainerPeriodType.addEventListener("change", saveTrainerToolsState);
+}
+if(trainerPeriodDate){
+  trainerPeriodDate.addEventListener("change", saveTrainerToolsState);
+}
+if(showTrainerPlanButton){
+  showTrainerPlanButton.addEventListener("click", openTrainerPlanPage);
+}
 
 let hasBooted = false;
 
 function boot(){
-  if(hasBooted) return;
+  console.log("[BOOT] start");
+  if(hasBooted) {
+    console.log("[BOOT] skipped - already booted");
+    return;
+  }
+
   hasBooted = true;
 
-  init();
-  renderTrainerSelect?.();
-  renderManagerSelect?.();
-  renderSchedule?.();
-  renderStats?.();
-  renderDashboard?.();
+  try {
+    init();
+    console.log("[BOOT] init OK");
+  } catch (e) {
+    console.error("[BOOT] init failed:", e);
+    throw e;
+  }
 }
 
 if(document.readyState === "loading"){
@@ -1134,3 +2505,4 @@ if(document.readyState === "loading"){
 
 </body>
 </html>
+
