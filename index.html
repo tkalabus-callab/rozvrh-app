@@ -201,7 +201,66 @@ th.today-column::before {
 
 .editing {
   outline:3px solid orange !important;
-  background:#fff3cd !important;
+  background:#2b2b2b !important;
+  color:#ff6b6b;
+  font-weight:bold;
+}
+
+#table.schedule-edit-mode {
+  outline:3px solid #2b2b2b;
+}
+
+.edit-mode-active {
+  background:#2b2b2b;
+  color:#ff6b6b;
+  font-weight:bold;
+}
+
+.leave-edit-modal {
+  position:fixed;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:rgba(0,0,0,0.45);
+  z-index:2000;
+}
+
+.leave-edit-modal[hidden] {
+  display:none;
+}
+
+.leave-edit-dialog {
+  background:#2b2b2b;
+  color:#ff6b6b;
+  font-weight:bold;
+  padding:16px;
+  border-radius:6px;
+  max-width:none;
+  white-space:nowrap;
+  transform:scale(1.2);
+  transform-origin:center;
+}
+
+.leave-edit-actions {
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-top:12px;
+}
+
+.leave-edit-actions button {
+  white-space:nowrap;
+}
+
+.leave-edit-discard {
+  background:#e74c3c;
+  color:#000;
+  font-weight:bold;
+}
+
+.leave-edit-discard:hover {
+  background:#c0392b;
 }
 
 .day-border {
@@ -381,12 +440,78 @@ th.today-column::before {
   align-items: center;
   padding: 0 4px;
 }
+
+.top-toolbar {
+  position:sticky;
+  top:0;
+  z-index:100;
+  display:inline-flex;
+  flex-direction:column;
+  align-items:flex-start;
+  gap:4px;
+  margin:0 0 12px 0;
+  padding:0;
+  max-width:100%;
+  box-sizing:border-box;
+  background:rgba(255,255,255,0.94);
+  border:0;
+}
+
+.top-toolbar-left,
+.top-toolbar-actions,
+.top-toolbar-modules {
+  display:flex;
+  align-items:center;
+  gap:4px;
+  flex-wrap:wrap;
+}
+
+.top-toolbar a {
+  color:#222;
+  font-weight:bold;
+  text-decoration:none;
+  padding:3px 8px;
+  border:1px solid #aaa;
+  border-radius:4px;
+  background:#f5f5f5;
+  transition:background 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.top-toolbar a:hover {
+  background:#ffffff;
+  box-shadow:0 1px 4px rgba(0,0,0,0.14);
+  transform:translateY(-1px);
+}
+
+.top-toolbar a.active {
+  color:#c00;
+  border-color:#c00;
+  background:#fff0f0;
+}
+
+.top-toolbar a.active:hover {
+  background:#ffe8e8;
+}
 </style>
 </head>
 
 <body>
 
 <h2 id="pageTitle">ROZVRH</h2>
+<div class="top-toolbar">
+  <div class="top-toolbar-left">
+    <a href="home.html">🏠 Domů</a>
+  </div>
+  <div class="top-toolbar-actions"></div>
+  <div class="top-toolbar-modules">
+    <a class="active" href="index.html">📅 Rozvrh</a>
+    <a href="schools.html">🏫 Školy</a>
+    <a href="caretakers.html">🧹 Školníci</a>
+    <a href="trainers.html">🧑‍🏫 Trenéři</a>
+    <a href="managers.html">📋 Manažeři</a>
+    <a href="reports.html">🧾 Výkazy</a>
+  </div>
+</div>
 
 <table class="header-table">
 <tr>
@@ -402,7 +527,7 @@ th.today-column::before {
   <td id="city">-</td>
   <td id="caretaker">-</td>
   <td>
-    <select id="yearSelect" onchange="render()">
+    <select id="yearSelect" onchange="onYearChange()">
       <option>1</option><option>2</option><option>3</option>
       <option>4</option><option>5</option><option>6</option>
       <option>7</option><option>8</option><option>9</option>
@@ -454,7 +579,19 @@ th.today-column::before {
 <div id="scheduleArea">
   <div id="trainerPanel" class="trainer-panel"></div>
   <div id="scheduleOverlayMessage" aria-live="polite"></div>
+  <button id="editWeekButton" type="button">Upravit tento týden</button>
   <table id="table"></table>
+</div>
+
+<div id="leaveEditModal" class="leave-edit-modal" hidden>
+  <div class="leave-edit-dialog">
+    <div>Opouštíte editovaný týden. Neuložené změny mohou být ztraceny.</div>
+    <div class="leave-edit-actions">
+      <button id="leaveEditConfirmButton" type="button">💾 Uložit a pokračovat</button>
+      <button id="leaveEditDiscardButton" class="leave-edit-discard" type="button">⚠️ Pokračovat bez uložení</button>
+      <button id="leaveEditCancelButton" type="button">✏️ Pokračovat v editaci</button>
+    </div>
+  </div>
 </div>
 
 <script type="module">
@@ -498,6 +635,11 @@ const showTrainerPlanButton = document.getElementById("showTrainerPlanButton");
 const trainerPlanPreview = document.getElementById("trainerPlanPreview");
 const trainerPanel = document.getElementById("trainerPanel");
 const scheduleOverlayMessage = document.getElementById("scheduleOverlayMessage");
+const editWeekButton = document.getElementById("editWeekButton");
+const leaveEditModal = document.getElementById("leaveEditModal");
+const leaveEditConfirmButton = document.getElementById("leaveEditConfirmButton");
+const leaveEditDiscardButton = document.getElementById("leaveEditDiscardButton");
+const leaveEditCancelButton = document.getElementById("leaveEditCancelButton");
 const table = document.getElementById("table");
 const CARETAKER_ID_STORAGE_KEY = "caretakerId";
 const LAST_SCHOOL_BY_CARETAKER_KEY = "lastSchoolByCaretaker";
@@ -565,6 +707,12 @@ let selectedManagerId = "";
 
 let menu = null;
 let activeCell = null;
+let isEditMode = false;
+let lastSchoolValue = "";
+let lastYearValue = "";
+let lastDateValue = "";
+let pendingLeaveEditConfirm = null;
+let pendingLeaveEditCancel = null;
 let statusMessageTimeout = null;
 let suppressMenuAutoCloseUntil = 0;
 let reopenAvailableOnlyContext = null;
@@ -769,6 +917,28 @@ function getVisibleTrainers(schoolId){
   return trainers.filter(t => mergedIds.includes(String(t.id)));
 }
 
+function splitTrainersBySchoolPreference(items, schoolId){
+  const schools = getSchools();
+  const school = schools.find(s => String(s.id) === String(schoolId));
+  const preferredIds = Array.isArray(school?.favoriteTrainers)
+    ? school.favoriteTrainers.map(String)
+    : [];
+  const preferredIdSet = new Set(preferredIds);
+  const preferred = [];
+  const other = [];
+
+  items.forEach(trainer => {
+    if(preferredIdSet.has(String(trainer.id))){
+      preferred.push(trainer);
+    } else {
+      other.push(trainer);
+    }
+  });
+
+  preferred.sort((a, b) => preferredIds.indexOf(String(a.id)) - preferredIds.indexOf(String(b.id)));
+  return { preferred, other };
+}
+
 function addTemporaryTrainerForSchool(schoolId, trainerId){
   if(!schoolId || !trainerId) return;
   const key = String(schoolId);
@@ -964,6 +1134,9 @@ function init(){
   }
 
   updateWeekInfo();
+  lastSchoolValue = schoolSelect.value;
+  lastYearValue = yearSelect.value;
+  lastDateValue = dateInput.value;
   console.log("[INIT] updateWeekInfo OK");
   syncTrainerPeriodDateFromMainDate();
   console.log("[INIT] syncTrainerPeriodDateFromMainDate OK");
@@ -1108,14 +1281,45 @@ function openCaretakers(){
   window.location.href = "caretakers.html";
 }
 
-schoolSelect.onchange = () => {
+function setEditMode(enabled){
+  isEditMode = enabled;
+  table.classList.toggle("schedule-edit-mode", isEditMode);
+  editWeekButton.classList.toggle("edit-mode-active", isEditMode);
+  editWeekButton.textContent = isEditMode ? "Ukončit editaci" : "Upravit tento týden";
+  if(!isEditMode) closeMenu();
+}
+
+function confirmLeaveEditMode(onConfirm, onCancel){
+  if(!isEditMode) return true;
+  pendingLeaveEditConfirm = onConfirm || null;
+  pendingLeaveEditCancel = onCancel || null;
+  leaveEditModal.hidden = false;
+  return false;
+}
+
+function saveEditedWeek(){
+  localStorage.setItem("plans", JSON.stringify(plans));
+  localStorage.setItem("reality", JSON.stringify(reality));
+}
+
+function applySchoolChange(){
   localStorage.setItem("selectedSchool", schoolSelect.value);
   activeSchoolId = schoolSelect.value;
+  lastSchoolValue = schoolSelect.value;
   if (isCaretakerRoleMode()) {
     saveLastSchoolForCaretaker(getRoleCaretakerId(), schoolSelect.value);
   }
   updateSchoolUI();
   renderTrainerPanel();
+}
+
+schoolSelect.onchange = () => {
+  if(!confirmLeaveEditMode(applySchoolChange, () => {
+    schoolSelect.value = lastSchoolValue;
+  })){
+    return;
+  }
+  applySchoolChange();
 };
 
 function getSelectedSchool(){
@@ -1481,12 +1685,6 @@ function openMenu(e, date, cls, h, type, availableOnly = false, promptText = "",
     let filteredVisibleTrainers = source;
 
     if(openMenuMode === "search" || openMenuMode === "availableSearch"){
-      if(openMenuMode === "availableSearch"){
-        let header = document.createElement("div");
-        header.className = "trainer-group-title";
-        header.textContent = "Volní trenéři";
-        menu.appendChild(header);
-      }
       let searchInput = document.createElement("input");
       searchInput.className = "trainer-search";
       searchInput.placeholder = TEXTS.schedule.searchTrainer;
@@ -1526,7 +1724,17 @@ function openMenu(e, date, cls, h, type, availableOnly = false, promptText = "",
     }
 
     if(openMenuMode === "search" || openMenuMode === "availableSearch") {
-      renderFlatTrainerList(filteredVisibleTrainers);
+      if(openMenuMode === "availableSearch"){
+        const groups = splitTrainersBySchoolPreference(filteredVisibleTrainers, activeSchoolId);
+        if(groups.preferred.length){
+          renderTrainerGroup("Volní trenéři školy", groups.preferred, false);
+        }
+        if(groups.other.length){
+          renderTrainerGroup("Ostatní volní trenéři", groups.other, false);
+        }
+      } else {
+        renderFlatTrainerList(filteredVisibleTrainers);
+      }
     } else {
       addAction(TEXTS.schedule.searchTrainer, () => {
         openMenuMode = "search";
@@ -1668,19 +1876,31 @@ ${date.toLocaleDateString()} / ${cls} / ${h}. hodina.`);
 }
 
 function onDateChange(){
+  if(!confirmLeaveEditMode(applyDateChange, () => {
+    dateInput.value = lastDateValue;
+  })){
+    return;
+  }
+  applyDateChange();
+}
+
+function applyDateChange(){
   currentDate = new Date(dateInput.value);
   resetTemporarySchoolTrainers();
   if (isCaretakerRoleMode() && dateInput.value) {
     saveLastDateForCaretaker(getRoleCaretakerId(), dateInput.value);
   }
   updateWeekInfo();
+  lastDateValue = dateInput.value;
   renderScheduleSafe();
 }
 
 function changeWeek(o){
+  if(!confirmLeaveEditMode(() => changeWeek(o))) return;
   currentDate.setDate(currentDate.getDate() + o);
   resetTemporarySchoolTrainers();
   updateWeekInfo();
+  lastDateValue = dateInput.value;
   if (isCaretakerRoleMode() && dateInput.value) {
     saveLastDateForCaretaker(getRoleCaretakerId(), dateInput.value);
   }
@@ -1688,12 +1908,29 @@ function changeWeek(o){
 }
 
 function goToday(){
+  if(!confirmLeaveEditMode(goToday)) return;
   currentDate = new Date();
   resetTemporarySchoolTrainers();
   updateWeekInfo();
+  lastDateValue = dateInput.value;
   if (isCaretakerRoleMode() && dateInput.value) {
     saveLastDateForCaretaker(getRoleCaretakerId(), dateInput.value);
   }
+  renderScheduleSafe();
+}
+
+function onYearChange(){
+  if(!confirmLeaveEditMode(applyYearChange, () => {
+    yearSelect.value = lastYearValue;
+  })){
+    return;
+  }
+  applyYearChange();
+}
+
+function applyYearChange(){
+  lastYearValue = yearSelect.value;
+  resetTemporarySchoolTrainers();
   renderScheduleSafe();
 }
 
@@ -2234,6 +2471,7 @@ function renderScheduleCore(){
           planConflict ? "Konflikt – trenér už je jinde" : ""
         );
         planCell.addEventListener("click", (event) => {
+          if(!isEditMode) return;
           try {
             activeSchoolId = event.currentTarget.dataset.schoolId || schoolSelect.value;
             renderTrainerPanel();
@@ -2317,6 +2555,7 @@ function renderScheduleCore(){
           realityConflict ? "Konflikt – trenér už je jinde" : ""
         );
         realCell.addEventListener("click", (event) => {
+          if(!isEditMode) return;
           try {
             activeSchoolId = event.currentTarget.dataset.schoolId || schoolSelect.value;
             renderTrainerPanel();
@@ -2447,6 +2686,7 @@ function copyWeek(){
 window.changeWeek = changeWeek;
 window.copyWeek = copyWeek;
 window.goToday = goToday;
+window.onYearChange = onYearChange;
 window.openSchools = openSchools;
 window.openTrainers = openTrainers;
 window.openCaretakers = openCaretakers;
@@ -2461,7 +2701,6 @@ showAllTrainersButton.addEventListener("click", () => {
   renderTrainerPanel();
   refreshOpenMenu();
 });
-yearSelect.addEventListener("change", resetTemporarySchoolTrainers);
 if(trainerFilterSelect){
   trainerFilterSelect.addEventListener("change", saveTrainerToolsState);
 }
@@ -2474,6 +2713,33 @@ if(trainerPeriodDate){
 if(showTrainerPlanButton){
   showTrainerPlanButton.addEventListener("click", openTrainerPlanPage);
 }
+editWeekButton.addEventListener("click", () => {
+  setEditMode(!isEditMode);
+});
+leaveEditConfirmButton.addEventListener("click", () => {
+  const onConfirm = pendingLeaveEditConfirm;
+  pendingLeaveEditConfirm = null;
+  pendingLeaveEditCancel = null;
+  leaveEditModal.hidden = true;
+  saveEditedWeek();
+  setEditMode(false);
+  if(onConfirm) onConfirm();
+});
+leaveEditDiscardButton.addEventListener("click", () => {
+  const onConfirm = pendingLeaveEditConfirm;
+  pendingLeaveEditConfirm = null;
+  pendingLeaveEditCancel = null;
+  leaveEditModal.hidden = true;
+  setEditMode(false);
+  if(onConfirm) onConfirm();
+});
+leaveEditCancelButton.addEventListener("click", () => {
+  const onCancel = pendingLeaveEditCancel;
+  pendingLeaveEditConfirm = null;
+  pendingLeaveEditCancel = null;
+  leaveEditModal.hidden = true;
+  if(onCancel) onCancel();
+});
 
 let hasBooted = false;
 

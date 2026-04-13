@@ -30,9 +30,64 @@ td, th {
 
 tr.active { background:#ffeeba; }
 
+tr.trainer-available { background:#eaf7ea; }
+tr.trainer-busy { background:#fdeaea; }
+
 tr:hover {
   background:#f5f5f5;
   cursor:pointer;
+}
+
+.top-toolbar {
+  position:sticky;
+  top:0;
+  z-index:100;
+  display:inline-flex;
+  flex-direction:column;
+  align-items:flex-start;
+  gap:4px;
+  margin:0 0 12px 0;
+  padding:0;
+  max-width:100%;
+  box-sizing:border-box;
+  background:rgba(255,255,255,0.94);
+  border:0;
+}
+
+.top-toolbar-left,
+.top-toolbar-actions,
+.top-toolbar-modules {
+  display:flex;
+  align-items:center;
+  gap:4px;
+  flex-wrap:wrap;
+}
+
+.top-toolbar a {
+  color:#222;
+  font-weight:bold;
+  text-decoration:none;
+  padding:3px 8px;
+  border:1px solid #aaa;
+  border-radius:4px;
+  background:#f5f5f5;
+  transition:background 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.top-toolbar a:hover {
+  background:#ffffff;
+  box-shadow:0 1px 4px rgba(0,0,0,0.14);
+  transform:translateY(-1px);
+}
+
+.top-toolbar a.active {
+  color:#c00;
+  border-color:#c00;
+  background:#fff0f0;
+}
+
+.top-toolbar a.active:hover {
+  background:#ffe8e8;
 }
 </style>
 </head>
@@ -40,7 +95,22 @@ tr:hover {
 <body>
 
 <h2 id="pageTitle"></h2>
-<a id="backLink" href="index.html"></a><br><br>
+<div class="top-toolbar">
+  <div class="top-toolbar-left">
+    <a href="home.html">🏠 Domů</a>
+    <a id="backLink" href="index.html">← Zpět na rozvrh</a>
+  </div>
+  <div class="top-toolbar-actions"></div>
+  <div class="top-toolbar-modules">
+    <a href="index.html">📅 Rozvrh</a>
+    <a href="schools.html">🏫 Školy</a>
+    <a href="caretakers.html">🧹 Školníci</a>
+    <a class="active" href="trainers.html">🧑‍🏫 Trenéři</a>
+    <a href="managers.html">📋 Manažeři</a>
+    <a href="reports.html">🧾 Výkazy</a>
+  </div>
+</div>
+<div id="selectionModeInfo" hidden></div>
 
 <input id="jmeno">
 <input id="prijmeni">
@@ -68,6 +138,8 @@ tr:hover {
 <div id="detail"></div>
 
 <h3 id="listTitle"></h3>
+<input id="trainerSearch" hidden>
+<div id="selectionListInfo" hidden></div>
 <table>
   <thead>
     <tr>
@@ -85,6 +157,7 @@ tr:hover {
 import { TEXTS } from "./texts.js";
 
 const pageTitle = document.getElementById("pageTitle");
+const selectionModeInfo = document.getElementById("selectionModeInfo");
 const backLink = document.getElementById("backLink");
 const jmeno = document.getElementById("jmeno");
 const prijmeni = document.getElementById("prijmeni");
@@ -100,6 +173,8 @@ const saveButton = document.getElementById("saveButton");
 const detailTitle = document.getElementById("detailTitle");
 const detail = document.getElementById("detail");
 const listTitle = document.getElementById("listTitle");
+const trainerSearch = document.getElementById("trainerSearch");
+const selectionListInfo = document.getElementById("selectionListInfo");
 const nameHeader = document.getElementById("nameHeader");
 const clubHeader = document.getElementById("clubHeader");
 const availabilityHeader = document.getElementById("availabilityHeader");
@@ -126,7 +201,9 @@ let selectedId = null;
 
 function initStaticTexts(){
   pageTitle.textContent = TEXTS.trainers.title;
-  backLink.textContent = "Zpět";
+  selectionModeInfo.textContent = "Výběr trenéra pro aktuální buňku rozvrhu";
+  selectionModeInfo.hidden = !isSelectionMode;
+  backLink.textContent = "← Zpět na rozvrh";
   jmeno.placeholder = "Jméno";
   prijmeni.placeholder = "Příjmení";
   telefon.placeholder = TEXTS.common.phone;
@@ -141,6 +218,8 @@ function initStaticTexts(){
   detailTitle.textContent = "Detail";
   detail.textContent = TEXTS.trainers.detailPrompt;
   listTitle.textContent = "Seznam";
+  trainerSearch.placeholder = "Hledat trenéra";
+  trainerSearch.hidden = !isSelectionMode;
   nameHeader.textContent = TEXTS.trainers.title.slice(0, -2);
   clubHeader.textContent = TEXTS.trainers.club;
   availabilityHeader.textContent = "STAV";
@@ -344,17 +423,45 @@ function chooseTrainer(trainerId){
 
 function render(){
   let listFragment = document.createDocumentFragment();
+  const search = isSelectionMode ? trainerSearch.value.trim().toLowerCase() : "";
+  let visibleTrainers = trainers;
+  let shouldSortTrainers = true;
+  selectionListInfo.hidden = !isSelectionMode;
 
-  trainers
-    .sort((a, b) => {
+  if(isSelectionMode && search){
+    selectionListInfo.textContent = "Výsledky hledání v databázi trenérů";
+    visibleTrainers = trainers.filter(t =>
+      `${t.prijmeni || ""} ${t.jmeno || ""}`.toLowerCase().includes(search) ||
+      `${t.jmeno || ""} ${t.prijmeni || ""}`.toLowerCase().includes(search)
+    ).sort((a, b) => {
       if(a.prijmeni < b.prijmeni) return -1;
       if(a.prijmeni > b.prijmeni) return 1;
       return a.jmeno.localeCompare(b.jmeno);
-    })
+    });
+  } else if(isSelectionMode){
+    selectionListInfo.textContent = "Volní oblíbení trenéři školy";
+    const schools = JSON.parse(localStorage.getItem("schools") || "[]");
+    const school = schools.find(s => String(s.id) === String(availabilityContext?.schoolId));
+    if(school){
+      const favoriteTrainerIds = Array.isArray(school.favoriteTrainers) ? school.favoriteTrainers.map(String) : [];
+      visibleTrainers = favoriteTrainerIds
+        .map(id => trainers.find(t => String(t.id) === id))
+        .filter(t => t && !isTrainerBusyForAvailabilityContext(t.id));
+      if(!visibleTrainers.length) selectionListInfo.textContent = "Žádný volný oblíbený trenér pro tuto školu.";
+      shouldSortTrainers = false;
+    }
+  }
+
+  (shouldSortTrainers ? visibleTrainers.sort((a, b) => {
+      if(a.prijmeni < b.prijmeni) return -1;
+      if(a.prijmeni > b.prijmeni) return 1;
+      return a.jmeno.localeCompare(b.jmeno);
+    }) : visibleTrainers)
     .forEach((t, i) => {
       const isBusy = isTrainerBusyForAvailabilityContext(t.id);
       let row = document.createElement("tr");
-      if(t.id === selectedId) row.className = "active";
+      if(t.id === selectedId) row.classList.add("active");
+      if(isSelectionMode) row.classList.add(isBusy ? "trainer-busy" : "trainer-available");
       row.addEventListener("click", () => showDetail(t.id));
 
       let orderCell = document.createElement("td");
@@ -393,6 +500,7 @@ function render(){
 }
 
 window.add = add;
+trainerSearch.addEventListener("input", render);
 
 initStaticTexts();
 render();

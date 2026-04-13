@@ -31,7 +31,7 @@ export const TEXTS = {
     detailPrompt: "Klikni na školu",
     removeConfirm: "Smazat školu?",
     contact: "Kontakt",
-    favoriteTrainers: "Vybraní trenéři"
+    favoriteTrainers: "Přiřazení trenéři školy"
   },
 
   trainers: {
