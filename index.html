@@ -64,6 +64,8 @@ td, th {
 
 .active-cell:hover { outline:2px solid blue; cursor:pointer; }
 
+.cell, .active-cell { pointer-events: auto; }
+
 .editing {
   outline:3px solid orange !important;
   background:#fff3cd !important;
@@ -122,6 +124,18 @@ td, th {
 .cell.drag-over {
   outline:3px solid #0d6efd;
   outline-offset:-3px;
+}
+
+.cell.status-plan-missing {
+  background:#f8d7da;
+}
+
+.cell.status-reality-only {
+  background:#ffe5b4;
+}
+
+.cell.status-match {
+  background:#d4edda;
 }
 
 .trainer-toolbar {
@@ -202,6 +216,10 @@ td, th {
 import { TEXTS } from "./texts.js";
 import { loadManagers, createManager, getManagerById } from "./managers.js";
 
+window.onerror = function(msg, url, line, col, error) {
+  console.error("GLOBAL ERROR:", { msg, url, line, col, error });
+};
+
 const pageTitle = document.getElementById("pageTitle");
 const schoolHeader = document.getElementById("schoolHeader");
 const cityHeader = document.getElementById("cityHeader");
@@ -247,7 +265,8 @@ let activeCell = null;
 function normalizeSchool(school){
   return {
     ...school,
-    favoriteTrainers: school.favoriteTrainers || []
+    favoriteTrainers: school.favoriteTrainers || [],
+    assignedTrainerId: school.assignedTrainerId ?? null
   };
 }
 
@@ -259,7 +278,13 @@ function loadTrainers(){
   return load("trainers", []);
 }
 
-function getVisibleTrainers(schoolId){
+function getSelectedTrainerId(){
+  const trainerSelectEl = document.getElementById("trainerSelect");
+  const selectedTrainerId = trainerSelectEl ? trainerSelectEl.value : "";
+  return selectedTrainerId;
+}
+
+function getVisibleTrainersLegacyUnused(schoolId){
   const trainers = loadTrainers();
   const schools = getSchools();
 
@@ -288,6 +313,25 @@ function getVisibleTrainers(schoolId){
   return result;
 }
 
+function getVisibleTrainers(schoolId){
+  const trainers = loadTrainers();
+  const schools = getSchools();
+
+  if(showAll) return trainers;
+
+  const school = schools.find(s => s.id === schoolId);
+  console.log({
+    selectedTrainerId: getSelectedTrainerId(),
+    schoolAssigned: school?.assignedTrainerId ?? null
+  });
+
+  if(!school) return trainers;
+
+  if(!school.assignedTrainerId) return trainers;
+
+  return trainers.filter(trainer => trainer.id === school.assignedTrainerId);
+}
+
 function initStaticTexts(){
   schoolHeader.textContent = TEXTS.schools.title.slice(0, -1);
   cityHeader.textContent = "Místo";
@@ -309,7 +353,7 @@ function init(){
   activeSchoolId = schoolSelect.value;
   updateWeekInfo();
   dateInput.onchange = onDateChange;
-  render();
+  renderScheduleSafe();
 }
 
 function initManagers(){
@@ -503,7 +547,7 @@ document.addEventListener("click", (e) => {
 document.addEventListener("visibilitychange", () => {
   if(document.visibilityState === "visible"){
     renderTrainerPanel();
-    render();
+    renderScheduleSafe();
   }
 });
 
@@ -531,7 +575,7 @@ function assignTrainerToCell(trainerId){
   }
 
   closeMenu();
-  render();
+  renderScheduleSafe();
 }
 
 function openMenu(e, date, cls, h, type){
@@ -637,7 +681,7 @@ function openMenu(e, date, cls, h, type){
     }
 
     closeMenu();
-    render();
+    renderScheduleSafe();
   }
 
   document.body.appendChild(menu);
@@ -663,19 +707,19 @@ ${date.toLocaleDateString()} / ${cls} / ${h}. hodina.`);
 function onDateChange(){
   currentDate = new Date(dateInput.value);
   updateWeekInfo();
-  render();
+  renderScheduleSafe();
 }
 
 function changeWeek(o){
   currentDate.setDate(currentDate.getDate() + o);
   updateWeekInfo();
-  render();
+  renderScheduleSafe();
 }
 
 function goToday(){
   currentDate = new Date();
   updateWeekInfo();
-  render();
+  renderScheduleSafe();
 }
 
 function getMonday(d){
@@ -734,6 +778,45 @@ function getName(id){
 
   let t = trainers.find(t => t.id == id);
   return t ? `${t.prijmeni} (${t.klub || TEXTS.common.placeholderDash})` : "";
+}
+
+function hasVisibleValue(value){
+  return value !== undefined && value !== null && value !== "";
+}
+
+function getPlanRealityStatus(planValue, realityValue){
+  const hasPlan = hasVisibleValue(planValue);
+  const hasReality = hasVisibleValue(realityValue);
+
+  if(hasPlan && hasReality){
+    return {
+      className: "status-match",
+      tooltip: "Plán i realita jsou vyplněné"
+    };
+  }
+
+  if(hasPlan && !hasReality){
+    return {
+      className: "status-plan-missing",
+      tooltip: "Je vyplněný plán, ale chybí realita"
+    };
+  }
+
+  if(!hasPlan && hasReality){
+    return {
+      className: "status-reality-only",
+      tooltip: "Je vyplněná realita bez plánu"
+    };
+  }
+
+  return {
+    className: "",
+    tooltip: ""
+  };
+}
+
+function buildCellTitle(baseTooltip, conflictTooltip){
+  return [baseTooltip, conflictTooltip].filter(Boolean).join("\n");
 }
 
 function hasConflict(trainerId, date, cls, hour, type){
@@ -795,7 +878,7 @@ function isTrainerBusy(trainerId, date, cls, hour, type){
   return false;
 }
 
-function render(){
+function renderScheduleCore(){
   loadSchools();
   renderTrainerPanel();
 
@@ -864,12 +947,13 @@ function render(){
         let border = classIndex === 0 ? "day-border" : "";
         let planValue = getStoredValue(plans, dayDate, cls, hour);
         let realityValue = getStoredValue(reality, dayDate, cls, hour);
+        let comparisonStatus = getPlanRealityStatus(planValue, realityValue);
         let planConflict = planValue && planValue !== "X" && isTrainerBusy(planValue, dayDate, cls, hour, "plan");
         let realityConflict = realityValue && realityValue !== "X" && isTrainerBusy(realityValue, dayDate, cls, hour, "real");
         let planGlobalConflict = planValue && planValue !== "X" && hasConflict(planValue, dayDate, cls, hour, "plan");
         let realityGlobalConflict = realityValue && realityValue !== "X" && hasConflict(realityValue, dayDate, cls, hour, "real");
-        let planClass = ["active-cell", border, planValue === "X" ? "unavailable" : "", planGlobalConflict ? "conflict-global" : "", planConflict ? "conflict" : "", planConflict ? "conflict-plan" : ""].filter(Boolean).join(" ");
-        let realityClass = [border, realityValue === "X" ? "unavailable" : "", realityGlobalConflict ? "conflict-global" : "", realityConflict ? "conflict" : "", realityConflict ? "conflict-real" : ""].filter(Boolean).join(" ");
+        let planClass = ["active-cell", border, comparisonStatus.className, planValue === "X" ? "unavailable" : "", planGlobalConflict ? "conflict-global" : "", planConflict ? "conflict" : "", planConflict ? "conflict-plan" : ""].filter(Boolean).join(" ");
+        let realityClass = [border, comparisonStatus.className, realityValue === "X" ? "unavailable" : "", realityGlobalConflict ? "conflict-global" : "", realityConflict ? "conflict" : "", realityConflict ? "conflict-real" : ""].filter(Boolean).join(" ");
 
         let planCell = document.createElement("td");
         planCell.className = ["cell", planClass].filter(Boolean).join(" ");
@@ -879,11 +963,18 @@ function render(){
         planCell.dataset.hour = String(hour);
         planCell.dataset.type = "plan";
         planCell.textContent = getName(planValue);
-        planCell.title = planConflict ? "Konflikt – trenér už je jinde" : "";
+        planCell.title = buildCellTitle(
+          comparisonStatus.tooltip,
+          planConflict ? "Konflikt – trenér už je jinde" : ""
+        );
         planCell.addEventListener("click", (event) => {
-          activeSchoolId = event.currentTarget.dataset.schoolId || schoolSelect.value;
-          renderTrainerPanel();
-          openMenu(event, new Date(dayDate), cls, hour, "plan");
+          try {
+            activeSchoolId = event.currentTarget.dataset.schoolId || schoolSelect.value;
+            renderTrainerPanel();
+            openMenu(event, new Date(dayDate), cls, hour, "plan");
+          } catch (e) {
+            console.error("Cell click error:", e);
+          }
         });
         planCell.addEventListener("dragover", (event) => {
           event.preventDefault();
@@ -908,7 +999,7 @@ function render(){
 
           plans[getKey(dayDate, cls, hour)] = trainerId;
           localStorage.setItem("plans", JSON.stringify(plans));
-          render();
+          renderScheduleSafe();
         });
         rowP.appendChild(planCell);
 
@@ -920,11 +1011,18 @@ function render(){
         realCell.dataset.hour = String(hour);
         realCell.dataset.type = "real";
         realCell.textContent = getName(realityValue);
-        realCell.title = realityConflict ? "Konflikt – trenér už je jinde" : "";
+        realCell.title = buildCellTitle(
+          comparisonStatus.tooltip,
+          realityConflict ? "Konflikt – trenér už je jinde" : ""
+        );
         realCell.addEventListener("click", (event) => {
-          activeSchoolId = event.currentTarget.dataset.schoolId || schoolSelect.value;
-          renderTrainerPanel();
-          openMenu(event, new Date(dayDate), cls, hour, "real");
+          try {
+            activeSchoolId = event.currentTarget.dataset.schoolId || schoolSelect.value;
+            renderTrainerPanel();
+            openMenu(event, new Date(dayDate), cls, hour, "real");
+          } catch (e) {
+            console.error("Cell click error:", e);
+          }
         });
         realCell.addEventListener("dragover", (event) => {
           event.preventDefault();
@@ -949,7 +1047,7 @@ function render(){
 
           reality[getKey(dayDate, cls, hour)] = trainerId;
           localStorage.setItem("reality", JSON.stringify(reality));
-          render();
+          renderScheduleSafe();
         });
         rowS.appendChild(realCell);
       });
@@ -961,6 +1059,20 @@ function render(){
 
   table.replaceChildren(fragment);
 }
+
+function renderScheduleSafe(){
+  try {
+    renderScheduleCore();
+  } catch (e) {
+    console.error("renderSchedule crashed:", e);
+  }
+}
+
+function renderTrainerSelect(){}
+function renderManagerSelect(){ initManagers(); }
+function renderSchedule(){ renderScheduleSafe(); }
+function renderStats(){}
+function renderDashboard(){}
 
 function copyWeek(){
   let monday = getMonday(currentDate);
@@ -990,7 +1102,7 @@ window.copyWeek = copyWeek;
 window.goToday = goToday;
 window.openSchools = openSchools;
 window.openTrainers = openTrainers;
-window.render = render;
+window.render = renderScheduleSafe;
 
 trainerSearch.addEventListener("input", renderTrainerPanel);
 showAllTrainersButton.addEventListener("click", () => {
@@ -998,7 +1110,25 @@ showAllTrainersButton.addEventListener("click", () => {
   renderTrainerPanel();
 });
 
-init();
+let hasBooted = false;
+
+function boot(){
+  if(hasBooted) return;
+  hasBooted = true;
+
+  init();
+  renderTrainerSelect?.();
+  renderManagerSelect?.();
+  renderSchedule?.();
+  renderStats?.();
+  renderDashboard?.();
+}
+
+if(document.readyState === "loading"){
+  document.addEventListener("DOMContentLoaded", boot, { once: true });
+} else {
+  boot();
+}
 
 </script>
 

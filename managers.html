@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<title>Manažeři</title>
+
+<style>
+body { font-family: Arial; padding:20px; }
+
+input { margin:2px; width:220px; }
+
+select { margin:2px; width:220px; }
+
+table {
+  border-collapse: collapse;
+  margin-top:10px;
+}
+
+td, th {
+  border:1px solid #ccc;
+  padding:5px 10px;
+  text-align:left;
+}
+
+.col-name {
+  width:40ch;
+}
+
+.assigned-schools {
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-top:8px;
+}
+
+.assigned-school-item {
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  gap:6px;
+  padding:4px 8px;
+  border:1px solid #ccc;
+}
+
+.school-actions {
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:6px;
+}
+
+.assigned-school-header {
+  font-weight:bold;
+}
+
+.assigned-school-row {
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:6px;
+}
+</style>
+</head>
+
+<body>
+
+<h2>Manažeři</h2>
+<a href="index.html">Zpět</a><br><br>
+
+<input id="name" placeholder="Jméno manažera">
+<button id="addButton">Přidat manažera</button>
+
+<h3>Seznam</h3>
+<table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th class="col-name">Jméno</th>
+      <th>Akce</th>
+    </tr>
+  </thead>
+  <tbody id="list"></tbody>
+</table>
+
+<script type="module">
+import {
+  loadManagers,
+  createManager,
+  deleteManager,
+  assignSchoolToManager,
+  removeSchoolFromManager
+} from "./managers.js";
+
+const nameInput = document.getElementById("name");
+const addButton = document.getElementById("addButton");
+const list = document.getElementById("list");
+
+function loadSchools(){
+  try {
+    return (JSON.parse(localStorage.getItem("schools")) || []).map((school) => ({
+      ...school,
+      assignedTrainerId: school.assignedTrainerId ?? null
+    }));
+  } catch {
+    return [];
+  }
+}
+
+function saveSchools(schools){
+  localStorage.setItem("schools", JSON.stringify(schools));
+}
+
+function loadTrainers(){
+  try {
+    return JSON.parse(localStorage.getItem("trainers")) || [];
+  } catch {
+    return [];
+  }
+}
+
+function assignTrainerToSchool(schoolId, trainerId){
+  const schools = loadSchools();
+  const updated = schools.map((school) => (
+    String(school.id) === String(schoolId)
+      ? { ...school, assignedTrainerId: trainerId || null }
+      : school
+  ));
+
+  saveSchools(updated);
+}
+
+function getTrainerName(trainerId, trainers){
+  const trainer = trainers.find((item) => String(item.id) === String(trainerId));
+  if(!trainer) return "Bez přiřazeného trenéra";
+  return `${trainer.prijmeni || ""} ${trainer.jmeno || ""}`.trim() || "-";
+}
+
+function renderManagers(){
+  const schools = loadSchools()
+    .slice()
+    .sort((a, b) => (a.nazev || "").localeCompare(b.nazev || "", "cs"));
+  const trainers = loadTrainers()
+    .slice()
+    .sort((a, b) => `${a.prijmeni || ""} ${a.jmeno || ""}`.localeCompare(`${b.prijmeni || ""} ${b.jmeno || ""}`, "cs"));
+
+  const managers = loadManagers()
+    .slice()
+    .sort((a, b) => a.name.localeCompare(b.name, "cs"));
+
+  const fragment = document.createDocumentFragment();
+
+  managers.forEach((manager, index) => {
+    const row = document.createElement("tr");
+
+    const orderCell = document.createElement("td");
+    orderCell.textContent = index + 1;
+    row.appendChild(orderCell);
+
+    const nameCell = document.createElement("td");
+    nameCell.className = "col-name";
+    nameCell.textContent = manager.name || "-";
+
+    const schoolActions = document.createElement("div");
+    schoolActions.className = "school-actions";
+
+    const schoolSelect = document.createElement("select");
+
+    const placeholderOption = document.createElement("option");
+    placeholderOption.value = "";
+    placeholderOption.textContent = "Vyberte školu";
+    schoolSelect.appendChild(placeholderOption);
+
+    schools.forEach((school) => {
+      const option = document.createElement("option");
+      option.value = school.id;
+      option.textContent = school.nazev || "-";
+      schoolSelect.appendChild(option);
+    });
+
+    const assignButton = document.createElement("button");
+    assignButton.textContent = "Přiřadit školu";
+    assignButton.addEventListener("click", () => {
+      if(!schoolSelect.value) return;
+      assignSchoolToManager(manager.id, schoolSelect.value);
+      renderManagers();
+    });
+
+    schoolActions.appendChild(schoolSelect);
+    schoolActions.appendChild(assignButton);
+    nameCell.appendChild(document.createElement("br"));
+    nameCell.appendChild(schoolActions);
+
+    const assignedSchools = document.createElement("div");
+    assignedSchools.className = "assigned-schools";
+
+    const schoolNames = manager.schoolIds
+      .map((schoolId) => schools.find((school) => String(school.id) === String(schoolId)))
+      .filter(Boolean);
+
+    if(schoolNames.length){
+      schoolNames.forEach((school) => {
+        const schoolItem = document.createElement("div");
+        schoolItem.className = "assigned-school-item";
+
+        const schoolLabel = document.createElement("div");
+        schoolLabel.className = "assigned-school-header";
+        schoolLabel.textContent = school.nazev || "-";
+        schoolItem.appendChild(schoolLabel);
+
+        const trainerInfo = document.createElement("div");
+        trainerInfo.textContent = `Trenér: ${getTrainerName(school.assignedTrainerId, trainers)}`;
+        schoolItem.appendChild(trainerInfo);
+
+        const trainerRow = document.createElement("div");
+        trainerRow.className = "assigned-school-row";
+
+        const trainerSelect = document.createElement("select");
+
+        const emptyTrainerOption = document.createElement("option");
+        emptyTrainerOption.value = "";
+        emptyTrainerOption.textContent = "Bez trenéra";
+        trainerSelect.appendChild(emptyTrainerOption);
+
+        trainers.forEach((trainer) => {
+          const option = document.createElement("option");
+          option.value = trainer.id;
+          option.textContent = `${trainer.prijmeni || ""} ${trainer.jmeno || ""}`.trim() || "-";
+          option.selected = String(school.assignedTrainerId || "") === String(trainer.id);
+          trainerSelect.appendChild(option);
+        });
+
+        const assignTrainerButton = document.createElement("button");
+        assignTrainerButton.textContent = "Přiřadit trenéra";
+        assignTrainerButton.addEventListener("click", () => {
+          assignTrainerToSchool(school.id, trainerSelect.value || null);
+          renderManagers();
+        });
+
+        trainerRow.appendChild(trainerSelect);
+        trainerRow.appendChild(assignTrainerButton);
+        schoolItem.appendChild(trainerRow);
+
+        const removeSchoolButton = document.createElement("button");
+        removeSchoolButton.textContent = "Odebrat";
+        removeSchoolButton.addEventListener("click", () => {
+          removeSchoolFromManager(manager.id, school.id);
+          renderManagers();
+        });
+        schoolItem.appendChild(removeSchoolButton);
+
+        assignedSchools.appendChild(schoolItem);
+      });
+    } else {
+      const emptyState = document.createElement("span");
+      emptyState.textContent = "Žádné přiřazené školy";
+      assignedSchools.appendChild(emptyState);
+    }
+
+    nameCell.appendChild(assignedSchools);
+    row.appendChild(nameCell);
+
+    const actionCell = document.createElement("td");
+    const deleteButton = document.createElement("button");
+    deleteButton.textContent = "Smazat";
+    deleteButton.addEventListener("click", () => {
+      deleteManager(manager.id);
+      renderManagers();
+    });
+    actionCell.appendChild(deleteButton);
+    row.appendChild(actionCell);
+
+    fragment.appendChild(row);
+  });
+
+  list.replaceChildren(fragment);
+}
+
+function addManager(){
+  const name = nameInput.value.trim();
+  if(!name) return;
+
+  createManager({ name });
+  nameInput.value = "";
+  renderManagers();
+}
+
+addButton.addEventListener("click", addManager);
+nameInput.addEventListener("keydown", (event) => {
+  if(event.key === "Enter"){
+    addManager();
+  }
+});
+
+renderManagers();
+</script>
+
+</body>
+</html>

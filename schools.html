@@ -128,7 +128,8 @@ let selectedId = null;
 function normalizeSchool(school){
   return {
     ...school,
-    favoriteTrainers: school.favoriteTrainers || []
+    favoriteTrainers: school.favoriteTrainers || [],
+    assignedTrainerId: school.assignedTrainerId ?? null
   };
 }
 
@@ -237,6 +238,10 @@ favoriteTrainersList.addEventListener("change", (e) => {
 function add(){
   if(!nazev.value) return;
 
+  const existingSchool = editId
+    ? schools.find(s => s.id === editId)
+    : null;
+
   let obj = {
     id: editId || Date.now().toString(),
     nazev: nazev.value,
@@ -248,7 +253,8 @@ function add(){
     email: email.value,
     telefon: telefon.value,
     poznamka: poznamka.value,
-    favoriteTrainers: getSelectedFavoriteTrainerIds()
+    favoriteTrainers: getSelectedFavoriteTrainerIds(),
+    assignedTrainerId: existingSchool?.assignedTrainerId ?? null
   };
 
   if(editId){
