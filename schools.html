@@ -909,6 +909,7 @@ function render(){
 
       const caretakerCell = document.createElement("td");
       caretakerCell.textContent = getCaretakerNameById(s.assignedCaretakerId);
+      caretakerCell.style.fontWeight = "bold";
       row.appendChild(caretakerCell);
 
       let cityCell = document.createElement("td");
