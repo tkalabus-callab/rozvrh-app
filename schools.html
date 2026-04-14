@@ -892,11 +892,10 @@ function render(){
         event.dataTransfer.setData("text/plain", s.id);
         event.dataTransfer.effectAllowed = "move";
       });
-      if(String(s.id) === String(selectedId) || String(s.id) === String(editId)) row.className = "active";
+      if(String(s.id) === String(selectedId) || String(s.id) === String(editId)) row.classList.add("active");
       if (lightColor && !row.classList.contains("active")) {
         row.style.background = lightColor;
       }
-      row.addEventListener("click", () => showDetail(s.id));
 
       let orderCell = document.createElement("td");
       orderCell.textContent = i + 1;

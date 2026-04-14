@@ -5,18 +5,124 @@
 <title>ROZVRH</title>
 
 <style>
-body { font-family: Arial; padding:20px; }
+
+/* === TOP NAV === */
+.page-header {
+  background:var(--color-header);
+  width:100%;
+  box-sizing:border-box;
+}
+
+.top-nav {
+  background:transparent;
+  padding:14px 16px;
+  display:flex;
+  gap:14px;
+  align-items:stretch;
+  justify-content:center;
+  flex-wrap:wrap;
+  width:100%;
+  max-width:100%;
+  margin:0;
+  border-bottom:1px solid rgba(255,255,255,0.08);
+  box-sizing:border-box;
+}
+
+.top-nav a,
+.page-header .top-nav a {
+  box-sizing:border-box;
+  color:#062b25;
+  text-decoration:none;
+  padding:0 16px;
+  border-radius:6px;
+  font-weight:600;
+  transition:background-color 0.2s ease, box-shadow 0.2s ease;
+  white-space:nowrap;
+  background:var(--color-primary) !important;
+  border:1px solid rgba(0,0,0,0.35) !important;
+  box-shadow:
+    0 2px 4px rgba(0,0,0,0.25),
+    inset 0 1px 0 rgba(255,255,255,0.06);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex:0 0 160px;
+  height:46px;
+  line-height:1;
+  text-align:center;
+  overflow:hidden;
+  margin:0;
+}
+
+.top-nav a:hover {
+  background:var(--color-primary) !important;
+  box-shadow:
+    0 4px 10px rgba(0,0,0,0.35),
+    inset 0 1px 0 rgba(255,255,255,0.10);
+  border-color:#6b84a3;
+  color:#062b25;
+}
+
+.top-nav a.is-current,
+.top-nav a[aria-current="page"],
+.top-nav a.is-current:hover,
+.top-nav a[aria-current="page"]:hover {
+  background:var(--color-primary) !important;
+  border-color:#ffffff !important;
+  color:#062b25 !important;
+  height:46px;
+}
+
+.top-nav a.is-current,
+.top-nav a[aria-current="page"] {
+  box-shadow: inset 0 0 0 4px #ffffff;
+}
+
+#pageTitle {
+  background:transparent;
+  color:#fff;
+  padding:10px 16px 16px 16px;
+  margin:0;
+  font-weight:700;
+  letter-spacing:0.3px;
+  text-align:center;
+  display:block;
+  width:100%;
+  max-width:100%;
+  box-sizing:border-box;
+}
+
+:root {
+  --color-primary: #1bb3c8;
+  --color-primary-dark: #146f80;
+  --color-bg: #eef3f7;
+  --color-border: #d4dde6;
+  --color-header: #2c3e55;
+  --color-text: #24364b;
+}
+
+body {
+  font-family: Arial;
+  padding:20px;
+  background:#eef3f7;
+  color:var(--color-text);
+}
+
+.page-shell {
+  padding:16px;
+}
 
 .header-table {
   width:100%;
   border-collapse: collapse;
   margin:10px 0;
-  border:2px solid #000;
+  background:#ffffff;
+  border:1px solid var(--color-border);
 }
 
 .header-table th,
 .header-table td {
-  border:1px solid #000;
+  border:1px solid var(--color-border);
   text-align:center;
   padding:6px;
   font-weight:bold;
@@ -30,10 +136,109 @@ table {
 }
 
 td, th {
-  border:1px solid #ccc;
+  border:1px solid var(--color-border);
   padding:4px;
   text-align:center;
   font-size:11px;
+}
+
+button {
+  border:1px solid var(--color-primary);
+  background:var(--color-primary);
+  color:var(--color-text);
+  font-weight:500;
+  box-shadow:
+    0 2px 0 rgba(0,0,0,0.15),
+    inset 0 1px 0 rgba(255,255,255,0.25);
+  transition: all 0.15s ease;
+}
+
+button:hover {
+  background:var(--color-primary-dark);
+  border-color:var(--color-primary-dark);
+  box-shadow:
+    0 3px 6px rgba(0,0,0,0.2),
+    inset 0 1px 0 rgba(255,255,255,0.2);
+}
+
+button:active {
+  transform: translateY(1px);
+  box-shadow:
+    0 1px 0 rgba(0,0,0,0.2),
+    inset 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.legacy-shortcuts {
+  display:none;
+}
+
+a[href="home.html"],
+a[href="index.html"],
+a[href="schools.html"],
+a[href="caretakers.html"],
+a[href="trainers.html"],
+a[href="managers.html"],
+a[href="trainer-plan.html"] {
+  display:inline-block;
+  padding:7px 12px;
+  margin:0 4px 0 0;
+  border:1px solid var(--color-header);
+  border-radius:4px;
+  background:var(--color-header);
+  color:#f4f7fb;
+  text-decoration:none;
+  box-shadow:
+    0 2px 0 rgba(0,0,0,0.18),
+    inset 0 1px 0 rgba(255,255,255,0.12);
+  transition:all 0.15s ease;
+}
+
+a[href="home.html"]:hover,
+a[href="index.html"]:hover,
+a[href="schools.html"]:hover,
+a[href="caretakers.html"]:hover,
+a[href="trainers.html"]:hover,
+a[href="managers.html"]:hover,
+a[href="trainer-plan.html"]:hover {
+  background:#3a5675;
+  border-color:#3a5675;
+  color:#ffffff;
+  box-shadow:
+    0 3px 6px rgba(0,0,0,0.22),
+    inset 0 1px 0 rgba(255,255,255,0.14);
+}
+
+a[href="home.html"]:active,
+a[href="index.html"]:active,
+a[href="schools.html"]:active,
+a[href="caretakers.html"]:active,
+a[href="trainers.html"]:active,
+a[href="managers.html"]:active,
+a[href="trainer-plan.html"]:active {
+  transform:translateY(1px);
+}
+
+a[href="home.html"] {
+  margin-bottom:10px;
+}
+
+a[href="index.html"][aria-current="page"],
+a[href="schools.html"][aria-current="page"],
+a[href="caretakers.html"][aria-current="page"],
+a[href="trainers.html"][aria-current="page"],
+a[href="managers.html"][aria-current="page"],
+a[href="trainer-plan.html"][aria-current="page"] {
+  background:#3a5675;
+  border-color:#6f8aa8;
+  color:#ffffff;
+  box-shadow:
+    0 2px 0 rgba(0,0,0,0.18),
+    inset 0 1px 0 rgba(255,255,255,0.18);
+}
+
+select {
+  border:1px solid var(--color-border);
+  color:var(--color-text);
 }
 
 .hour-cell { width:40px; background:#eee; }
@@ -381,15 +586,22 @@ th.today-column::before {
 
 .trainer-search {
   padding:6px 10px;
-  border:1px solid #999;
+  border:1px solid var(--color-border);
+  color:var(--color-text);
   border-radius:4px;
   min-width:220px;
 }
 
 .trainer-toggle {
   padding:6px 10px;
-  border:1px solid #999;
-  background:#fff;
+  border:1px solid var(--color-primary);
+  background:var(--color-primary);
+  color:var(--color-text);
+  font-weight:500;
+  box-shadow:
+    0 2px 0 rgba(0,0,0,0.15),
+    inset 0 1px 0 rgba(255,255,255,0.25);
+  transition: all 0.15s ease;
   border-radius:4px;
   cursor:pointer;
 }
@@ -497,20 +709,17 @@ th.today-column::before {
 
 <body>
 
-<h2 id="pageTitle">ROZVRH</h2>
-<div class="top-toolbar">
-  <div class="top-toolbar-left">
-    <a href="home.html">🏠 Domů</a>
+<div class="page-header">
+  <div class="top-nav">
+    <a href="home.html">Domů</a>
+    <a href="index.html" aria-current="page" class="is-current">Rozvrh</a>
+    <a href="schools.html">Školy</a>
+    <a href="trainers.html">Trenéři</a>
+    <a href="caretakers.html">Školníci</a>
+    <a href="managers.html">Manažeři</a>
   </div>
-  <div class="top-toolbar-actions"></div>
-  <div class="top-toolbar-modules">
-    <a class="active" href="index.html">📅 Rozvrh</a>
-    <a href="schools.html">🏫 Školy</a>
-    <a href="caretakers.html">🧹 Školníci</a>
-    <a href="trainers.html">🧑‍🏫 Trenéři</a>
-    <a href="managers.html">📋 Manažeři</a>
-    <a href="reports.html">🧾 Výkazy</a>
-  </div>
+
+  <h2 id="pageTitle">ROZVRH</h2>
 </div>
 
 <table class="header-table">
@@ -544,9 +753,6 @@ th.today-column::before {
 <button onclick="changeWeek(7)">→</button>
 <button id="copyWeekButton" onclick="copyWeek()"></button>
 <button id="todayButton" onclick="goToday()"></button>
-<button id="schoolsButton" onclick="openSchools()"></button>
-<button id="trainersButton" onclick="openTrainers()">Trenéři</button>
-<button id="caretakersButton" onclick="openCaretakers()">Školníci</button>
 
 <div id="trainerToolsContainer">
   <select id="trainerFilterSelect"></select>
@@ -623,9 +829,6 @@ const trainerPeriodDate = document.getElementById("trainerPeriodDate");
 const weekNumber = document.getElementById("weekNumber");
 const copyWeekButton = document.getElementById("copyWeekButton");
 const todayButton = document.getElementById("todayButton");
-const schoolsButton = document.getElementById("schoolsButton");
-const trainersButton = document.getElementById("trainersButton");
-const caretakersButton = document.getElementById("caretakersButton");
 const managerSelect = document.getElementById("managerSelect");
 const trainerSearch = document.getElementById("trainerSearch");
 const trainerFilterSelect = document.getElementById("trainerFilterSelect");
@@ -1022,8 +1225,6 @@ function initStaticTexts(){
   weekNumberHeader.textContent = "Týden č.";
   copyWeekButton.textContent = TEXTS.schedule.copyWeek;
   todayButton.textContent = "Dnes";
-  schoolsButton.textContent = TEXTS.schools.title;
-  trainersButton.textContent = TEXTS.trainers.title;
   trainerSearch.placeholder = TEXTS.schedule.searchTrainer;
   showAllTrainersButton.textContent = TEXTS.schedule.allTrainers;
 }
