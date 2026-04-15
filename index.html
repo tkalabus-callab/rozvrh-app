@@ -436,36 +436,73 @@ th.today-column::before {
 }
 
 .leave-edit-dialog {
-  background:#2b2b2b;
-  color:#ff6b6b;
-  font-weight:bold;
-  padding:16px;
-  border-radius:6px;
+  background:#eef6fb;
+  border:1px solid var(--color-primary);
+  border-radius:10px;
+  box-shadow:0 8px 24px rgba(0,0,0,0.22);
+  padding:16px 18px;
+  color:var(--color-header);
   max-width:none;
   white-space:nowrap;
   transform:scale(1.2);
   transform-origin:center;
 }
 
+.leave-edit-dialog > div:first-child {
+  font-size:16px;
+  font-weight:700;
+  color:var(--color-header);
+  margin-bottom:14px;
+}
+
 .leave-edit-actions {
   display:flex;
   align-items:center;
-  gap:8px;
-  margin-top:12px;
+  gap:10px;
+  flex-wrap:wrap;
 }
 
 .leave-edit-actions button {
+  height:40px;
+  padding:0 18px;
+  border-radius:6px;
+  border:1px solid rgba(0,0,0,0.2);
+  box-shadow:0 2px 6px rgba(0,0,0,0.18);
+  font-size:16px;
+  line-height:1;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
   white-space:nowrap;
 }
 
-.leave-edit-discard {
-  background:#e74c3c;
-  color:#000;
-  font-weight:bold;
+#leaveEditConfirmButton {
+  background:var(--color-primary);
+  color:#000000;
+  font-weight:800;
 }
 
-.leave-edit-discard:hover {
-  background:#c0392b;
+.leave-edit-discard {
+  background:#3a4d63;
+  color:var(--color-primary);
+  font-weight:800;
+}
+
+#leaveEditCancelButton {
+  background:#ffffff;
+  color:var(--color-header);
+  font-weight:700;
+}
+
+.leave-edit-actions button:hover,
+.leave-edit-actions button:focus {
+  transform:translateY(-2px);
+  box-shadow:0 6px 14px rgba(0,0,0,0.24);
+}
+
+.leave-edit-actions button:active {
+  transform:translateY(0);
+  box-shadow:0 2px 4px rgba(0,0,0,0.18);
 }
 
 .day-border {
@@ -581,7 +618,7 @@ th.today-column::before {
   display:flex;
   gap:8px;
   align-items:center;
-  margin:12px 0 8px;
+  margin:0;
 }
 
 .trainer-search {
@@ -611,10 +648,305 @@ th.today-column::before {
 }
 
 #trainerToolsContainer {
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-  margin-top: 10px;
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:8px;
+}
+
+.schedule-toolbar {
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap:12px;
+  align-items:stretch;
+}
+
+/* rozložení:
+   A | C
+   B | . */
+#group-week{
+  grid-column:1;
+  grid-row:1;
+}
+
+#group-trainer-plan{
+  grid-column:2;
+  grid-row:1;
+}
+
+#group-trainers{
+  grid-column:1;
+  grid-row:2;
+  width:100%;
+  box-sizing:border-box;
+  padding:8px 12px;
+  gap:8px;
+}
+
+#group-caretaker-mode{
+  grid-column:2;
+  grid-row:2;
+  width:100%;
+  box-sizing:border-box;
+  padding:8px 12px;
+  background:var(--color-primary);
+  border-color:var(--color-primary);
+  color:#000000;
+}
+
+.grouped-toolbar{
+  margin-top:12px;
+}
+
+.toolbar-group{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  padding:10px 12px;
+  border:1px solid var(--color-border);
+  border-radius:10px;
+  background:#fff;
+  min-width:220px;
+  align-self:stretch;
+  height:100%;
+}
+
+.toolbar-group:focus-within{
+  border-color:var(--color-primary-dark);
+  box-shadow:0 6px 14px rgba(0,0,0,0.18);
+  background:#f3fbfd;
+}
+
+/* A = neutrální */
+#group-week{
+  background:#eef6fb;
+  border-color:var(--color-primary);
+}
+
+/* B = lehce zvýraznit (primární práce) */
+#group-trainers{
+  background:#eef6fb;
+  border-color:var(--color-primary);
+}
+
+/* C = nejdůležitější akce (silný důraz) */
+#group-trainer-plan{
+  background:var(--color-primary);
+  border-color:var(--color-primary);
+  color:#fff;
+}
+
+#group-trainer-plan .toolbar-group-title{
+  color:#fff;
+  font-size:15px;
+}
+
+#group-trainer-plan .toolbar-group-body button{
+  background:#fff;
+  color:var(--color-primary-dark);
+  font-weight:700;
+}
+
+#group-trainer-plan select,
+#group-trainer-plan input{
+  height:32px;
+  min-height:32px;
+}
+
+.toolbar-group-title{
+  margin:0;
+  font-weight:700;
+  color:var(--color-header);
+  font-size:14px;
+  line-height:1.2;
+  min-height:17px;
+  text-transform:uppercase;
+}
+
+.toolbar-group-body{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  align-items:center;
+  flex:1;
+  padding-bottom:2px;
+}
+
+#group-week,
+#group-trainers,
+#group-trainer-plan,
+#group-caretaker-mode{
+  min-height:100%;
+}
+
+#group-week,
+#group-trainer-plan{
+  width:100%;
+  box-sizing:border-box;
+}
+
+#group-week .toolbar-group-body,
+#group-trainers .toolbar-group-body,
+#group-trainer-plan .toolbar-group-body{
+  align-items:center;
+}
+
+#group-week .toolbar-group-body{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  align-items:center;
+}
+
+/* všechny tlačítka ve skupinách stejně vysoké a zarovnané */
+#group-week .toolbar-group-body button,
+#group-trainers .toolbar-group-body button,
+#group-trainer-plan .toolbar-group-body button{
+  height:32px;
+  min-height:32px;
+  padding:0 12px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  box-sizing:border-box;
+}
+
+/* inputy/selecty zarovnat na stejnou výšku */
+#group-week .toolbar-group-body input,
+#group-week .toolbar-group-body select,
+#group-trainers .toolbar-group-body input,
+#group-trainers .toolbar-group-body select,
+#group-trainer-plan .toolbar-group-body input,
+#group-trainer-plan .toolbar-group-body select{
+  height:32px;
+  min-height:32px;
+  box-sizing:border-box;
+}
+
+#group-week .toolbar-group-body > *,
+#group-trainers .toolbar-group-body > *,
+#group-trainer-plan .toolbar-group-body > *{
+  margin:0;
+}
+
+#group-trainer-plan .toolbar-group-body{
+  gap:10px;
+}
+
+#group-caretaker-mode-body{
+  display:block;
+}
+
+.caretaker-fields-grid{
+  display:grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(96px, 0.7fr) auto;
+  grid-template-areas:
+    "caretaker year action"
+    "school city city";
+  gap:6px 12px;
+  align-items:end;
+}
+
+.caretaker-field{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+
+.caretaker-field-label{
+  font-weight:700;
+  color:#000000;
+  font-size:14px;
+  line-height:1.2;
+}
+
+.caretaker-field-value{
+  min-height:32px;
+  display:flex;
+  align-items:center;
+}
+
+.caretaker-field-value select,
+.caretaker-field-value input,
+.caretaker-field-value > div,
+.caretaker-field-value > span{
+  min-height:32px;
+  box-sizing:border-box;
+}
+
+.caretaker-field-surface{
+  min-height:32px;
+  padding:0 12px;
+  display:flex;
+  align-items:center;
+  border-radius:6px;
+  border:1px solid rgba(0,0,0,0.12);
+  background:#ffffff;
+  color:var(--color-header);
+  box-sizing:border-box;
+}
+
+#city{
+  justify-content:flex-start;
+}
+
+#caretaker{
+  font-weight:700;
+  font-size:14px;
+  line-height:1.2;
+  color:#000000;
+  justify-content:center;
+  width:100%;
+}
+
+#group-caretaker-mode #schoolSelect,
+#group-caretaker-mode #yearSelect{
+  width:100%;
+  min-height:32px;
+  height:32px;
+  padding:0 12px;
+  border-radius:6px;
+  box-sizing:border-box;
+}
+
+.caretaker-field-school{
+  grid-area:school;
+}
+
+.caretaker-field-city{
+  grid-area:city;
+}
+
+.caretaker-field-caretaker{
+  grid-area:caretaker;
+}
+
+.caretaker-field-year{
+  grid-area:year;
+}
+
+/* tlačítko Upravit tento týden dolů jako samostatná akce */
+#group-week .edit-week-button{
+  margin-top:8px;
+}
+
+.toolbar-field {
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  font-size:13px;
+  font-weight:600;
+  color:var(--color-header);
+}
+
+.week-number-value {
+  min-width:28px;
+}
+
+.toolbar-group-body .trainer-panel {
+  width:100%;
+  margin:0;
 }
 
 #scheduleArea {
@@ -704,6 +1036,260 @@ th.today-column::before {
 .top-toolbar a.active:hover {
   background:#ffe8e8;
 }
+
+#group-trainer-plan #showTrainerPlanButton{
+  height:40px;
+  min-height:40px;
+  padding:0 18px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  box-sizing:border-box;
+  font-weight:800;
+  border-radius:6px;
+  border:1px solid rgba(0,0,0,0.2);
+  background:#3a4d63;
+  color:var(--color-primary);
+  box-shadow:0 2px 6px rgba(0,0,0,0.2);
+}
+
+#group-week #editWeekButton{
+  height:40px;
+  min-height:40px;
+  padding:0 18px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  box-sizing:border-box;
+  font-size:16px;
+  font-weight:800;
+  line-height:1;
+  border-radius:6px;
+  border:1px solid rgba(0,0,0,0.2);
+  background:var(--color-primary);
+  color:#000000;
+  box-shadow:0 2px 6px rgba(0,0,0,0.2);
+}
+
+#group-trainer-plan #showTrainerPlanButton:hover,
+#group-trainer-plan #showTrainerPlanButton:focus,
+#group-week #editWeekButton:hover,
+#group-week #editWeekButton:focus{
+  transform:translateY(-2px);
+  box-shadow:0 6px 14px rgba(0,0,0,0.28);
+}
+
+#group-trainer-plan #showTrainerPlanButton:active,
+#group-week #editWeekButton:active{
+  transform:translateY(0);
+  box-shadow:0 2px 4px rgba(0,0,0,0.2);
+}
+
+button[style*="var(--color-primary)"],
+#group-week button,
+#group-trainer-plan button{
+  color:#000000;
+}
+
+#group-trainer-plan .toolbar-group-title{
+  color:#000000;
+}
+
+#trainerSchoolScopeLabel{
+  color:#000000;
+}
+
+#group-trainers.collapsed .toolbar-group-body{
+  display:none;
+}
+
+#group-trainers.collapsed{
+  padding-bottom:6px;
+}
+
+.group-trainers-title-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  width:100%;
+  min-height:17px;
+  margin:0;
+  padding:0;
+  background:transparent;
+  border:0;
+  box-shadow:none;
+}
+
+.group-trainers-title-text{
+  color:var(--color-header);
+  line-height:1.2;
+}
+
+#group-trainers-toggle{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  min-height:28px;
+  height:28px;
+  padding:0 10px;
+  margin:0;
+
+  font-weight:800;
+  font-size:12px;
+  line-height:1;
+  text-align:center;
+
+  border:1px solid rgba(0,0,0,0.2);
+  border-radius:6px;
+
+  background:var(--color-primary);
+  background-color:var(--color-primary);
+  color:#000000;
+
+  box-shadow:0 2px 6px rgba(0,0,0,0.18);
+  cursor:pointer;
+}
+
+#group-trainers-toggle:hover,
+#group-trainers-toggle:focus{
+  background:var(--color-primary);
+  background-color:var(--color-primary);
+  border-color:rgba(0,0,0,0.24);
+  color:#000000;
+  transform:none;
+  box-shadow:0 4px 10px rgba(0,0,0,0.22);
+}
+
+#group-trainers-toggle:active{
+  background:var(--color-primary);
+  background-color:var(--color-primary);
+  border-color:rgba(0,0,0,0.2);
+  transform:none;
+  box-shadow:0 2px 4px rgba(0,0,0,0.18);
+}
+
+#group-trainers .trainer-toolbar{
+  width:100%;
+  margin:0;
+}
+
+#group-caretaker-mode .toolbar-group-title{
+  color:#000000;
+}
+
+#group-week #editWeekButton.edit-active{
+  background:#3a4d63;
+  color:var(--color-primary);
+  font-weight:800;
+}
+
+#caretakerRoleInfo{
+  grid-area:action;
+  align-self:end;
+  display:none;
+  margin:0;
+  padding:0;
+  border:none;
+  background:transparent;
+  border-radius:0;
+  box-shadow:none;
+  font-weight:700;
+  color:var(--color-header);
+}
+
+#group-caretaker-mode #city{
+  width:100%;
+}
+
+#caretakerRoleInfo .caretaker-role-label{
+  display:none;
+}
+
+#caretakerRoleInfo .caretaker-name-badge{
+  display:none;
+}
+
+.caretaker-mode-row{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+#group-caretaker-mode .caretaker-mode-row{
+  justify-content:flex-end;
+  gap:0;
+  flex-wrap:nowrap;
+}
+
+.caretaker-name-badge{
+  min-height:32px;
+  padding:0 14px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:6px;
+  border:1px solid rgba(0,0,0,0.12);
+  color:#000000;
+  font-weight:800;
+  box-sizing:border-box;
+}
+
+#exitCaretakerModeButton{
+  height:32px;
+  padding:0 14px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  white-space:nowrap;
+  box-sizing:border-box;
+  border-radius:6px;
+  border:1px solid rgba(0,0,0,0.2);
+  background:#3a4d63;
+  color:var(--color-primary);
+  font-weight:800;
+}
+
+/* unified keyboard focus for CTA & toggle buttons */
+#group-week button:focus-visible,
+#group-trainers button:focus-visible,
+#group-trainer-plan button:focus-visible,
+#group-caretaker-mode button:focus-visible{
+  outline:none;
+  box-shadow:
+    0 0 0 2px var(--color-primary),
+    0 4px 10px rgba(0,0,0,0.24);
+  border-radius:6px;
+}
+
+/* ensure focus ring is visible on dark CTA in C */
+#group-trainer-plan #showTrainerPlanButton:focus-visible{
+  box-shadow:
+    0 0 0 2px var(--color-primary),
+    0 6px 14px rgba(0,0,0,0.28);
+}
+
+/* ensure focus ring is visible on primary CTA in A */
+#group-week #editWeekButton:focus-visible{
+  box-shadow:
+    0 0 0 2px var(--color-primary-dark),
+    0 6px 14px rgba(0,0,0,0.28);
+}
+
+#group-week input:focus-visible,
+#group-week select:focus-visible,
+#group-trainers input:focus-visible,
+#group-trainers select:focus-visible,
+#group-trainer-plan input:focus-visible,
+#group-trainer-plan select:focus-visible{
+  outline:none;
+  box-shadow:
+    0 0 0 2px var(--color-primary),
+    0 2px 6px rgba(0,0,0,0.18);
+  border-radius:4px;
+}
 </style>
 </head>
 
@@ -722,47 +1308,97 @@ th.today-column::before {
   <h2 id="pageTitle">ROZVRH</h2>
 </div>
 
-<table class="header-table">
-<tr>
-  <th id="schoolHeader"></th>
-  <th id="cityHeader"></th>
-  <th id="caretakerHeader">Školník</th>
-  <th id="yearHeader"></th>
-  <th id="weekFromHeader"></th>
-  <th id="weekNumberHeader"></th>
-</tr>
-<tr>
-  <td><select id="schoolSelect"></select></td>
-  <td id="city">-</td>
-  <td id="caretaker">-</td>
-  <td>
-    <select id="yearSelect" onchange="onYearChange()">
-      <option>1</option><option>2</option><option>3</option>
-      <option>4</option><option>5</option><option>6</option>
-      <option>7</option><option>8</option><option>9</option>
-    </select>
-  </td>
-  <td><input type="date" id="dateInput"></td>
-  <td id="weekNumber"></td>
-</tr>
-</table>
+<div class="schedule-toolbar grouped-toolbar">
 
-<div id="caretakerRoleInfo" style="margin-top:8px; display:none; padding:10px 12px; border-radius:8px; font-weight:bold;"></div>
+  <!-- A: práce s týdnem -->
+  <div class="toolbar-group" id="group-week">
+    <div class="toolbar-group-title">Práce s týdnem</div>
+    <div class="toolbar-group-body" id="group-week-body">
+      <label class="toolbar-field" for="dateInput">
+        <span id="weekFromHeader"></span>
+        <input type="date" id="dateInput">
+      </label>
+      <div class="toolbar-field">
+        <span id="weekNumberHeader"></span>
+        <span id="weekNumber" class="week-number-value"></span>
+      </div>
+      <button onclick="changeWeek(-7)">←</button>
+      <button onclick="changeWeek(7)">→</button>
+      <button id="copyWeekButton" onclick="copyWeek()"></button>
+      <button id="todayButton" onclick="goToday()"></button>
+      <button id="editWeekButton" class="edit-week-button" type="button">Upravit tento týden</button>
+    </div>
+  </div>
 
-<button onclick="changeWeek(-7)">←</button>
-<button onclick="changeWeek(7)">→</button>
-<button id="copyWeekButton" onclick="copyWeek()"></button>
-<button id="todayButton" onclick="goToday()"></button>
+  <!-- B: obsazení trenérů -->
+  <div class="toolbar-group" id="group-trainers">
+    <div class="toolbar-group-title group-trainers-title-row">
+      <span class="group-trainers-title-text">Výběr trenéra</span>
+      <button id="group-trainers-toggle" type="button" aria-label="Sbalit nebo rozbalit obsazení trenérů">SBALIT</button>
+    </div>
+    <div class="toolbar-group-body" id="group-trainers-body">
+      <div class="trainer-toolbar">
+        <input id="trainerSearch" class="trainer-search">
+        <button id="showAllTrainersButton" class="trainer-toggle" type="button"></button>
+      </div>
+      <div id="trainerPanel" class="trainer-panel"></div>
+    </div>
+  </div>
 
-<div id="trainerToolsContainer">
-  <select id="trainerFilterSelect"></select>
-  <span id="trainerSchoolScopeLabel">Všechny školy</span>
-  <select id="trainerPeriodType">
-    <option value="week">Týden</option>
-    <option value="month">Měsíc</option>
-  </select>
-  <input type="date" id="trainerPeriodDate">
-  <button id="showTrainerPlanButton" type="button">Zobrazit plán</button>
+  <!-- C: plán trenéra -->
+  <div class="toolbar-group" id="group-trainer-plan">
+    <div class="toolbar-group-title">Plán trenéra</div>
+    <div class="toolbar-group-body" id="group-trainer-plan-body">
+      <div id="trainerToolsContainer">
+        <select id="trainerFilterSelect"></select>
+        <span id="trainerSchoolScopeLabel">Všechny školy</span>
+        <select id="trainerPeriodType">
+          <option value="week">Týden</option>
+          <option value="month">Měsíc</option>
+        </select>
+        <input type="date" id="trainerPeriodDate">
+        <button id="showTrainerPlanButton" type="button">Zobrazit plán</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toolbar-group" id="group-caretaker-mode">
+    <div class="toolbar-group-title">REŽIM ŠKOLNÍKA</div>
+    <div class="toolbar-group-body" id="group-caretaker-mode-body">
+      <div class="caretaker-fields-grid">
+        <div class="caretaker-field caretaker-field-caretaker">
+          <div class="caretaker-field-label" id="caretakerHeader">Školník</div>
+          <div class="caretaker-field-value caretaker-field-surface" id="caretaker">-</div>
+        </div>
+
+        <div class="caretaker-field caretaker-field-year">
+          <div class="caretaker-field-label" id="yearHeader"></div>
+          <div class="caretaker-field-value">
+            <select id="yearSelect" onchange="onYearChange()">
+              <option>1</option><option>2</option><option>3</option>
+              <option>4</option><option>5</option><option>6</option>
+              <option>7</option><option>8</option><option>9</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="caretakerRoleInfo"></div>
+
+        <div class="caretaker-field caretaker-field-school">
+          <div class="caretaker-field-label" id="schoolHeader"></div>
+          <div class="caretaker-field-value">
+            <select id="schoolSelect"></select>
+          </div>
+        </div>
+
+        <div class="caretaker-field caretaker-field-city">
+          <div class="caretaker-field-label" id="cityHeader"></div>
+          <div class="caretaker-field-value caretaker-field-surface" id="city">-</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>
 <div id="trainerPlanPreview" style="margin-top:10px;"></div>
 
@@ -778,14 +1414,8 @@ th.today-column::before {
   <select id="trainerSelect" multiple size="5"></select>
 </div>
 
-<div class="trainer-toolbar">
-  <input id="trainerSearch" class="trainer-search">
-  <button id="showAllTrainersButton" class="trainer-toggle" type="button"></button>
-</div>
 <div id="scheduleArea">
-  <div id="trainerPanel" class="trainer-panel"></div>
   <div id="scheduleOverlayMessage" aria-live="polite"></div>
-  <button id="editWeekButton" type="button">Upravit tento týden</button>
   <table id="table"></table>
 </div>
 
@@ -793,9 +1423,9 @@ th.today-column::before {
   <div class="leave-edit-dialog">
     <div>Opouštíte editovaný týden. Neuložené změny mohou být ztraceny.</div>
     <div class="leave-edit-actions">
-      <button id="leaveEditConfirmButton" type="button">💾 Uložit a pokračovat</button>
-      <button id="leaveEditDiscardButton" class="leave-edit-discard" type="button">⚠️ Pokračovat bez uložení</button>
-      <button id="leaveEditCancelButton" type="button">✏️ Pokračovat v editaci</button>
+      <button id="leaveEditConfirmButton" type="button">Uložit a pokračovat</button>
+      <button id="leaveEditDiscardButton" class="leave-edit-discard" type="button">Pokračovat bez uložení</button>
+      <button id="leaveEditCancelButton" type="button">Pokračovat v editaci</button>
     </div>
   </div>
 </div>
@@ -1218,7 +1848,7 @@ function loadTrainerFilterOptions(){
 }
 
 function initStaticTexts(){
-  schoolHeader.textContent = TEXTS.schools.title.slice(0, -1);
+  schoolHeader.textContent = "Škola";
   cityHeader.textContent = "Místo";
   yearHeader.textContent = "Ročník";
   weekFromHeader.textContent = "Týden od";
@@ -1243,23 +1873,30 @@ function renderCaretakerRoleInfo(){
 
   const caretakerName = `${caretakerItem.prijmeni || ""} ${caretakerItem.jmeno || ""}`.trim() || caretakerItem.name || "-";
   const caretakerColor = getCaretakerColorById(caretakerId);
-  const lightColor = lightenColor(caretakerColor, 0.82);
 
   caretakerRoleInfo.style.display = "block";
-  caretakerRoleInfo.style.background = lightColor || "#f5f5f5";
-  caretakerRoleInfo.style.border = `2px solid ${caretakerColor || "#999"}`;
-  caretakerRoleInfo.style.borderLeft = `10px solid ${caretakerColor || "#999"}`;
-  caretakerRoleInfo.textContent = `REŽIM ŠKOLNÍKA: ${caretakerName}`;
+  caretakerRoleInfo.replaceChildren();
+
+  const row = document.createElement("div");
+  row.className = "caretaker-mode-row";
+
+  const badge = document.createElement("div");
+  badge.className = "caretaker-name-badge";
+  badge.textContent = caretakerName;
+  badge.style.background = caretakerColor || "";
 
   const button = document.createElement("button");
+  button.id = "exitCaretakerModeButton";
+  button.type = "button";
   button.textContent = "Ukončit režim";
-  button.style.marginLeft = "8px";
   button.addEventListener("click", () => {
     localStorage.removeItem("caretakerId");
     location.reload();
   });
 
-  caretakerRoleInfo.appendChild(button);
+  row.appendChild(badge);
+  row.appendChild(button);
+  caretakerRoleInfo.appendChild(row);
 }
 
 function syncTrainerPeriodDateFromMainDate(){
@@ -2915,6 +3552,7 @@ if(showTrainerPlanButton){
   showTrainerPlanButton.addEventListener("click", openTrainerPlanPage);
 }
 editWeekButton.addEventListener("click", () => {
+  editWeekButton.classList.toggle("edit-active");
   setEditMode(!isEditMode);
 });
 leaveEditConfirmButton.addEventListener("click", () => {
@@ -2967,6 +3605,23 @@ if(document.readyState === "loading"){
 } else {
   boot();
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+  const toggle = document.getElementById("group-trainers-toggle");
+  const group = document.getElementById("group-trainers");
+
+  if(toggle && group){
+    const syncToggleLabel = () => {
+      toggle.textContent = group.classList.contains("collapsed") ? "ROZBALIT" : "SBALIT";
+    };
+
+    syncToggleLabel();
+    toggle.addEventListener("click", () => {
+      group.classList.toggle("collapsed");
+      syncToggleLabel();
+    });
+  }
+});
 
 </script>
 

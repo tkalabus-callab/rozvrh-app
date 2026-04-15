@@ -5,7 +5,41 @@
 <title>Školy</title>
 
 <style>
-body { font-family: Arial; padding:20px; }
+:root {
+  --color-primary: #1bb3c8;
+  --color-primary-dark: #146f80;
+  --color-bg: #eef3f7;
+  --color-border: #d4dde6;
+  --color-header: #2c3e55;
+  --color-text: #24364b;
+}
+
+body {
+  font-family: Arial;
+  padding:20px;
+  background:#eef3f7;
+  color:var(--color-text);
+}
+
+.page-header {
+  background:var(--color-header);
+  width:100%;
+  box-sizing:border-box;
+}
+
+#pageTitle {
+  background:transparent;
+  color:#fff;
+  padding:10px 16px 16px 16px;
+  margin:0;
+  font-weight:700;
+  letter-spacing:0.3px;
+  text-align:center;
+  display:block;
+  width:100%;
+  max-width:100%;
+  box-sizing:border-box;
+}
 
 input { margin:2px; width:180px; }
 
@@ -19,13 +53,17 @@ input { margin:2px; width:180px; }
 .favorite-trainers {
   margin:12px 0;
   padding:10px;
-  border:1px solid #ccc;
+  border:1px solid var(--color-border);
+  border-radius:10px;
+  background:#ffffff;
   max-width:760px;
 }
 
 .favorite-trainers-title {
   font-weight:bold;
   margin-bottom:8px;
+  color:var(--color-header);
+  text-transform:uppercase;
 }
 
 .favorite-trainers-list {
@@ -73,12 +111,40 @@ input { margin:2px; width:180px; }
 }
 
 .school-detail-panel {
-  margin:14px 0;
-  padding:12px;
-  max-width:760px;
-  border:2px solid #bbb;
-  border-radius:6px;
-  background:#f8f8f8;
+  margin:16px auto;
+  padding:14px 16px;
+  max-width:960px;
+  border:1px solid var(--color-border);
+  border-radius:10px;
+  background:#ffffff;
+}
+
+#detailTitle,
+#listTitle {
+  margin:0 0 10px;
+  color:var(--color-header);
+  font-size:16px;
+  line-height:1.2;
+  text-transform:uppercase;
+}
+
+#listTitle {
+  max-width:960px;
+  margin:18px auto 4px;
+  padding:0 4px;
+  font-weight:800;
+}
+
+.highlight-caretaker-name {
+  color:#000000;
+  background:var(--color-primary);
+  padding:2px 6px;
+  border-radius:4px;
+  font-weight:900;
+}
+
+#listTitle + .school-detail-panel {
+  margin-top:0;
 }
 
 .detail-actions {
@@ -99,9 +165,9 @@ input { margin:2px; width:180px; }
 .assigned-trainers {
   margin-top:8px;
   padding:8px 10px;
-  border:1px solid #ddd;
+  border:1px solid var(--color-border);
   border-radius:6px;
-  background:#f5f5f5;
+  background:#eef6fb;
 }
 
 .school-list-action {
@@ -109,31 +175,162 @@ input { margin:2px; width:180px; }
 }
 
 #newSchoolButton {
-  border-color:#c00;
-  background:#fff0f0;
-  box-shadow:0 1px 4px rgba(204,0,0,0.18);
+  border:0;
+  background:var(--color-header);
+  color:#ffffff;
+  box-shadow:0 4px 10px rgba(0,0,0,0.25);
+  min-height:40px;
+  line-height:1;
+  padding:0 18px;
+  font-weight:800;
+  text-transform:uppercase;
+  border-radius:8px;
+  cursor:pointer;
+  transition:background 0.15s ease, box-shadow 0.15s ease;
+}
+
+#newSchoolButton:hover,
+#newSchoolButton:focus {
+  background:var(--color-primary-dark);
+  box-shadow:0 6px 14px rgba(0,0,0,0.3);
 }
 
 table {
-  border-collapse: collapse;
-  margin-top:10px;
+  border-collapse: separate;
+  border-spacing:0;
+  table-layout:fixed;
+  width:100%;
+  margin:12px auto 0;
+  max-width:960px;
+  background:#ffffff;
+  border:1px solid var(--color-border);
+  border-radius:10px;
+  overflow:hidden;
+  font-size:13px;
 }
 
 td, th {
-  border:1px solid #ccc;
-  padding:5px 10px;
+  border:0;
+  border-bottom:1px solid rgba(44,62,85,0.12);
+  padding:4px 8px;
   text-align:left;
+  line-height:1.25;
 }
 
-.col-name { width:40ch; }
-.col-city { width:25ch; }
+th {
+  color:var(--color-header);
+  background:#eef6fb;
+  font-weight:700;
+  text-transform:uppercase;
+  font-size:13px;
+  line-height:1.2;
+}
+
+tbody tr:nth-child(even) {
+  background:#f9fbfd;
+}
+
+tbody tr:last-child td {
+  border-bottom:0;
+}
+
+.empty-state-cell {
+  padding:16px 10px;
+  color:var(--color-header);
+  font-weight:700;
+  text-align:center;
+  background:#f8fbfd;
+}
+
+.compact-school-list {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px 12px;
+}
+
+.compact-school-list[hidden] {
+  display:none;
+}
+
+.compact-school-column {
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+
+.compact-school-item {
+  padding:7px 9px;
+  border:1px solid rgba(44,62,85,0.12);
+  border-radius:6px;
+  background:#ffffff;
+  box-sizing:border-box;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+}
+
+.compact-school-main {
+  min-width:0;
+}
+
+.compact-school-title {
+  color:var(--color-header);
+  font-weight:800;
+  font-size:13px;
+  line-height:1.2;
+}
+
+.compact-school-meta {
+  margin-top:2px;
+  color:#5b6b7c;
+  font-size:12px;
+  line-height:1.2;
+}
+
+.compact-school-action {
+  flex:0 0 auto;
+}
+
+.compact-empty {
+  grid-column:1 / -1;
+  padding:16px 10px;
+  color:var(--color-header);
+  font-weight:700;
+  text-align:center;
+  background:#f8fbfd;
+  border-radius:6px;
+}
+
+.col-name { width:33%; }
+.col-city { width:33%; }
+
+th:nth-child(3),
+td:nth-child(3) {
+  width:34%;
+}
+
+th:nth-child(1),
+td:nth-child(1) {
+  width:42px;
+}
+
+th:nth-child(4),
+td:nth-child(4) {
+  width:130px;
+}
+
+th:nth-child(5),
+td:nth-child(5) {
+  width:72px;
+}
 
 tr.active {
-  background:#2b2b2b !important;
-  color:#ff6b6b;
+  background:#eef6fb !important;
+  color:var(--color-header);
   font-weight:bold;
-  outline:2px solid rgba(204,0,0,0.35);
-  box-shadow:0 0 6px rgba(204,0,0,0.25);
+  outline:2px solid var(--color-primary);
+  box-shadow:none;
 }
 
 tr.active .school-list-action {
@@ -144,81 +341,209 @@ tr.active .school-list-action {
 }
 
 tr:hover {
-  background:#f5f5f5 !important;
+  background:#f0f8fb !important;
   cursor:pointer;
 }
 
 .top-toolbar {
-  position:sticky;
-  top:0;
   z-index:100;
   display:flex;
-  align-items:center;
-  gap:4px;
-  margin:0 0 12px 0;
-  padding:0;
+  align-items:stretch;
+  justify-content:center;
+  gap:14px;
+  margin:0;
+  padding:14px 16px;
   max-width:100%;
   box-sizing:border-box;
-  background:rgba(255,255,255,0.94);
+  background:transparent;
   border:0;
+  border-bottom:1px solid rgba(255,255,255,0.08);
+  flex-wrap:wrap;
 }
 
 .top-toolbar-left,
 .top-toolbar-actions,
 .top-toolbar-modules {
   display:flex;
-  align-items:center;
-  gap:4px;
-  flex-wrap:nowrap;
+  align-items:stretch;
+  gap:14px;
+  flex-wrap:wrap;
 }
 
 .top-toolbar a,
 .top-toolbar button {
-  color:#222;
-  font-weight:bold;
+  box-sizing:border-box;
+  color:#062b25;
   text-decoration:none;
-  padding:3px 8px;
-  border:1px solid #aaa;
-  border-radius:4px;
-  background:#f5f5f5;
-  transition:background 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+  padding:0 16px;
+  border-radius:6px;
+  font-weight:600;
+  transition:background-color 0.2s ease, box-shadow 0.2s ease;
+  white-space:nowrap;
+  background:var(--color-primary);
+  border:1px solid rgba(0,0,0,0.35);
+  box-shadow:
+    0 2px 4px rgba(0,0,0,0.25),
+    inset 0 1px 0 rgba(255,255,255,0.06);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-width:160px;
+  height:46px;
+  line-height:1;
+  text-align:center;
+  overflow:hidden;
+  margin:0;
 }
 
 .top-toolbar a:hover,
 .top-toolbar button:hover {
-  background:#ffffff;
-  box-shadow:0 1px 4px rgba(0,0,0,0.14);
-  transform:translateY(-1px);
+  background:var(--color-primary);
+  box-shadow:
+    0 4px 10px rgba(0,0,0,0.35),
+    inset 0 1px 0 rgba(255,255,255,0.10);
+  border-color:#6b84a3;
+  color:#062b25;
 }
 
 .top-toolbar a.active {
-  color:#c00;
-  border-color:#c00;
-  background:#fff0f0;
+  color:#062b25;
+  border-color:#ffffff;
+  background:var(--color-primary);
+  box-shadow: inset 0 0 0 4px #ffffff;
 }
 
 .top-toolbar a.active:hover {
-  background:#ffe8e8;
+  background:var(--color-primary);
+  border-color:#ffffff;
+}
+
+.page-action-box {
+  margin:16px auto;
+  padding:16px 18px;
+  max-width:960px;
+  width:100%;
+  border:0;
+  border-radius:12px;
+  background:var(--color-primary);
+  box-sizing:border-box;
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+  gap:14px;
+  flex-wrap:wrap;
+}
+
+.view-options {
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
+  min-height:32px;
+  border-left:0;
+  padding-left:0;
+}
+
+.view-options-title {
+  color:#000000;
+  font-weight:800;
+  text-transform:uppercase;
+  font-size:14px;
+  line-height:1.2;
+  width:100%;
+  margin-bottom:10px;
+}
+
+.view-option-button {
+  min-height:40px;
+  padding:0 14px;
+  border-radius:8px;
+  border:1px solid var(--color-border);
+  background:#ffffff;
+  color:var(--color-header);
+  font-weight:700;
+  line-height:1;
+  cursor:pointer;
+  transition:background 0.15s ease, border-color 0.15s ease;
+  box-shadow:0 2px 6px rgba(0,0,0,0.18);
+}
+
+.view-option-button.is-active {
+  border-width:2px;
+  border-color:var(--color-primary);
+  background:#eef6fb;
+  box-shadow:0 2px 6px rgba(0,0,0,0.12);
+}
+
+.specific-caretaker-picker {
+  position:relative;
+  display:inline-flex;
+}
+
+.specific-caretaker-dropdown {
+  position:absolute;
+  top:calc(100% + 6px);
+  left:0;
+  z-index:20;
+  min-width:220px;
+  padding:6px;
+  border:1px solid var(--color-border);
+  border-radius:8px;
+  background:#ffffff;
+  box-shadow:0 6px 16px rgba(0,0,0,0.2);
+}
+
+.specific-caretaker-dropdown[hidden] {
+  display:none;
+}
+
+.specific-caretaker-dropdown button {
+  width:100%;
+  padding:8px 10px;
+  border:0;
+  border-radius:6px;
+  background:#ffffff;
+  color:var(--color-header);
+  text-align:left;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.specific-caretaker-dropdown button:hover {
+  background:#eef6fb;
+}
+
+.specific-caretaker-dropdown button.is-active {
+  background:#dff2f7;
+  box-shadow:inset 0 0 0 2px var(--color-primary);
+  font-weight:800;
 }
 </style>
 </head>
 
 <body>
 
-<h2 id="pageTitle"></h2>
-<div class="top-toolbar">
-  <div class="top-toolbar-left">
-    <a href="home.html">🏠 Domů</a>
-    <button id="newSchoolButton" type="button">➕ Nová škola</button>
+<div class="page-header">
+  <div class="top-toolbar">
+    <div class="top-toolbar-left">
+      <a href="home.html">Domů</a>
+      <a href="index.html">Zpět na Rozvrh</a>
+    </div>
   </div>
-  <div class="top-toolbar-actions"></div>
-  <div class="top-toolbar-modules">
-    <a href="index.html">📅 Rozvrh</a>
-    <a class="active" href="schools.html">🏫 Školy</a>
-    <a href="caretakers.html">🧹 Školníci</a>
-    <a href="trainers.html">🧑‍🏫 Trenéři</a>
-    <a href="managers.html">📋 Manažeři</a>
-    <a href="reports.html">🧾 Výkazy</a>
+  <h2 id="pageTitle"></h2>
+</div>
+
+<div class="page-action-box">
+  <span class="view-options-title">Zobrazení</span>
+  <button id="newSchoolButton" type="button">+ NOVÁ ŠKOLA</button>
+  <div class="view-options">
+    <button class="view-option-button" type="button" data-view-mode="caretakers">Podle školníků</button>
+    <div class="specific-caretaker-picker">
+      <button class="view-option-button" type="button" data-view-mode="specific-caretaker">Podle konkrétního školníka</button>
+      <div class="specific-caretaker-dropdown" id="specificCaretakerDropdown" hidden></div>
+    </div>
+    <button class="view-option-button is-active" type="button" data-view-mode="compact">Kompaktní přehled</button>
+    <button class="view-option-button" type="button" data-view-mode="all">Všechny školy</button>
   </div>
 </div>
 
@@ -261,21 +586,21 @@ tr:hover {
 </div>
 
 <h3 id="listTitle"></h3>
-<label for="caretakerFilterSelect">Filtr školník</label>
-<select id="caretakerFilterSelect"></select>
-<br><br>
+<div class="school-detail-panel">
+<div id="compactSchoolList" class="compact-school-list" hidden></div>
 <table>
   <thead>
     <tr>
-      <th>#</th>
+      <th>PČ</th>
+      <th id="cityHeader" class="col-city"></th>
       <th id="nameHeader" class="col-name"></th>
       <th>Školník</th>
-      <th id="cityHeader" class="col-city"></th>
       <th>Akce</th>
     </tr>
   </thead>
   <tbody id="list"></tbody>
 </table>
+</div>
 
 <script type="module">
 import { TEXTS } from "./texts.js";
@@ -306,15 +631,21 @@ const detailCloseAction = document.getElementById("detailCloseAction");
 const detailTitle = document.getElementById("detailTitle");
 const detail = document.getElementById("detail");
 const listTitle = document.getElementById("listTitle");
-const caretakerFilterSelect = document.getElementById("caretakerFilterSelect");
 const nameHeader = document.getElementById("nameHeader");
 const cityHeader = document.getElementById("cityHeader");
 const list = document.getElementById("list");
+const viewOptionButtons = Array.from(document.querySelectorAll(".view-option-button"));
+const specificCaretakerDropdown = document.getElementById("specificCaretakerDropdown");
+const compactSchoolList = document.getElementById("compactSchoolList");
+const schoolListTable = list.closest("table");
 
 let schools = JSON.parse(localStorage.getItem("schools")) || [];
 let editId = null;
 let selectedId = null;
 let currentFavoriteTrainerIds = [];
+let currentViewMode = "compact";
+let currentSpecificCaretakerId = "";
+const caretakers = JSON.parse(localStorage.getItem("caretakers")) || [];
 
 function normalizeSchool(school){
   return {
@@ -366,6 +697,18 @@ function getCaretakerColorById(caretakerId){
   const item = caretakers.find(c => String(c.id) === String(caretakerId));
 
   return item?.color || "#ddd";
+}
+
+function getTrainerNameById(trainerId){
+  if (!trainerId) return "Bez trenéra";
+
+  const trainers = loadTrainers();
+  const item = trainers.find(t => String(t.id) === String(trainerId));
+
+  if (!item) return "Bez trenéra";
+
+  const fullName = `${item.prijmeni || ""} ${item.jmeno || ""}`.trim();
+  return fullName || item.name || "Bez trenéra";
 }
 
 function lightenColor(hex, amount = 0.85){
@@ -554,46 +897,138 @@ function renderCaretakerSelect(selectedId = ""){
   });
 }
 
-function renderCaretakerFilter(){
-  const select = document.getElementById("caretakerFilterSelect");
-  if (!select) return;
-
-  const caretakers = loadCaretakers();
-  select.innerHTML = "";
-
-  const allOption = document.createElement("option");
-  allOption.value = "";
-  allOption.textContent = "Všichni školníci";
-  select.appendChild(allOption);
-
-  caretakers.forEach(c => {
-    const option = document.createElement("option");
-    option.value = String(c.id);
-
-    const fullName = `${c.prijmeni || ""} ${c.jmeno || ""}`.trim();
-    option.textContent = fullName || c.name || "-";
-
-    select.appendChild(option);
+function sortSchools(items){
+  return items.slice().sort((a, b) => {
+    const cityCompare = (a.mesto || "").localeCompare(b.mesto || "", "cs");
+    if(cityCompare !== 0) return cityCompare;
+    return (a.nazev || "").localeCompare(b.nazev || "", "cs");
   });
 }
 
-function applyIncomingCaretakerFilter(){
-  const select = document.getElementById("caretakerFilterSelect");
-  if (!select) return;
+function getAvailableSpecificCaretakerIds(){
+  const ids = schools
+    .map(s => s.assignedCaretakerId || "")
+    .filter((id, index, items) => items.indexOf(id) === index);
 
-  const incomingId = localStorage.getItem("schoolsCaretakerFilter");
-  if (!incomingId) return;
-
-  const exists = Array.from(select.options).some(option => String(option.value) === String(incomingId));
-  if (exists) {
-    select.value = String(incomingId);
-  }
-
-  localStorage.removeItem("schoolsCaretakerFilter");
+  return ids;
 }
 
-function sortSchools(items){
-  return items.slice().sort((a, b) => a.nazev.localeCompare(b.nazev));
+function ensureSpecificCaretakerId(){
+  const ids = getAvailableSpecificCaretakerIds();
+  if(!ids.includes(currentSpecificCaretakerId)){
+    currentSpecificCaretakerId = ids[0] || "";
+  }
+}
+
+function syncViewModeButtons(){
+  let activeViewModeText = "";
+  viewOptionButtons.forEach(button => {
+    button.classList.toggle("is-active", button.dataset.viewMode === currentViewMode);
+    if(button.dataset.viewMode === "specific-caretaker"){
+      button.textContent = "Podle konkrétního školníka";
+    }
+    if(button.dataset.viewMode === currentViewMode){
+      if(currentViewMode === "specific-caretaker" && currentSpecificCaretakerId){
+        const name = getCaretakerNameById(currentSpecificCaretakerId);
+        activeViewModeText = `Podle konkrétního školníka: <span class="highlight-caretaker-name">${name}</span>`;
+      } else {
+        activeViewModeText = button.textContent;
+      }
+    }
+  });
+  if(listTitle && activeViewModeText){
+    listTitle.innerHTML = activeViewModeText;
+  }
+}
+
+function closeSpecificCaretakerDropdown(){
+  if(specificCaretakerDropdown){
+    specificCaretakerDropdown.hidden = true;
+  }
+}
+
+function renderSpecificCaretakerDropdown(){
+  if(!specificCaretakerDropdown) return;
+
+  specificCaretakerDropdown.innerHTML = "";
+  getAvailableSpecificCaretakerIds().forEach(caretakerId => {
+    const option = document.createElement("button");
+    option.type = "button";
+    option.textContent = getCaretakerNameById(caretakerId);
+    option.classList.toggle("is-active", String(caretakerId) === String(currentSpecificCaretakerId));
+    option.addEventListener("click", () => {
+      currentSpecificCaretakerId = caretakerId;
+      currentViewMode = "specific-caretaker";
+      closeSpecificCaretakerDropdown();
+      render();
+    });
+    specificCaretakerDropdown.appendChild(option);
+  });
+}
+
+function toggleSpecificCaretakerDropdown(){
+  if(!specificCaretakerDropdown) return;
+
+  renderSpecificCaretakerDropdown();
+  specificCaretakerDropdown.hidden = !specificCaretakerDropdown.hidden;
+}
+
+function renderCompactSchools(items){
+  if(!compactSchoolList) return;
+
+  const sortedItems = sortSchools(items);
+  if(sortedItems.length === 0){
+    const empty = document.createElement("div");
+    empty.className = "compact-empty";
+    empty.textContent = "Žádné školy k zobrazení.";
+    compactSchoolList.replaceChildren(empty);
+    return;
+  }
+
+  const midpoint = Math.ceil(sortedItems.length / 2);
+  const columns = [sortedItems.slice(0, midpoint), sortedItems.slice(midpoint)];
+  const fragment = document.createDocumentFragment();
+
+  columns.forEach(columnItems => {
+    const column = document.createElement("div");
+    column.className = "compact-school-column";
+
+    columnItems.forEach(s => {
+      const item = document.createElement("div");
+      item.className = "compact-school-item";
+
+      const main = document.createElement("div");
+      main.className = "compact-school-main";
+
+      const title = document.createElement("div");
+      title.className = "compact-school-title";
+      title.textContent = `${s.mesto || TEXTS.common.placeholderDash} · ${s.nazev || TEXTS.common.placeholderDash}`;
+
+      const meta = document.createElement("div");
+      meta.className = "compact-school-meta";
+      meta.textContent = getCaretakerNameById(s.assignedCaretakerId);
+
+      const editButton = document.createElement("button");
+      editButton.type = "button";
+      editButton.className = "school-list-action compact-school-action";
+      editButton.textContent = TEXTS.common.edit;
+      editButton.addEventListener("click", () => {
+        edit(s.id);
+        showDetail(s.id);
+        schoolDetailPanel.scrollIntoView({ block: "start", behavior: "smooth" });
+      });
+
+      main.appendChild(title);
+      main.appendChild(meta);
+      item.appendChild(main);
+      item.appendChild(editButton);
+      column.appendChild(item);
+    });
+
+    fragment.appendChild(column);
+  });
+
+  compactSchoolList.replaceChildren(fragment);
 }
 
 function assignSchoolToCaretaker(schoolId, caretakerId){
@@ -829,59 +1264,95 @@ function clearForm(){
 }
 
 function render(){
+  if(currentViewMode === "specific-caretaker"){
+    ensureSpecificCaretakerId();
+  }
+  syncViewModeButtons();
+
+  const isCompactView = currentViewMode === "compact";
+  if(compactSchoolList) compactSchoolList.hidden = !isCompactView;
+  if(schoolListTable) schoolListTable.hidden = isCompactView;
+
+  if(isCompactView){
+    renderCompactSchools(schools);
+    return;
+  }
+
   let listFragment = document.createDocumentFragment();
-  const selectedCaretakerId = document.getElementById("caretakerFilterSelect")?.value || "";
-  const filtered = selectedCaretakerId
-    ? schools.filter(s => String(s.assignedCaretakerId) === String(selectedCaretakerId))
-    : schools;
+  let visibleSchools = schools;
+
+  if (currentViewMode === "caretakers") {
+    visibleSchools = schools.slice();
+  } else if (currentViewMode === "specific-caretaker") {
+    visibleSchools = sortSchools(schools).filter(s => String(s.assignedCaretakerId || "") === String(currentSpecificCaretakerId));
+  }
+
+  const filtered = visibleSchools;
   const groups = {};
+  const isCaretakerGroupView = currentViewMode === "caretakers" || currentViewMode === "specific-caretaker";
 
   filtered.forEach(s => {
-    const key = s.assignedCaretakerId || "";
+    const caretakerId = s.assignedCaretakerId || "";
+    const key = isCaretakerGroupView ? `caretaker:${caretakerId}` : "all";
     if (!groups[key]) groups[key] = [];
     groups[key].push(s);
   });
 
   const sortedKeys = Object.keys(groups).sort((a, b) => {
-    return getCaretakerNameById(a).localeCompare(getCaretakerNameById(b), "cs");
+    const nameA = isCaretakerGroupView ? getCaretakerNameById(a.replace("caretaker:", "")) : "Všechny školy";
+    const nameB = isCaretakerGroupView ? getCaretakerNameById(b.replace("caretaker:", "")) : "Všechny školy";
+    return nameA.localeCompare(nameB, "cs");
   });
 
+  if(sortedKeys.length === 0){
+    const emptyRow = document.createElement("tr");
+    const emptyCell = document.createElement("td");
+    emptyCell.colSpan = 5;
+    emptyCell.className = "empty-state-cell";
+    emptyCell.textContent = currentViewMode === "specific-caretaker"
+      ? "Vybraný školník zatím nemá přiřazené školy."
+      : "Žádné školy k zobrazení.";
+    emptyRow.appendChild(emptyCell);
+    list.replaceChildren(emptyRow);
+    return;
+  }
+
   sortedKeys.forEach(key => {
-    const groupName = getCaretakerNameById(key);
+    const groupName = isCaretakerGroupView ? getCaretakerNameById(key.replace("caretaker:", "")) : "";
 
-    const headerRow = document.createElement("tr");
-    headerRow.style.background = getCaretakerColorById(key);
-    headerRow.dataset.caretakerId = key;
-    headerRow.dataset.groupHeader = "true";
-    headerRow.addEventListener("dragover", (event) => {
-      event.preventDefault();
-    });
-    headerRow.addEventListener("dragenter", () => {
-      highlightGroup(headerRow);
-    });
-    headerRow.addEventListener("dragleave", () => {
-      clearHighlight(headerRow);
-    });
-    headerRow.addEventListener("drop", (event) => {
-      event.preventDefault();
-      clearHighlight(headerRow);
+    if (isCaretakerGroupView) {
+      const headerRow = document.createElement("tr");
+      headerRow.style.background = getCaretakerColorById(key.replace("caretaker:", ""));
+      headerRow.dataset.caretakerId = key.replace("caretaker:", "");
+      headerRow.dataset.groupHeader = "true";
+      headerRow.addEventListener("dragover", (event) => {
+        event.preventDefault();
+      });
+      headerRow.addEventListener("dragenter", () => {
+        highlightGroup(headerRow);
+      });
+      headerRow.addEventListener("dragleave", () => {
+        clearHighlight(headerRow);
+      });
+      headerRow.addEventListener("drop", (event) => {
+        event.preventDefault();
+        clearHighlight(headerRow);
 
-      const schoolId = event.dataTransfer.getData("text/plain");
-      if (!schoolId) return;
+        const schoolId = event.dataTransfer.getData("text/plain");
+        if (!schoolId) return;
 
-      assignSchoolToCaretaker(schoolId, headerRow.dataset.caretakerId);
-    });
+        assignSchoolToCaretaker(schoolId, headerRow.dataset.caretakerId);
+      });
 
-    const headerCell = document.createElement("td");
-    headerCell.colSpan = 5;
-    headerCell.textContent = groupName;
+      const headerCell = document.createElement("td");
+      headerCell.colSpan = 5;
+      headerCell.textContent = groupName;
 
-    headerRow.appendChild(headerCell);
-    listFragment.appendChild(headerRow);
+      headerRow.appendChild(headerCell);
+      listFragment.appendChild(headerRow);
+    }
 
-    const groupSchools = groups[key]
-      .slice()
-      .sort((a, b) => a.nazev.localeCompare(b.nazev, "cs"));
+    const groupSchools = sortSchools(groups[key]);
 
     groupSchools.forEach((s, i) => {
       let row = document.createElement("tr");
@@ -901,6 +1372,11 @@ function render(){
       orderCell.textContent = i + 1;
       row.appendChild(orderCell);
 
+      let cityCell = document.createElement("td");
+      cityCell.className = "col-city";
+      cityCell.textContent = s.mesto || TEXTS.common.placeholderDash;
+      row.appendChild(cityCell);
+
       let nameCell = document.createElement("td");
       nameCell.className = "col-name";
       nameCell.textContent = s.nazev;
@@ -910,11 +1386,6 @@ function render(){
       caretakerCell.textContent = getCaretakerNameById(s.assignedCaretakerId);
       caretakerCell.style.fontWeight = "bold";
       row.appendChild(caretakerCell);
-
-      let cityCell = document.createElement("td");
-      cityCell.className = "col-city";
-      cityCell.textContent = s.mesto || TEXTS.common.placeholderDash;
-      row.appendChild(cityCell);
 
       const actionCell = document.createElement("td");
       const editListButton = document.createElement("button");
@@ -942,8 +1413,7 @@ window.add = add;
 initStaticTexts();
 renderFavoriteTrainerOptions([]);
 renderCaretakerSelect("");
-renderCaretakerFilter();
-applyIncomingCaretakerFilter();
+currentViewMode = "compact";
 if (newSchoolButton) {
   newSchoolButton.addEventListener("click", () => {
     clearForm();
@@ -956,9 +1426,27 @@ if (removeCaretakerButton) {
 if (cancelEditButton) {
   cancelEditButton.addEventListener("click", clearForm);
 }
-if (caretakerFilterSelect) {
-  caretakerFilterSelect.addEventListener("change", render);
-}
+viewOptionButtons.forEach(button => {
+  button.addEventListener("click", () => {
+    if(button.dataset.viewMode === "specific-caretaker"){
+      if(currentViewMode !== "specific-caretaker"){
+        ensureSpecificCaretakerId();
+      }
+      currentViewMode = "specific-caretaker";
+      toggleSpecificCaretakerDropdown();
+      render();
+      return;
+    }
+    closeSpecificCaretakerDropdown();
+    currentViewMode = button.dataset.viewMode || "all";
+    render();
+  });
+});
+document.addEventListener("click", (event) => {
+  if(!event.target.closest(".specific-caretaker-picker")){
+    closeSpecificCaretakerDropdown();
+  }
+});
 render();
 
 </script>
