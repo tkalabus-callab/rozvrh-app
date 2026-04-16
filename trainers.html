@@ -5,19 +5,259 @@
 <title>Trenéři</title>
 
 <style>
-body { font-family: Arial; padding:20px; }
+:root {
+  --color-primary: #1bb3c8;
+  --color-primary-dark: #146f80;
+  --color-bg: #eef3f7;
+  --color-border: #d4dde6;
+  --color-header: #2c3e55;
+  --color-text: #24364b;
+  --content-max-width:960px;
+}
+
+body {
+  font-family: Arial;
+  padding:20px;
+  background:#eef3f7;
+  color:var(--color-text);
+}
+
+.page-header {
+  background:var(--color-header);
+  width:100%;
+  box-sizing:border-box;
+}
+
+#pageTitle {
+  background:transparent;
+  color:#fff;
+  padding:10px 16px 16px 16px;
+  margin:0;
+  font-weight:700;
+  letter-spacing:0.3px;
+  text-align:center;
+  text-transform:uppercase;
+  display:block;
+  width:100%;
+  max-width:100%;
+  box-sizing:border-box;
+}
+
+.trainer-detail-panel {
+  margin:16px auto;
+  padding:18px;
+  width:100%;
+  max-width:var(--content-max-width);
+  border:1px solid var(--color-border);
+  border-radius:10px;
+  background:#ffffff;
+  box-sizing:border-box;
+}
+
+#detailTitle {
+  margin:0 0 10px;
+  color:var(--color-header);
+  font-size:16px;
+  line-height:1.2;
+  text-transform:uppercase;
+}
 
 input { margin:2px; }
 
-table {
-  border-collapse: collapse;
+.trainer-form-row {
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:10px 12px;
   margin-top:10px;
 }
 
+.trainer-form-row input {
+  box-sizing:border-box;
+  min-width:0;
+  height:34px;
+  margin:0;
+  padding:6px 8px;
+  border:1px solid var(--color-border);
+  border-radius:6px;
+  flex:1 1 150px;
+}
+
+#detail {
+  margin:0 0 14px;
+  line-height:1.45;
+}
+
+#jmeno,
+#prijmeni,
+#telefon,
+#email,
+#ico {
+  flex-basis:calc((100% - 48px) / 5);
+}
+
+#ulice,
+#mesto,
+#psc {
+  flex-basis:calc((100% - 24px) / 3);
+}
+
+#klub,
+#poznamka {
+  flex-basis:100%;
+}
+
+.trainer-detail-actions {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-top:18px;
+  padding-top:14px;
+  border-top:1px solid var(--color-border);
+}
+
+.trainer-actions-left,
+.trainer-actions-right {
+  display:flex;
+  align-items:center;
+  gap:12px;
+  flex-wrap:wrap;
+}
+
+#deleteTrainerButton {
+  color:#c00;
+  font-weight:700;
+}
+
+.trainer-delete-confirm {
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top:8px;
+  color:#c00;
+  font-weight:700;
+}
+
+.trainer-delete-confirm[hidden] {
+  display:none;
+}
+
+.page-action-box {
+  margin:16px auto;
+  padding:16px 18px;
+  max-width:var(--content-max-width);
+  width:100%;
+  border:0;
+  border-radius:12px;
+  background:var(--color-primary);
+  box-sizing:border-box;
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+  gap:14px;
+  flex-wrap:wrap;
+}
+
+.view-options {
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
+  min-height:32px;
+  border-left:0;
+  padding-left:0;
+}
+
+.view-options-title {
+  color:#000000;
+  font-weight:800;
+  text-transform:uppercase;
+  font-size:14px;
+  line-height:1.2;
+  width:100%;
+  margin-bottom:10px;
+}
+
+.view-option-button {
+  min-height:40px;
+  padding:0 14px;
+  border-radius:8px;
+  border:1px solid var(--color-border);
+  background:#ffffff;
+  color:var(--color-header);
+  font-weight:700;
+  line-height:1;
+  cursor:pointer;
+  transition:background 0.15s ease, border-color 0.15s ease;
+  box-shadow:0 2px 6px rgba(0,0,0,0.18);
+}
+
+.view-option-button.is-active {
+  border-width:2px;
+  border-color:var(--color-primary);
+  background:#eef6fb;
+  box-shadow:0 2px 6px rgba(0,0,0,0.12);
+}
+
+#newTrainerButton {
+  border:0;
+  background:var(--color-header);
+  color:#ffffff;
+  box-shadow:0 4px 10px rgba(0,0,0,0.25);
+  min-height:40px;
+  line-height:1;
+  padding:0 18px;
+  font-weight:800;
+  text-transform:uppercase;
+  border-radius:8px;
+  cursor:pointer;
+  transition:background 0.15s ease, box-shadow 0.15s ease;
+}
+
+#newTrainerButton:hover,
+#newTrainerButton:focus {
+  background:var(--color-primary-dark);
+  box-shadow:0 6px 14px rgba(0,0,0,0.3);
+}
+
+table {
+  border-collapse:separate;
+  border-spacing:0;
+  width:100%;
+  max-width:var(--content-max-width);
+  margin:0 auto;
+  background:#ffffff;
+  border:1px solid #000;
+  border-radius:10px;
+  overflow:hidden;
+  font-size:13px;
+  box-sizing:border-box;
+}
+
 td, th {
-  border:1px solid #ccc;
-  padding:5px 10px;
+  border:0;
+  border-right:1px solid #000;
+  border-bottom:1px solid rgba(44,62,85,0.25);
+  padding:3px 6px;
   text-align:left;
+  line-height:1.2;
+}
+
+tr td:last-child,
+tr th:last-child {
+  border-right:0;
+}
+
+th {
+  color:#ffffff;
+  background:var(--color-header);
+  font-weight:bold;
+  text-transform:uppercase;
+  font-size:13px;
+  line-height:1.2;
 }
 
 .col-name {
@@ -28,123 +268,242 @@ td, th {
   width:30ch;
 }
 
-tr.active { background:#ffeeba; }
+tr.active { background:#eef6fb; }
 
-tr.trainer-available { background:#eaf7ea; }
-tr.trainer-busy { background:#fdeaea; }
+tr.trainer-available { background:#edf8ef; }
+tr.trainer-busy { background:#fbecec; }
 
 tr:hover {
-  background:#f5f5f5;
-  cursor:pointer;
+  background:#f0f8fb;
+}
+
+tr.active:hover { background:#e3f2f7; }
+tr.trainer-available:hover { background:#e3f3e7; }
+tr.trainer-busy:hover { background:#f6dddd; }
+
+.compact-trainer-list {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px 12px;
+  width:100%;
+  max-width:var(--content-max-width);
+  margin:0 auto;
+  box-sizing:border-box;
+}
+
+.compact-trainer-list[hidden] {
+  display:none;
+}
+
+.compact-trainer-column {
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+
+.compact-trainer-item {
+  padding:7px 9px;
+  border:1px solid rgba(44,62,85,0.12);
+  border-radius:6px;
+  background:#ffffff;
+  box-sizing:border-box;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+}
+
+.compact-trainer-item.trainer-available { background:#edf8ef; }
+.compact-trainer-item.trainer-busy { background:#fbecec; }
+.compact-trainer-item.active { background:#eef6fb; }
+
+.compact-trainer-main {
+  min-width:0;
+}
+
+.compact-trainer-title {
+  color:var(--color-header);
+  font-weight:800;
+  font-size:13px;
+  line-height:1.2;
+}
+
+.compact-trainer-meta {
+  margin-top:2px;
+  color:#5b6b7c;
+  font-size:12px;
+  line-height:1.2;
+}
+
+.compact-trainer-action {
+  flex:0 0 auto;
+}
+
+#listTitle {
+  display:none;
+}
+
+.list-title-banner {
+  width:100%;
+  max-width:var(--content-max-width);
+  box-sizing:border-box;
+  background:var(--color-header);
+  color:#ffffff;
+  font-weight:700;
+  padding:10px 14px;
+  border-radius:8px;
+  margin:18px auto 8px;
 }
 
 .top-toolbar {
-  position:sticky;
-  top:0;
   z-index:100;
-  display:inline-flex;
-  flex-direction:column;
-  align-items:flex-start;
-  gap:4px;
-  margin:0 0 12px 0;
-  padding:0;
+  display:flex;
+  align-items:stretch;
+  justify-content:center;
+  gap:14px;
+  margin:0;
+  padding:14px 16px;
   max-width:100%;
   box-sizing:border-box;
-  background:rgba(255,255,255,0.94);
+  background:transparent;
   border:0;
+  border-bottom:1px solid rgba(255,255,255,0.08);
+  flex-wrap:wrap;
 }
 
 .top-toolbar-left,
 .top-toolbar-actions,
 .top-toolbar-modules {
   display:flex;
-  align-items:center;
-  gap:4px;
+  align-items:stretch;
+  gap:14px;
   flex-wrap:wrap;
 }
 
-.top-toolbar a {
-  color:#222;
-  font-weight:bold;
+.top-toolbar a,
+.top-toolbar button {
+  box-sizing:border-box;
+  color:#062b25;
   text-decoration:none;
-  padding:3px 8px;
-  border:1px solid #aaa;
-  border-radius:4px;
-  background:#f5f5f5;
-  transition:background 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+  padding:0 16px;
+  border-radius:6px;
+  font-weight:600;
+  transition:background-color 0.2s ease, box-shadow 0.2s ease;
+  white-space:nowrap;
+  background:var(--color-primary);
+  border:1px solid rgba(0,0,0,0.35);
+  box-shadow:
+    0 2px 4px rgba(0,0,0,0.25),
+    inset 0 1px 0 rgba(255,255,255,0.06);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-width:160px;
+  height:46px;
+  line-height:1;
+  text-align:center;
+  overflow:hidden;
+  margin:0;
 }
 
-.top-toolbar a:hover {
-  background:#ffffff;
-  box-shadow:0 1px 4px rgba(0,0,0,0.14);
-  transform:translateY(-1px);
+.top-toolbar a:hover,
+.top-toolbar button:hover {
+  background:var(--color-primary);
+  box-shadow:
+    0 4px 10px rgba(0,0,0,0.35),
+    inset 0 1px 0 rgba(255,255,255,0.10);
+  border-color:#6b84a3;
+  color:#062b25;
 }
 
 .top-toolbar a.active {
-  color:#c00;
-  border-color:#c00;
-  background:#fff0f0;
+  color:#062b25;
+  border-color:#ffffff;
+  background:var(--color-primary);
+  box-shadow: inset 0 0 0 4px #ffffff;
 }
 
 .top-toolbar a.active:hover {
-  background:#ffe8e8;
+  background:var(--color-primary);
+  border-color:#ffffff;
 }
 </style>
 </head>
 
 <body>
 
-<h2 id="pageTitle"></h2>
-<div class="top-toolbar">
-  <div class="top-toolbar-left">
-    <a href="home.html">🏠 Domů</a>
-    <a id="backLink" href="index.html">← Zpět na rozvrh</a>
+<div class="page-header">
+  <div class="top-toolbar">
+    <div class="top-toolbar-left">
+      <a href="home.html">Domů</a>
+      <a id="backLink" href="index.html">Zpět na Rozvrh</a>
+    </div>
   </div>
-  <div class="top-toolbar-actions"></div>
-  <div class="top-toolbar-modules">
-    <a href="index.html">📅 Rozvrh</a>
-    <a href="schools.html">🏫 Školy</a>
-    <a href="caretakers.html">🧹 Školníci</a>
-    <a class="active" href="trainers.html">🧑‍🏫 Trenéři</a>
-    <a href="managers.html">📋 Manažeři</a>
-    <a href="reports.html">🧾 Výkazy</a>
-  </div>
+  <h2 id="pageTitle">TRENÉŘI</h2>
 </div>
 <div id="selectionModeInfo" hidden></div>
 
-<input id="jmeno">
-<input id="prijmeni">
-<input id="telefon">
-<input id="email">
-<input id="ico">
+<div class="page-action-box">
+  <span class="view-options-title">ZOBRAZENÍ</span>
+  <button id="newTrainerButton" type="button">+ NOVÝ TRENÉR</button>
+  <div class="view-options">
+    <button class="view-option-button is-active" type="button" data-view-mode="all">VŠICHNI TRENÉŘI</button>
+    <button class="view-option-button" type="button" data-view-mode="compact">KOMPAKTNÍ ZOBRAZENÍ</button>
+  </div>
+</div>
 
-<br>
-
-<input id="ulice">
-<input id="mesto">
-<input id="psc">
-
-<br>
-
-<input id="klub">
-
-<br>
-
-<input id="poznamka">
-
-<button id="saveButton" onclick="add()"></button>
-
+<div id="trainerDetailPanel" class="trainer-detail-panel" hidden>
 <h3 id="detailTitle"></h3>
 <div id="detail"></div>
+
+<div class="trainer-form-row">
+  <input id="jmeno">
+  <input id="prijmeni">
+  <input id="telefon">
+  <input id="email">
+  <input id="ico">
+</div>
+
+<div class="trainer-form-row">
+  <input id="ulice">
+  <input id="mesto">
+  <input id="psc">
+</div>
+
+<div class="trainer-form-row">
+  <input id="klub">
+</div>
+
+<div class="trainer-form-row">
+  <input id="poznamka">
+</div>
+
+<div class="trainer-detail-actions">
+  <div class="trainer-actions-left">
+    <button id="deleteTrainerButton" type="button">Smazat trenéra</button>
+  </div>
+  <div class="trainer-actions-right">
+    <button id="saveButton" type="button"></button>
+  </div>
+</div>
+<div id="deleteTrainerConfirm" class="trainer-delete-confirm" hidden>
+  <span>Opravdu smazat trenéra?</span>
+  <button id="confirmDeleteTrainerButton" type="button">Ano</button>
+  <button id="cancelDeleteTrainerButton" type="button">Ne</button>
+</div>
+</div>
 
 <h3 id="listTitle"></h3>
 <input id="trainerSearch" hidden>
 <div id="selectionListInfo" hidden></div>
+<div class="list-title-banner">SEZNAM TRENÉRŮ</div>
+<div id="compactTrainerList" class="compact-trainer-list" hidden></div>
 <table>
   <thead>
     <tr>
       <th>#</th>
       <th id="nameHeader" class="col-name"></th>
+      <th>Město</th>
       <th id="clubHeader" class="col-klub"></th>
       <th id="availabilityHeader"></th>
       <th id="actionHeader"></th>
@@ -159,6 +518,8 @@ import { TEXTS } from "./texts.js";
 const pageTitle = document.getElementById("pageTitle");
 const selectionModeInfo = document.getElementById("selectionModeInfo");
 const backLink = document.getElementById("backLink");
+const newTrainerButton = document.getElementById("newTrainerButton");
+const trainerDetailPanel = document.getElementById("trainerDetailPanel");
 const jmeno = document.getElementById("jmeno");
 const prijmeni = document.getElementById("prijmeni");
 const telefon = document.getElementById("telefon");
@@ -170,6 +531,10 @@ const psc = document.getElementById("psc");
 const klub = document.getElementById("klub");
 const poznamka = document.getElementById("poznamka");
 const saveButton = document.getElementById("saveButton");
+const deleteTrainerButton = document.getElementById("deleteTrainerButton");
+const deleteTrainerConfirm = document.getElementById("deleteTrainerConfirm");
+const confirmDeleteTrainerButton = document.getElementById("confirmDeleteTrainerButton");
+const cancelDeleteTrainerButton = document.getElementById("cancelDeleteTrainerButton");
 const detailTitle = document.getElementById("detailTitle");
 const detail = document.getElementById("detail");
 const listTitle = document.getElementById("listTitle");
@@ -180,6 +545,9 @@ const clubHeader = document.getElementById("clubHeader");
 const availabilityHeader = document.getElementById("availabilityHeader");
 const actionHeader = document.getElementById("actionHeader");
 const list = document.getElementById("list");
+const compactTrainerList = document.getElementById("compactTrainerList");
+const trainerTable = list.closest("table");
+const viewOptionButtons = document.querySelectorAll(".view-option-button");
 const selectionParam = new URLSearchParams(window.location.search).get("selection");
 
 let trainers = JSON.parse(localStorage.getItem("trainers")) || [];
@@ -198,12 +566,13 @@ const hasSelectionContext = !!(
 );
 let editId = null;
 let selectedId = null;
+let currentViewMode = "all";
 
 function initStaticTexts(){
   pageTitle.textContent = TEXTS.trainers.title;
   selectionModeInfo.textContent = "Výběr trenéra pro aktuální buňku rozvrhu";
   selectionModeInfo.hidden = !isSelectionMode;
-  backLink.textContent = "← Zpět na rozvrh";
+  backLink.textContent = "Zpět na rozvrh";
   jmeno.placeholder = "Jméno";
   prijmeni.placeholder = "Příjmení";
   telefon.placeholder = TEXTS.common.phone;
@@ -214,8 +583,8 @@ function initStaticTexts(){
   psc.placeholder = "PSČ";
   klub.placeholder = TEXTS.trainers.club;
   poznamka.placeholder = TEXTS.common.note;
-  saveButton.textContent = "Uložit";
-  detailTitle.textContent = "Detail";
+  saveButton.textContent = "Uložit a ukončit editaci";
+  detailTitle.textContent = "Zadání nového trenéra";
   detail.textContent = TEXTS.trainers.detailPrompt;
   listTitle.textContent = "Seznam";
   trainerSearch.placeholder = "Hledat trenéra";
@@ -273,13 +642,15 @@ function edit(id){
 }
 
 function remove(id){
-  if(!confirm(TEXTS.trainers.removeConfirm)) return;
-
   trainers = trainers.filter(t => t.id !== id);
   localStorage.setItem("trainers", JSON.stringify(trainers));
 
   detail.textContent = TEXTS.trainers.detailPrompt;
   selectedId = null;
+  editId = null;
+  trainerDetailPanel.hidden = true;
+  deleteTrainerButton.hidden = true;
+  deleteTrainerConfirm.hidden = true;
   render();
 }
 
@@ -291,7 +662,12 @@ function showDetail(id){
   let t = trainers.find(t => t.id === id);
   if(!t) return;
 
+  trainerDetailPanel.hidden = false;
   selectedId = id;
+  detailTitle.textContent = "Detail";
+  deleteTrainerButton.hidden = false;
+  deleteTrainerConfirm.hidden = true;
+  edit(id);
 
   let detailFragment = document.createDocumentFragment();
 
@@ -318,16 +694,6 @@ function showDetail(id){
   appendDetailTextLine(detailFragment, `${TEXTS.common.note}: ${t.poznamka || TEXTS.common.placeholderDash}`);
   detailFragment.append(document.createElement("br"));
 
-  let editButton = document.createElement("button");
-  editButton.textContent = TEXTS.common.edit;
-  editButton.addEventListener("click", () => edit(t.id));
-  detailFragment.appendChild(editButton);
-
-  let removeButton = document.createElement("button");
-  removeButton.textContent = TEXTS.common.unavailableSymbol;
-  removeButton.addEventListener("click", () => remove(t.id));
-  detailFragment.appendChild(removeButton);
-
   detail.replaceChildren(detailFragment);
   render();
 }
@@ -344,6 +710,12 @@ function clearForm(){
   klub.value = "";
   poznamka.value = "";
   editId = null;
+  selectedId = null;
+  detailTitle.textContent = "Zadání nového trenéra";
+  deleteTrainerButton.hidden = true;
+  deleteTrainerConfirm.hidden = true;
+  detail.textContent = TEXTS.trainers.detailPrompt;
+  trainerDetailPanel.hidden = true;
 }
 
 function getStoredTrainerId(value){
@@ -421,6 +793,67 @@ function chooseTrainer(trainerId){
   window.location.href = "index.html";
 }
 
+function renderCompactTrainers(items){
+  if(!compactTrainerList) return;
+
+  if(items.length === 0){
+    compactTrainerList.replaceChildren();
+    return;
+  }
+
+  const midpoint = Math.ceil(items.length / 2);
+  const columns = [items.slice(0, midpoint), items.slice(midpoint)];
+  const fragment = document.createDocumentFragment();
+
+  columns.forEach((columnItems, columnIndex) => {
+    const column = document.createElement("div");
+    column.className = "compact-trainer-column";
+
+    columnItems.forEach((t, index) => {
+      const isBusy = isTrainerBusyForAvailabilityContext(t.id);
+      const item = document.createElement("div");
+      item.className = "compact-trainer-item";
+      if(t.id === selectedId) item.classList.add("active");
+      if(isSelectionMode) item.classList.add(isBusy ? "trainer-busy" : "trainer-available");
+
+      const main = document.createElement("div");
+      main.className = "compact-trainer-main";
+
+      const title = document.createElement("div");
+      title.className = "compact-trainer-title";
+      title.textContent = `${columnIndex * midpoint + index + 1}. ${t.prijmeni} ${t.jmeno}`;
+
+      const meta = document.createElement("div");
+      meta.className = "compact-trainer-meta";
+      meta.textContent = `${t.mesto || ""}${t.klub ? " | " + t.klub : ""}${isSelectionMode ? " | " + (isBusy ? "🔴" : "🟢") : ""}`;
+
+      const actionButton = document.createElement("button");
+      actionButton.type = "button";
+      actionButton.className = "compact-trainer-action";
+      actionButton.textContent = isSelectionMode ? "Zvolit" : TEXTS.common.edit;
+      actionButton.disabled = isSelectionMode && (!hasSelectionContext || isBusy);
+      actionButton.addEventListener("click", (event) => {
+        event.stopPropagation();
+        if(isSelectionMode){
+          chooseTrainer(t.id);
+        } else {
+          showDetail(t.id);
+        }
+      });
+
+      main.appendChild(title);
+      main.appendChild(meta);
+      item.appendChild(main);
+      item.appendChild(actionButton);
+      column.appendChild(item);
+    });
+
+    fragment.appendChild(column);
+  });
+
+  compactTrainerList.replaceChildren(fragment);
+}
+
 function render(){
   let listFragment = document.createDocumentFragment();
   const search = isSelectionMode ? trainerSearch.value.trim().toLowerCase() : "";
@@ -452,17 +885,30 @@ function render(){
     }
   }
 
-  (shouldSortTrainers ? visibleTrainers.sort((a, b) => {
+  const renderedTrainers = shouldSortTrainers ? visibleTrainers.sort((a, b) => {
       if(a.prijmeni < b.prijmeni) return -1;
       if(a.prijmeni > b.prijmeni) return 1;
       return a.jmeno.localeCompare(b.jmeno);
-    }) : visibleTrainers)
+    }) : visibleTrainers;
+
+  const isCompactView = currentViewMode === "compact";
+  if(compactTrainerList) compactTrainerList.hidden = !isCompactView;
+  if(trainerTable) trainerTable.hidden = isCompactView;
+  viewOptionButtons.forEach(button => {
+    button.classList.toggle("is-active", button.dataset.viewMode === currentViewMode);
+  });
+
+  if(isCompactView){
+    renderCompactTrainers(renderedTrainers);
+    return;
+  }
+
+  renderedTrainers
     .forEach((t, i) => {
       const isBusy = isTrainerBusyForAvailabilityContext(t.id);
       let row = document.createElement("tr");
       if(t.id === selectedId) row.classList.add("active");
       if(isSelectionMode) row.classList.add(isBusy ? "trainer-busy" : "trainer-available");
-      row.addEventListener("click", () => showDetail(t.id));
 
       let orderCell = document.createElement("td");
       orderCell.textContent = i + 1;
@@ -472,6 +918,10 @@ function render(){
       nameCell.className = "col-name";
       nameCell.textContent = `${t.prijmeni} ${t.jmeno}`;
       row.appendChild(nameCell);
+
+      let cityCell = document.createElement("td");
+      cityCell.textContent = t.mesto;
+      row.appendChild(cityCell);
 
       let clubCell = document.createElement("td");
       clubCell.className = "col-klub";
@@ -484,11 +934,15 @@ function render(){
 
       let actionCell = document.createElement("td");
       let chooseButton = document.createElement("button");
-      chooseButton.textContent = "Zvolit";
-      chooseButton.disabled = !isSelectionMode || !hasSelectionContext || isBusy;
+      chooseButton.textContent = isSelectionMode ? "Zvolit" : TEXTS.common.edit;
+      chooseButton.disabled = isSelectionMode && (!hasSelectionContext || isBusy);
       chooseButton.addEventListener("click", (event) => {
         event.stopPropagation();
-        chooseTrainer(t.id);
+        if(isSelectionMode){
+          chooseTrainer(t.id);
+        } else {
+          showDetail(t.id);
+        }
       });
       actionCell.appendChild(chooseButton);
       row.appendChild(actionCell);
@@ -503,6 +957,37 @@ window.add = add;
 trainerSearch.addEventListener("input", render);
 
 initStaticTexts();
+saveButton.addEventListener("click", () => {
+  const shouldCloseAfterSave = !editId && jmeno.value && prijmeni.value;
+  add();
+  if(shouldCloseAfterSave){
+    trainerDetailPanel.hidden = true;
+    selectedId = null;
+  }
+});
+deleteTrainerButton.addEventListener("click", () => {
+  if(selectedId) deleteTrainerConfirm.hidden = false;
+});
+confirmDeleteTrainerButton.addEventListener("click", () => {
+  if(selectedId) remove(selectedId);
+});
+cancelDeleteTrainerButton.addEventListener("click", () => {
+  deleteTrainerConfirm.hidden = true;
+});
+if(newTrainerButton){
+  newTrainerButton.addEventListener("click", () => {
+    clearForm();
+    trainerDetailPanel.hidden = false;
+    render();
+    jmeno.focus();
+  });
+}
+viewOptionButtons.forEach(button => {
+  button.addEventListener("click", () => {
+    currentViewMode = button.dataset.viewMode || "all";
+    render();
+  });
+});
 render();
 
 </script>

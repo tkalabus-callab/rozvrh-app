@@ -135,6 +135,15 @@ table {
   margin-top:15px;
 }
 
+#table {
+  border-collapse:separate;
+  border-spacing:0;
+  border:1px solid #000;
+  border-radius:10px;
+  background:#ffffff;
+  overflow:hidden;
+}
+
 td, th {
   border:1px solid var(--color-border);
   padding:4px;
@@ -241,7 +250,7 @@ select {
   color:var(--color-text);
 }
 
-.hour-cell { width:40px; background:#eee; }
+.hour-cell { width:40px; background:var(--color-header); }
 .label { width:30px; background:#f5f5f5; }
 
 .plan-row td { background:#d0e7ff; }
@@ -298,22 +307,41 @@ select {
   box-shadow: inset 0 0 0 2px #1b5e20;
 }
 
-.class-header { background:#ddd; }
+.class-header { background:var(--color-header); }
+#table tr:first-child th,
+#table tr:nth-child(2) th {
+  background-color:var(--color-header);
+  color:#ffffff;
+  font-weight:bold;
+  padding:6px 4px;
+  border-color:rgba(255,255,255,0.22);
+}
+
+#table tr:first-child th:first-child,
+.plan-row td:first-child {
+  border-left:0;
+}
+
+#table tr:first-child th:nth-child(2),
+.plan-row td:nth-child(2),
+.real-row td:first-child {
+  border-right:0;
+}
+
 .today-column {
   position: relative;
-  box-shadow: inset 0 0 0 9999px rgba(0, 0, 0, 0.04);
 }
 th.today-column::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: #f0c040;
+  content:none;
 }
 #table tr:first-child th.today-column {
-  background: rgba(255, 220, 120, 0.35);
+  background:var(--color-primary) !important;
+}
+
+.today-column.unavailable,
+.today-column.conflict,
+.today-column.conflict-global {
+  color:inherit;
 }
 
 #table tr:first-child th:nth-of-type(3),
@@ -321,7 +349,6 @@ th.today-column::before {
 .plan-row td:nth-of-type(n+3):nth-of-type(-n+6),
 .real-row td:nth-of-type(n+2):nth-of-type(-n+5) {
   background-image: linear-gradient(rgba(0,0,0,0.02), rgba(0,0,0,0.02));
-  box-shadow: inset 1px 0 0 rgba(0,0,0,0.05), inset -1px 0 0 rgba(0,0,0,0.05);
 }
 
 #table tr:first-child th:nth-of-type(4),
@@ -329,7 +356,6 @@ th.today-column::before {
 .plan-row td:nth-of-type(n+7):nth-of-type(-n+10),
 .real-row td:nth-of-type(n+6):nth-of-type(-n+9) {
   background-image: linear-gradient(rgba(60,90,140,0.025), rgba(60,90,140,0.025));
-  box-shadow: inset 1px 0 0 rgba(0,0,0,0.05), inset -1px 0 0 rgba(0,0,0,0.05);
 }
 
 #table tr:first-child th:nth-of-type(5),
@@ -337,7 +363,6 @@ th.today-column::before {
 .plan-row td:nth-of-type(n+11):nth-of-type(-n+14),
 .real-row td:nth-of-type(n+10):nth-of-type(-n+13) {
   background-image: linear-gradient(rgba(0,0,0,0.02), rgba(0,0,0,0.02));
-  box-shadow: inset 1px 0 0 rgba(0,0,0,0.05), inset -1px 0 0 rgba(0,0,0,0.05);
 }
 
 #table tr:first-child th:nth-of-type(6),
@@ -345,7 +370,6 @@ th.today-column::before {
 .plan-row td:nth-of-type(n+15):nth-of-type(-n+18),
 .real-row td:nth-of-type(n+14):nth-of-type(-n+17) {
   background-image: linear-gradient(rgba(60,90,140,0.025), rgba(60,90,140,0.025));
-  box-shadow: inset 1px 0 0 rgba(0,0,0,0.05), inset -1px 0 0 rgba(0,0,0,0.05);
 }
 
 #table tr:first-child th:nth-of-type(7),
@@ -353,7 +377,6 @@ th.today-column::before {
 .plan-row td:nth-of-type(n+19):nth-of-type(-n+22),
 .real-row td:nth-of-type(n+18):nth-of-type(-n+21) {
   background-image: linear-gradient(rgba(0,0,0,0.02), rgba(0,0,0,0.02));
-  box-shadow: inset 1px 0 0 rgba(0,0,0,0.05), inset -1px 0 0 rgba(0,0,0,0.05);
 }
 
 #table tr:first-child th:nth-of-type(3),
@@ -376,7 +399,7 @@ th.today-column::before {
 #table tr:nth-child(2) th:nth-of-type(17),
 .plan-row td:nth-of-type(19),
 .real-row td:nth-of-type(18) {
-  border-left:3px solid #000;
+  border-left:1px solid #000;
 }
 
 #table tr:first-child th:nth-of-type(3),
@@ -399,7 +422,7 @@ th.today-column::before {
 #table tr:nth-child(2) th:nth-of-type(20),
 .plan-row td:nth-of-type(22),
 .real-row td:nth-of-type(21) {
-  border-right:3px solid #000;
+  border-right:0;
 }
 
 .active-cell:hover { outline:2px solid blue; cursor:pointer; }
@@ -506,7 +529,7 @@ th.today-column::before {
 }
 
 .day-border {
-  border-left:3px solid #000 !important;
+  border-left:1px solid #000 !important;
 }
 
 .menu {

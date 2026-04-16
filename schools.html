@@ -131,7 +131,11 @@ input { margin:2px; width:180px; }
 #listTitle {
   max-width:960px;
   margin:18px auto 4px;
-  padding:0 4px;
+  padding:10px 14px;
+  box-sizing:border-box;
+  border-radius:8px;
+  background:var(--color-header);
+  color:#ffffff;
   font-weight:800;
 }
 
@@ -171,7 +175,24 @@ input { margin:2px; width:180px; }
 }
 
 .school-list-action {
-  margin-left:8px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:30px;
+  padding:0 12px;
+  border:1px solid var(--color-border);
+  border-radius:6px;
+  background:#ffffff;
+  color:var(--color-header);
+  font-weight:700;
+  line-height:1;
+  cursor:pointer;
+  transition:background 0.15s ease, border-color 0.15s ease;
+}
+
+.school-list-action:hover {
+  border-color:var(--color-primary);
+  background:#eef6fb;
 }
 
 #newSchoolButton {
@@ -218,9 +239,9 @@ td, th {
 }
 
 th {
-  color:var(--color-header);
-  background:#eef6fb;
-  font-weight:700;
+  color:#ffffff;
+  background:var(--color-header);
+  font-weight:bold;
   text-transform:uppercase;
   font-size:13px;
   line-height:1.2;
@@ -268,6 +289,12 @@ tbody tr:last-child td {
   align-items:center;
   justify-content:space-between;
   gap:8px;
+}
+
+.compact-school-item.is-selected {
+  background:#eef6fb;
+  border-color:var(--color-primary);
+  box-shadow:inset 0 0 0 2px var(--color-primary);
 }
 
 .compact-school-main {
@@ -323,6 +350,7 @@ td:nth-child(4) {
 th:nth-child(5),
 td:nth-child(5) {
   width:72px;
+  text-align:center;
 }
 
 tr.active {
@@ -338,6 +366,13 @@ tr.active .school-list-action {
   background:#fff0f0;
   color:#c00;
   font-weight:bold;
+}
+
+tr.is-selected,
+tr.is-selected:hover {
+  background:#eef6fb !important;
+  outline:2px solid var(--color-primary);
+  box-shadow:inset 0 0 0 1px var(--color-primary);
 }
 
 tr:hover {
@@ -577,7 +612,8 @@ tr:hover {
 
   <div class="detail-actions">
     <div id="detailActionButtons" class="detail-action-buttons">
-      <button id="saveButton" onclick="add()"></button>
+      <button id="saveNewSchoolButton" type="button">Uložit a ukončit editaci</button>
+      <button id="saveButton" type="button"></button>
       <button id="cancelEditButton" type="button">Zrušit</button>
       <button id="removeCaretakerButton">Odebrat školníka</button>
     </div>
@@ -623,6 +659,7 @@ const favoriteTrainersTitle = document.getElementById("favoriteTrainersTitle");
 const favoriteTrainerSearch = document.getElementById("favoriteTrainerSearch");
 const favoriteTrainerSearchResults = document.getElementById("favoriteTrainerSearchResults");
 const favoriteTrainersList = document.getElementById("favoriteTrainersList");
+const saveNewSchoolButton = document.getElementById("saveNewSchoolButton");
 const saveButton = document.getElementById("saveButton");
 const cancelEditButton = document.getElementById("cancelEditButton");
 const removeCaretakerButton = document.getElementById("removeCaretakerButton");
@@ -739,6 +776,10 @@ function initStaticTexts(){
   poznamka.placeholder = TEXTS.common.note;
   favoriteTrainerSearch.placeholder = "Hledat trenéra";
   saveButton.textContent = "Uložit";
+  saveButton.hidden = true;
+  saveNewSchoolButton.hidden = false;
+  cancelEditButton.hidden = true;
+  removeCaretakerButton.hidden = true;
   detailTitle.textContent = "Zadání nové školy";
   detail.textContent = TEXTS.schools.detailPrompt;
   listTitle.textContent = "Seznam";
@@ -996,6 +1037,7 @@ function renderCompactSchools(items){
     columnItems.forEach(s => {
       const item = document.createElement("div");
       item.className = "compact-school-item";
+      if(String(s.id) === String(selectedId) || String(s.id) === String(editId)) item.classList.add("is-selected");
 
       const main = document.createElement("div");
       main.className = "compact-school-main";
@@ -1139,6 +1181,9 @@ function edit(id){
   if(!s) return;
 
   editId = id;
+  saveButton.textContent = "Uložit";
+  saveButton.hidden = false;
+  saveNewSchoolButton.hidden = true;
   nazev.value = s.nazev || "";
   ulice.value = s.ulice || "";
   mesto.value = s.mesto || "";
@@ -1181,13 +1226,27 @@ function appendDetailTextLine(parent, text){
   parent.append(text, document.createElement("br"));
 }
 
+function openSchoolDetailPanel(){
+  schoolDetailPanel.hidden = false;
+}
+
+function closeSchoolDetailPanel(){
+  schoolDetailPanel.hidden = true;
+  editId = null;
+  selectedId = null;
+}
+
 function showDetail(id){
   let s = schools.find(s => s.id === id);
   if(!s) return;
 
-  schoolDetailPanel.hidden = false;
+  openSchoolDetailPanel();
   selectedId = id;
   detailTitle.textContent = "Editace školy";
+  saveButton.hidden = false;
+  saveNewSchoolButton.hidden = true;
+  cancelEditButton.hidden = false;
+  removeCaretakerButton.hidden = false;
 
   let detailFragment = document.createDocumentFragment();
 
@@ -1257,9 +1316,12 @@ function clearForm(){
   editId = null;
   selectedId = null;
   detailTitle.textContent = "Zadání nové školy";
+  saveButton.hidden = true;
+  saveNewSchoolButton.hidden = false;
+  cancelEditButton.hidden = true;
+  removeCaretakerButton.hidden = true;
   detail.textContent = TEXTS.schools.detailPrompt;
   document.getElementById("detailRemoveButton")?.remove();
-  schoolDetailPanel.hidden = true;
   render();
 }
 
@@ -1363,7 +1425,7 @@ function render(){
         event.dataTransfer.setData("text/plain", s.id);
         event.dataTransfer.effectAllowed = "move";
       });
-      if(String(s.id) === String(selectedId) || String(s.id) === String(editId)) row.classList.add("active");
+      if(String(s.id) === String(selectedId) || String(s.id) === String(editId)) row.classList.add("active", "is-selected");
       if (lightColor && !row.classList.contains("active")) {
         row.style.background = lightColor;
       }
@@ -1414,10 +1476,41 @@ initStaticTexts();
 renderFavoriteTrainerOptions([]);
 renderCaretakerSelect("");
 currentViewMode = "compact";
+saveNewSchoolButton.addEventListener("click", () => {
+  if(!nazev.value) return;
+  const selectedFavoriteTrainerIds = getSelectedFavoriteTrainerIds();
+
+  let obj = {
+    id: Date.now().toString(),
+    nazev: nazev.value,
+    ulice: ulice.value,
+    mesto: mesto.value,
+    psc: psc.value,
+    ico: ico.value,
+    kontakt: kontakt.value,
+    email: email.value,
+    telefon: telefon.value,
+    poznamka: poznamka.value,
+    favoriteTrainers: selectedFavoriteTrainerIds,
+    assignedTrainerId: null,
+    assignedCaretakerId: document.getElementById("assignedCaretakerId")?.value || ""
+  };
+
+  schools.push(obj);
+  localStorage.setItem("schools", JSON.stringify(schools));
+  selectedId = null;
+  editId = null;
+  render();
+  clearForm();
+  closeSchoolDetailPanel();
+});
+saveButton.addEventListener("click", () => {
+  add();
+});
 if (newSchoolButton) {
   newSchoolButton.addEventListener("click", () => {
     clearForm();
-    schoolDetailPanel.hidden = false;
+    openSchoolDetailPanel();
   });
 }
 if (removeCaretakerButton) {
