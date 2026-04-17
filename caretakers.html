@@ -5,96 +5,510 @@
 <title>Školníci</title>
 
 <style>
-body { font-family: Arial; padding:20px; }
+:root {
+  --color-primary: #1bb3c8;
+  --color-primary-dark: #146f80;
+  --color-header: #2c3e55;
+  --color-border: #d4dde6;
+  --color-bg: #eef3f7;
+  --color-text: #24364b;
+  --content-max-width:960px;
+}
 
-input { margin:2px; width:180px; }
+body {
+  display:flex;
+  flex-direction:column;
+  font-family: Arial;
+  padding:20px;
+  background:var(--color-bg);
+  color:var(--color-text);
+}
+
+body > h2 {
+  order:1;
+  margin:0;
+  padding:16px;
+  background:var(--color-header);
+  color:#ffffff;
+  text-align:center;
+  text-transform:uppercase;
+  letter-spacing:0.3px;
+  box-sizing:border-box;
+  width:100%;
+}
+
+.caretaker-form-panel {
+  order:4;
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:10px 12px;
+  width:100%;
+  max-width:var(--content-max-width);
+  margin:18px auto 16px;
+  padding:18px 18px 16px;
+  border:1px solid var(--color-border);
+  border-radius:14px;
+  background:#fff;
+  box-shadow:0 6px 18px rgba(44,62,85,0.08);
+  box-sizing:border-box;
+}
+
+#caretakerEditPanel[hidden] {
+  display:none !important;
+}
+
+.caretaker-form-panel.is-new {
+  border-color:var(--color-primary);
+  box-shadow:0 0 0 3px rgba(27,179,200,0.12);
+}
+
+.caretaker-form-panel.is-edit {
+  border-color:var(--color-header);
+  box-shadow:0 0 0 3px rgba(44,62,85,0.12);
+}
+
+.caretaker-form-panel.is-opening {
+  border-color:var(--color-primary);
+  box-shadow:0 0 0 3px rgba(27,179,200,0.22);
+}
+
+.caretaker-form-panel > br {
+  display:none;
+}
+
+.caretaker-form-panel input,
+.caretaker-form-panel select {
+  flex:1 1 180px;
+  max-width:220px;
+  margin:0;
+  min-height:40px;
+}
+
+.caretaker-form-panel input,
+.caretaker-form-panel select,
+.caretaker-form-panel textarea,
+.caretaker-form-panel button {
+  font-size:15px;
+}
+
+.caretaker-form-panel input[type="color"] {
+  flex:0 0 54px;
+}
+
+.caretaker-form-panel textarea {
+  flex:1 1 100%;
+  width:100%;
+  max-width:760px;
+  margin:0;
+  min-height:92px;
+  resize:vertical;
+}
+
+.caretaker-form-panel .buttons {
+  flex:1 1 100%;
+  margin:14px 0 0;
+  padding-top:12px;
+  border-top:1px solid var(--color-border);
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.caretaker-form-panel .buttons button {
+  min-height:38px;
+  padding:0 14px;
+}
+
+.caretaker-form-panel #saveButton {
+  min-width:150px;
+}
+
+#caretakerFormTitle {
+  flex:1 1 100%;
+  margin:0 0 10px;
+  color:var(--color-header);
+  font-size:22px;
+  font-weight:800;
+  line-height:1.2;
+  text-transform:uppercase;
+}
+
+#caretakerFormTitle.is-new {
+  color:var(--color-primary-dark);
+}
+
+#caretakerFormTitle.is-edit {
+  color:var(--color-header);
+}
+
+.page-action-box {
+  order:3;
+  margin:16px auto;
+  padding:16px 18px;
+  max-width:var(--content-max-width);
+  width:100%;
+  border:0;
+  border-radius:12px;
+  background:var(--color-primary);
+  box-sizing:border-box;
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+  gap:14px;
+  flex-wrap:wrap;
+}
+
+.page-action-box::before {
+  content:"ZOBRAZENÍ";
+  color:#000000;
+  font-weight:800;
+  text-transform:uppercase;
+  font-size:14px;
+  line-height:1.2;
+  width:100%;
+}
+
+.view-option-button {
+  min-height:40px;
+  padding:0 14px;
+  border-radius:8px;
+  border:1px solid #d4dde6;
+  background:#ffffff;
+  color:var(--color-header);
+  font-weight:700;
+  line-height:1;
+  cursor:pointer;
+  transition:background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  box-shadow:0 2px 6px rgba(0,0,0,0.18);
+}
+
+.view-option-button:hover {
+  border-color:var(--color-primary);
+  background:#eef6fb;
+}
+
+.view-option-button.is-active {
+  border-width:2px;
+  border-color:var(--color-primary);
+  background:#eef6fb;
+  box-shadow:0 2px 6px rgba(0,0,0,0.12);
+}
+
+#newCaretakerButton {
+  border:0;
+  background:var(--color-header);
+  color:#ffffff;
+  box-shadow:0 4px 10px rgba(0,0,0,0.25);
+  min-height:40px;
+  line-height:1;
+  padding:0 18px;
+  font-weight:800;
+  text-transform:uppercase;
+}
+
+#newCaretakerButton:hover,
+#newCaretakerButton:focus {
+  background:#146f80;
+  box-shadow:0 6px 14px rgba(0,0,0,0.3);
+}
+
+input,
+select {
+  margin:4px 6px 4px 0;
+  width:180px;
+  height:34px;
+  padding:6px 8px;
+  border:1px solid #d4dde6;
+  border-radius:6px;
+  box-sizing:border-box;
+  color:#24364b;
+  background:#ffffff;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline:2px solid var(--color-primary);
+  outline-offset:1px;
+  border-color:var(--color-primary);
+}
+
+input[type="color"] {
+  width:54px;
+  padding:3px;
+  vertical-align:middle;
+}
+
+label {
+  margin-right:6px;
+  color:var(--color-header);
+  font-weight:700;
+}
 
 textarea {
-  margin:2px;
+  display:block;
+  margin:8px 0 0;
   width:370px;
   height:70px;
+  padding:6px 8px;
+  border:1px solid #d4dde6;
+  border-radius:6px;
+  box-sizing:border-box;
   font-family: Arial;
+  color:#24364b;
+  background:#ffffff;
 }
 
 table {
-  border-collapse: collapse;
-  margin-top:10px;
+  order:6;
+  border-collapse: separate;
+  border-spacing:0;
+  margin:0 auto;
   width:100%;
-  max-width:900px;
+  max-width:var(--content-max-width);
+  background:#ffffff;
+  border:1px solid #d4dde6;
+  border-radius:10px;
+  overflow:hidden;
+  font-size:13px;
+  box-sizing:border-box;
+}
+
+body > h3 {
+  order:5;
+  width:100%;
+  max-width:var(--content-max-width);
+  box-sizing:border-box;
+  background:var(--color-header);
+  color:#ffffff;
+  font-weight:700;
+  padding:10px 14px;
+  border-radius:8px;
+  margin:18px auto 8px;
+  text-transform:uppercase;
 }
 
 td, th {
-  border:1px solid #ccc;
-  padding:5px 10px;
+  border:0;
+  border-bottom:1px solid rgba(44,62,85,0.12);
+  padding:6px 8px;
   text-align:left;
+  line-height:1.25;
 }
 
-tr.active { background:#ffeeba; }
+th {
+  color:#ffffff;
+  background:var(--color-header);
+  font-weight:bold;
+  text-transform:uppercase;
+  font-size:13px;
+  line-height:1.2;
+}
+
+tbody tr:nth-child(even) {
+  background:#f9fbfd;
+}
+
+tbody tr:last-child td {
+  border-bottom:0;
+}
+
+tr.active {
+  background:#eef6fb !important;
+  color:var(--color-header);
+  font-weight:700;
+  box-shadow:inset 0 0 0 1px var(--color-primary);
+}
 
 tr:hover {
-  background:#f5f5f5;
+  background:#f0f8fb !important;
   cursor:pointer;
 }
 
+tr.active:hover {
+  background:#e6f4f8 !important;
+}
+
+.assigned-schools-detail td {
+  padding:6px 10px;
+  font-size:12px;
+  background:#f9fbfd;
+}
+
+.assigned-schools-detail ul {
+  margin:0;
+  padding-left:18px;
+}
+
+.assigned-schools-detail li {
+  margin:2px 0;
+  line-height:1.25;
+}
+
+.assigned-schools-toggle-active {
+  border-color:var(--color-header);
+  background:var(--color-header);
+  color:#ffffff;
+  font-weight:800;
+}
+
+.profile-toggle-active {
+  border-color:var(--color-header);
+  background:var(--color-header);
+  color:#ffffff;
+  font-weight:800;
+}
+
+.caretaker-color-cell {
+  width:44px;
+  text-align:center;
+}
+
+.caretaker-color-dot {
+  display:inline-block;
+  width:14px;
+  height:14px;
+  border:1px solid rgba(44,62,85,0.25);
+  border-radius:50%;
+  vertical-align:middle;
+}
+
+.caretaker-count-cell {
+  text-align:center;
+}
+
+.caretakers-table.is-disabled {
+  opacity:0.45;
+  pointer-events:none;
+  transition:opacity 0.2s ease;
+}
+
+.danger-confirm {
+  background:#c62828 !important;
+  color:#fff !important;
+  border-color:#8e1d1d !important;
+}
+
 .buttons {
-  margin:10px 0;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
+  margin:12px 0 16px;
+  padding-top:12px;
+  border-top:1px solid #d4dde6;
 }
 
 .buttons button,
 .buttons a {
-  margin-right:6px;
+  min-height:34px;
+  margin:0;
+  padding:0 12px;
+  border:1px solid #d4dde6;
+  border-radius:8px;
+  background:#ffffff;
+  color:var(--color-header);
+  font-weight:700;
+  line-height:1;
+  cursor:pointer;
+  transition:background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.buttons button:hover,
+.buttons a:hover {
+  border-color:var(--color-primary);
+  background:#eef6fb;
+}
+
+#saveButton {
+  border:0;
+  background:var(--color-header);
+  color:#ffffff;
+  box-shadow:0 4px 10px rgba(0,0,0,0.25);
+  padding:0 18px;
+  text-transform:uppercase;
+}
+
+#saveButton:hover,
+#saveButton:focus {
+  background:#146f80;
+  box-shadow:0 6px 14px rgba(0,0,0,0.3);
+}
+
+#deleteButton {
+  color:#c00;
 }
 
 .top-toolbar {
-  position:sticky;
-  top:0;
+  order:2;
   z-index:100;
-  display:inline-flex;
-  flex-direction:column;
-  align-items:flex-start;
-  gap:4px;
-  margin:0 0 12px 0;
-  padding:0;
+  display:flex;
+  align-items:stretch;
+  justify-content:center;
+  gap:14px;
+  margin:0 0 16px 0;
+  padding:14px 16px;
   max-width:100%;
   box-sizing:border-box;
-  background:rgba(255,255,255,0.94);
+  background:var(--color-header);
   border:0;
+  border-top:1px solid rgba(255,255,255,0.08);
+  flex-wrap:wrap;
 }
 
 .top-toolbar-left,
 .top-toolbar-actions,
 .top-toolbar-modules {
   display:flex;
-  align-items:center;
-  gap:4px;
+  align-items:stretch;
+  gap:14px;
   flex-wrap:wrap;
 }
 
 .top-toolbar a {
-  color:#222;
-  font-weight:bold;
+  box-sizing:border-box;
+  color:#062b25;
   text-decoration:none;
-  padding:3px 8px;
-  border:1px solid #aaa;
-  border-radius:4px;
-  background:#f5f5f5;
-  transition:background 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+  padding:0 16px;
+  border-radius:6px;
+  font-weight:600;
+  transition:background-color 0.2s ease, box-shadow 0.2s ease;
+  white-space:nowrap;
+  background:var(--color-primary);
+  border:1px solid rgba(0,0,0,0.35);
+  box-shadow:
+    0 2px 4px rgba(0,0,0,0.25),
+    inset 0 1px 0 rgba(255,255,255,0.06);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-width:160px;
+  height:46px;
+  line-height:1;
+  text-align:center;
+  overflow:hidden;
+  margin:0;
 }
 
 .top-toolbar a:hover {
-  background:#ffffff;
-  box-shadow:0 1px 4px rgba(0,0,0,0.14);
-  transform:translateY(-1px);
+  background:var(--color-primary);
+  box-shadow:
+    0 4px 10px rgba(0,0,0,0.35),
+    inset 0 1px 0 rgba(255,255,255,0.10);
+  border-color:#6b84a3;
+  color:#062b25;
 }
 
 .top-toolbar a.active {
-  color:#c00;
-  border-color:#c00;
-  background:#fff0f0;
+  color:#062b25;
+  border-color:#ffffff;
+  background:var(--color-primary);
+  box-shadow: inset 0 0 0 4px #ffffff;
 }
 
 .top-toolbar a.active:hover {
-  background:#ffe8e8;
+  background:var(--color-primary);
+  border-color:#ffffff;
 }
 </style>
 </head>
@@ -104,32 +518,27 @@ tr:hover {
 <h2>Školníci</h2>
 <div class="top-toolbar">
   <div class="top-toolbar-left">
-    <a href="home.html">🏠 Domů</a>
-    <a href="index.html">← Zpět na rozvrh</a>
+    <a href="home.html">Domů</a>
+    <a href="index.html">Zpět na rozvrh</a>
+    <a href="schools.html">Školy</a>
   </div>
   <div class="top-toolbar-actions"></div>
   <div class="top-toolbar-modules">
-    <a href="index.html">📅 Rozvrh</a>
-    <a href="schools.html">🏫 Školy</a>
-    <a class="active" href="caretakers.html">🧹 Školníci</a>
-    <a href="trainers.html">🧑‍🏫 Trenéři</a>
-    <a href="managers.html">📋 Manažeři</a>
-    <a href="reports.html">🧾 Výkazy</a>
   </div>
 </div>
 
-<input id="jmeno" placeholder="Jméno">
+<div id="caretakerEditPanel" class="caretaker-form-panel" hidden>
+<h3 id="caretakerFormTitle">Nový školník</h3>
 <input id="prijmeni" placeholder="Příjmení">
+<input id="jmeno" placeholder="Jméno">
 <br>
 <input id="telefon" placeholder="Telefon">
 <input id="email" placeholder="Email">
+<label for="barva">Vyber barvu školníkovi</label>
 <br>
 <input id="barva" type="color" value="#d9ead3">
 <br>
-<label for="defaultSchoolId">Výchozí škola</label>
-<select id="defaultSchoolId"></select>
-<br>
-<textarea id="poznamka" placeholder="Poznámka"></textarea>
+<div id="caretakerAssignedSchools" class="caretaker-assigned-schools" hidden></div>
 
 <div class="buttons">
   <button id="saveButton">Přidat / Uložit</button>
@@ -138,14 +547,25 @@ tr:hover {
   <button id="openSchoolsButton">Zobrazit školy</button>
   <button id="clearCaretakerRoleButton">Zrušit režim školníka</button>
 </div>
+</div>
+
+<div class="page-action-box">
+  <button id="newCaretakerButton" class="view-option-button" type="button">+ Nový školník</button>
+  <button id="allCaretakersViewButton" class="view-option-button is-active" type="button">Všichni školníci</button>
+  <button id="expandedCaretakersViewButton" class="view-option-button" type="button">Školníci + přidělené školy</button>
+</div>
 
 <h3>Seznam</h3>
-<table>
+<table class="caretakers-table">
   <thead>
     <tr>
       <th>#</th>
       <th>Školník</th>
+      <th>Barva</th>
       <th>Počet škol</th>
+      <th>Zobrazit přidělené školy</th>
+      <th>Použít jako profil</th>
+      <th>Upravit</th>
     </tr>
   </thead>
   <tbody id="list"></tbody>
@@ -160,10 +580,15 @@ const prijmeni = document.getElementById("prijmeni");
 const telefon = document.getElementById("telefon");
 const email = document.getElementById("email");
 const barva = document.getElementById("barva");
-const defaultSchoolId = document.getElementById("defaultSchoolId");
-const poznamka = document.getElementById("poznamka");
+const caretakerAssignedSchools = document.getElementById("caretakerAssignedSchools");
+const caretakerFormTitle = document.getElementById("caretakerFormTitle");
+const caretakerEditPanel = document.getElementById("caretakerEditPanel");
+const caretakersTable = document.querySelector(".caretakers-table");
 const saveButton = document.getElementById("saveButton");
 const newButton = document.getElementById("newButton");
+const newCaretakerButton = document.getElementById("newCaretakerButton");
+const allCaretakersViewButton = document.getElementById("allCaretakersViewButton");
+const expandedCaretakersViewButton = document.getElementById("expandedCaretakersViewButton");
 const deleteButton = document.getElementById("deleteButton");
 const openSchoolsButton = document.getElementById("openSchoolsButton");
 const clearCaretakerRoleButton = document.getElementById("clearCaretakerRoleButton");
@@ -172,6 +597,9 @@ const list = document.getElementById("list");
 let caretakers = loadCaretakers();
 let editId = null;
 let selectedId = null;
+let expandedCaretakerId = null;
+let caretakerViewMode = "default";
+let pendingDeleteCaretakerId = null;
 
 function loadCaretakers(){
   try {
@@ -231,42 +659,46 @@ function getAssignedSchoolCount(caretakerId){
   return schools.filter(s => String(s.assignedCaretakerId || "") === String(caretakerId)).length;
 }
 
+function getAssignedSchools(caretakerId){
+  return loadSchools()
+    .filter(s => String(s.assignedCaretakerId || "") === String(caretakerId))
+    .sort((a, b) => safeName(a).localeCompare(safeName(b), "cs"));
+}
+
 function hasAssignedSchools(caretakerId){
   const schools = loadSchools();
   return schools.some(s => String(s.assignedCaretakerId || "") === String(caretakerId));
 }
 
-function renderDefaultSchoolSelect(caretakerId = "", selectedSchoolId = ""){
-  const schools = !caretakerId
-    ? []
-    : loadSchools()
-        .filter(s => String(s.assignedCaretakerId || "") === String(caretakerId || ""))
-        .sort((a, b) => (safeName(a)).localeCompare(safeName(b), "cs"));
-
-  defaultSchoolId.replaceChildren();
-
-  const emptyOption = document.createElement("option");
-  emptyOption.value = "";
-  emptyOption.textContent = "— bez výchozí školy —";
-  defaultSchoolId.appendChild(emptyOption);
-
-  schools.forEach(school => {
-    const option = document.createElement("option");
-    option.value = String(school.id || "");
-    option.textContent = safeName(school);
-    option.selected = String(selectedSchoolId || "") === String(school.id || "");
-    defaultSchoolId.appendChild(option);
-  });
-
-  defaultSchoolId.disabled = !schools.length;
-  defaultSchoolId.title = !schools.length ? "Školník nemá přiřazené školy" : "";
-  defaultSchoolId.value = schools.some(s => String(s.id || "") === String(selectedSchoolId || ""))
-    ? String(selectedSchoolId || "")
-    : "";
-}
-
 function safeName(school){
   return school?.nazev || "-";
+}
+
+function renderAssignedSchools(caretakerId){
+  const schools = loadSchools().filter(
+    s => String(s.assignedCaretakerId || "") === String(caretakerId)
+  );
+
+  caretakerAssignedSchools.innerHTML = "";
+
+  const title = document.createElement("div");
+  title.textContent = "Přidělené školy:";
+  title.style.fontWeight = "700";
+  title.style.margin = "6px 0";
+  caretakerAssignedSchools.appendChild(title);
+
+  if(!schools.length){
+    const empty = document.createElement("div");
+    empty.textContent = "— žádné školy —";
+    caretakerAssignedSchools.appendChild(empty);
+    return;
+  }
+
+  schools.forEach(s => {
+    const item = document.createElement("div");
+    item.textContent = "• " + safeName(s);
+    caretakerAssignedSchools.appendChild(item);
+  });
 }
 
 function getActiveCaretakerRoleId(){
@@ -286,14 +718,45 @@ function isActiveCaretakerRole(caretakerId){
   return String(getActiveCaretakerRoleId()) === String(caretakerId || "");
 }
 
+function openCaretakerEditPanel(){
+  caretakerEditPanel.hidden = false;
+  caretakerEditPanel.classList.remove("is-opening");
+  void caretakerEditPanel.offsetWidth;
+  caretakerEditPanel.classList.add("is-opening");
+  caretakerEditPanel.scrollIntoView({ behavior:"smooth", block:"start" });
+  setTimeout(() => caretakerEditPanel.classList.remove("is-opening"), 1600);
+  caretakersTable.classList.add("is-disabled");
+  setTimeout(() => caretakersTable.classList.remove("is-disabled"), 1600);
+}
+
+function closeCaretakerEditPanel(){
+  caretakerEditPanel.hidden = true;
+}
+
+function setCaretakerEditPanelMode(mode){
+  caretakerEditPanel.classList.remove("is-new", "is-edit");
+  caretakerFormTitle.classList.remove("is-new", "is-edit");
+  caretakerEditPanel.classList.add(mode === "edit" ? "is-edit" : "is-new");
+  caretakerFormTitle.classList.add(mode === "edit" ? "is-edit" : "is-new");
+}
+
+function resetDeleteConfirmation(){
+  pendingDeleteCaretakerId = null;
+  deleteButton.textContent = "Smazat";
+  deleteButton.classList.remove("danger-confirm");
+}
+
 function clearForm(){
   jmeno.value = "";
   prijmeni.value = "";
   telefon.value = "";
   email.value = "";
   barva.value = "#d9ead3";
-  renderDefaultSchoolSelect("", "");
-  poznamka.value = "";
+  caretakerAssignedSchools.hidden = true;
+  caretakerFormTitle.textContent = "Nový školník";
+  saveButton.textContent = "Uložit školníka";
+  setCaretakerEditPanelMode("new");
+  resetDeleteConfirmation();
   editId = null;
   selectedId = null;
   render();
@@ -303,24 +766,44 @@ function loadToForm(id){
   const caretaker = caretakers.find(item => item.id === id);
   if(!caretaker) return;
 
+  openCaretakerEditPanel();
   jmeno.value = caretaker.jmeno || "";
   prijmeni.value = caretaker.prijmeni || "";
   telefon.value = caretaker.telefon || "";
   email.value = caretaker.email || "";
   barva.value = caretaker.color || "#d9ead3";
-  renderDefaultSchoolSelect(caretaker.id, caretaker.defaultSchoolId || "");
-  poznamka.value = caretaker.poznamka || "";
+  renderAssignedSchools(caretaker.id);
+  caretakerAssignedSchools.hidden = false;
+  caretakerFormTitle.textContent = "Upravit školníka";
+  saveButton.textContent = "Uložit změny";
+  setCaretakerEditPanelMode("edit");
+  resetDeleteConfirmation();
 
   editId = caretaker.id;
   selectedId = caretaker.id;
+  jmeno.focus();
   render();
 }
 
 function saveCurrent(){
-  const caretakerId = editId || Date.now().toString();
-  const availableDefaultSchoolIds = loadSchools()
-    .filter(s => String(s.assignedCaretakerId || "") === String(caretakerId))
-    .map(s => String(s.id || ""));
+  const isEmptyNewCaretaker =
+    editId === null &&
+    !jmeno.value.trim() &&
+    !prijmeni.value.trim() &&
+    !telefon.value.trim() &&
+    !email.value.trim() &&
+    (!barva.value || barva.value === "#d9ead3");
+
+  if(isEmptyNewCaretaker){
+    editId = null;
+    selectedId = null;
+    closeCaretakerEditPanel();
+    render();
+    return;
+  }
+
+  const caretakerId = String(editId || Date.now().toString());
+  const existingCaretaker = caretakers.find(item => String(item.id) === String(caretakerId));
   const caretaker = {
     id: caretakerId,
     jmeno: jmeno.value.trim(),
@@ -328,10 +811,8 @@ function saveCurrent(){
     telefon: telefon.value.trim(),
     email: email.value.trim(),
     color: barva.value || "#d9ead3",
-    defaultSchoolId: availableDefaultSchoolIds.includes(String(defaultSchoolId.value || ""))
-      ? String(defaultSchoolId.value || "")
-      : "",
-    poznamka: poznamka.value.trim()
+    defaultSchoolId: existingCaretaker?.defaultSchoolId || "",
+    poznamka: existingCaretaker?.poznamka || ""
   };
 
   if(editId){
@@ -341,9 +822,11 @@ function saveCurrent(){
   }
 
   saveCaretakers();
-  editId = caretaker.id;
-  selectedId = caretaker.id;
-  renderDefaultSchoolSelect(caretaker.id, caretaker.defaultSchoolId || "");
+  editId = null;
+  selectedId = null;
+  caretakerFormTitle.textContent = "Nový školník";
+  saveButton.textContent = "Uložit školníka";
+  closeCaretakerEditPanel();
   render();
 }
 
@@ -353,11 +836,19 @@ function removeCurrent(){
     alert("Tento školník má přiřazené školy. Nejprve změň přiřazeného školníka u těchto škol v databázi škol.");
     return;
   }
-  if(!confirm("Smazat školníka?")) return;
+  if(pendingDeleteCaretakerId !== editId){
+    pendingDeleteCaretakerId = editId;
+    deleteButton.textContent = "Opravdu smazat?";
+    deleteButton.classList.add("danger-confirm");
+    return;
+  }
 
   caretakers = caretakers.filter(item => item.id !== editId);
   saveCaretakers();
+  resetDeleteConfirmation();
   clearForm();
+  closeCaretakerEditPanel();
+  render();
 }
 
 function openSchoolsForCaretaker(){
@@ -366,14 +857,23 @@ function openSchoolsForCaretaker(){
   window.location.href = "schools.html";
 }
 
+function isCaretakerExpanded(caretakerId){
+  return caretakerViewMode === "expanded" || String(expandedCaretakerId || "") === String(caretakerId);
+}
+
+function syncCaretakerViewButtons(){
+  allCaretakersViewButton.classList.toggle("is-active", caretakerViewMode === "default");
+  expandedCaretakersViewButton.classList.toggle("is-active", caretakerViewMode === "expanded");
+}
+
 function render(){
   const fragment = document.createDocumentFragment();
   const sorted = sortCaretakers(caretakers);
+  syncCaretakerViewButtons();
 
   sorted.forEach((caretaker, index) => {
     const row = document.createElement("tr");
-    if(caretaker.id === selectedId) row.className = "active";
-    row.addEventListener("click", () => loadToForm(caretaker.id));
+    if(caretaker.id === selectedId || isActiveCaretakerRole(caretaker.id)) row.className = "active";
 
     const orderCell = document.createElement("td");
     orderCell.textContent = index + 1;
@@ -381,32 +881,123 @@ function render(){
 
     const textCell = document.createElement("td");
     textCell.textContent = getListText(caretaker);
-
-    const profileButton = document.createElement("button");
-    profileButton.textContent = isActiveCaretakerRole(caretaker.id) ? "Aktivní profil" : "Použít jako profil";
-    profileButton.disabled = isActiveCaretakerRole(caretaker.id);
-    profileButton.style.marginLeft = "8px";
-    profileButton.addEventListener("click", (event) => {
-      event.stopPropagation();
-      setActiveCaretakerRoleId(caretaker.id);
-      render();
-    });
-
-    textCell.appendChild(profileButton);
     row.appendChild(textCell);
 
+    const colorCell = document.createElement("td");
+    colorCell.className = "caretaker-color-cell";
+    if(caretaker.color){
+      const colorDot = document.createElement("span");
+      colorDot.className = "caretaker-color-dot";
+      colorDot.style.background = caretaker.color;
+      colorCell.appendChild(colorDot);
+    }
+    row.appendChild(colorCell);
+
     const countCell = document.createElement("td");
+    countCell.className = "caretaker-count-cell";
     countCell.textContent = String(getAssignedSchoolCount(caretaker.id));
     row.appendChild(countCell);
 
+    const assignedSchoolsCell = document.createElement("td");
+    const assignedSchoolsButton = document.createElement("button");
+    assignedSchoolsButton.type = "button";
+    assignedSchoolsButton.textContent = isCaretakerExpanded(caretaker.id)
+      ? "Zavřít seznam"
+      : "Zobrazit přidělené školy";
+    assignedSchoolsButton.classList.toggle("assigned-schools-toggle-active", isCaretakerExpanded(caretaker.id));
+    assignedSchoolsButton.addEventListener("click", (event) => {
+      event.stopPropagation();
+      if(caretakerViewMode === "expanded"){
+        caretakerViewMode = "default";
+        expandedCaretakerId = null;
+      } else {
+        expandedCaretakerId = String(expandedCaretakerId || "") === String(caretaker.id)
+          ? null
+          : caretaker.id;
+      }
+      render();
+    });
+    assignedSchoolsCell.appendChild(assignedSchoolsButton);
+    row.appendChild(assignedSchoolsCell);
+
+    const profileCell = document.createElement("td");
+    const profileButton = document.createElement("button");
+    profileButton.textContent = isActiveCaretakerRole(caretaker.id) ? "Zrušit profil" : "Použít jako profil";
+    profileButton.classList.toggle("profile-toggle-active", isActiveCaretakerRole(caretaker.id));
+    profileButton.style.marginLeft = "8px";
+    profileButton.addEventListener("click", (event) => {
+      event.stopPropagation();
+      if(isActiveCaretakerRole(caretaker.id)){
+        clearActiveCaretakerRoleId();
+      } else {
+        setActiveCaretakerRoleId(caretaker.id);
+      }
+      render();
+    });
+
+    profileCell.appendChild(profileButton);
+    row.appendChild(profileCell);
+
+    const editCell = document.createElement("td");
+    const editButton = document.createElement("button");
+    editButton.type = "button";
+    editButton.textContent = "Upravit";
+    editButton.addEventListener("click", (event) => {
+      event.stopPropagation();
+      loadToForm(caretaker.id);
+    });
+    editCell.appendChild(editButton);
+    row.appendChild(editCell);
+
     fragment.appendChild(row);
+
+    if(isCaretakerExpanded(caretaker.id)){
+      const detailRow = document.createElement("tr");
+      detailRow.className = "assigned-schools-detail";
+      const detailCell = document.createElement("td");
+      const assignedSchools = getAssignedSchools(caretaker.id);
+      detailCell.colSpan = 7;
+
+      if(assignedSchools.length){
+        const schoolList = document.createElement("ul");
+        assignedSchools.forEach(school => {
+          const item = document.createElement("li");
+          item.textContent = safeName(school);
+          schoolList.appendChild(item);
+        });
+        detailCell.appendChild(schoolList);
+      } else {
+        detailCell.textContent = "Žádné přidělené školy.";
+      }
+
+      detailRow.appendChild(detailCell);
+      fragment.appendChild(detailRow);
+    }
   });
 
   list.replaceChildren(fragment);
+  if(editId === null && selectedId === null){
+    closeCaretakerEditPanel();
+  }
 }
 
 saveButton.addEventListener("click", saveCurrent);
 newButton.addEventListener("click", clearForm);
+newCaretakerButton.addEventListener("click", () => {
+  clearForm();
+  openCaretakerEditPanel();
+  jmeno.focus();
+});
+allCaretakersViewButton.addEventListener("click", () => {
+  caretakerViewMode = "default";
+  expandedCaretakerId = null;
+  render();
+});
+expandedCaretakersViewButton.addEventListener("click", () => {
+  caretakerViewMode = "expanded";
+  expandedCaretakerId = null;
+  render();
+});
 deleteButton.addEventListener("click", removeCurrent);
 openSchoolsButton.addEventListener("click", openSchoolsForCaretaker);
 clearCaretakerRoleButton.addEventListener("click", () => {
@@ -414,6 +1005,9 @@ clearCaretakerRoleButton.addEventListener("click", () => {
   render();
 });
 
+editId = null;
+selectedId = null;
+closeCaretakerEditPanel();
 render();
 </script>
 
