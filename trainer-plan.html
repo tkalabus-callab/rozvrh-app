@@ -4,37 +4,305 @@
 <meta charset="UTF-8">
 <title>Plán trenéra</title>
 <style>
+  :root {
+    --color-primary: #1bb3c8;
+    --color-primary-dark: #146f80;
+    --color-bg: #eef3f7;
+    --color-border: #d4dde6;
+    --color-header: #2c3e55;
+    --color-surface: #ffffff;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: var(--color-bg);
+    color: #1f2d3d;
+  }
+
+  .page-header {
+    background: var(--color-header);
+    color: #fff;
+    padding: 14px 0 18px;
+    margin-bottom: 16px;
+  }
+
+  .page-header-inner {
+    width: min(960px, calc(100% - 32px));
+    margin: 0 auto;
+  }
+
+  .top-toolbar {
+    display: flex;
+    justify-content: center;
+    padding: 0 20px 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    margin-bottom: 12px;
+  }
+
+  .top-toolbar-left {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .top-toolbar-left a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 150px;
+    padding: 12px 18px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 16px;
+    background: var(--color-primary);
+    color: #111;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.18);
+  }
+
+  .page-header h2 {
+    margin: 0;
+    text-align: center;
+    font-size: 24px;
+    letter-spacing: 0.3px;
+  }
+
+  .page-action-box,
+  .section-title,
+  .school-detail-panel {
+    width: min(960px, calc(100% - 32px));
+    margin: 0 auto 16px;
+  }
+
+  .page-action-box,
+  .school-detail-panel {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 14px;
+    padding: 16px;
+  }
+
+  .page-action-box {
+    background: var(--color-primary);
+  }
+
+  #trainerPlanHeader {
+    font-size: 18px;
+    line-height: 1.45;
+    margin-bottom: 14px;
+    color: #0d2230;
+  }
+
+  #trainerPlanActions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  #trainerPlanActions button {
+    padding: 10px 16px;
+    border-radius: 8px;
+    border: 1px solid rgba(44,62,85,0.18);
+    background: #fff;
+    color: var(--color-header);
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+  }
+
+  #trainerPlanActions button:hover {
+    transform: translateY(-1px);
+  }
+
+  #backToScheduleButton {
+    background: var(--color-header);
+    color: #fff;
+    border-color: var(--color-header);
+  }
+
+  #trainerPlanContent {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  #trainerPlanContent.month-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    align-items: start;
+  }
+
 .day-block {
-  margin-bottom: 12px;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
+    background: #f9fbfd;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    padding: 12px 14px;
 }
 
 .day-title {
-  font-weight: bold;
-  margin-bottom: 4px;
-}
+    font-weight: 700;
+    color: var(--color-header);
+    margin-bottom: 8px;
+    font-size: 20px;
+  }
 
-#trainerPlanActions {
-  display: flex;
-  gap: 8px;
-  margin: 12px 0;
-  flex-wrap: wrap;
-}
+  .day-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .day-table th,
+  .day-table td {
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--color-border);
+    text-align: left;
+    font-size: 15px;
+  }
+
+  .day-table th {
+    background: var(--color-header);
+    color: #fff;
+    font-weight: 700;
+    font-size: 14px;
+  }
+
+  .day-table tr:last-child td {
+    border-bottom: none;
+  }
+
+  .day-table .col-date {
+    width: 140px;
+    white-space: nowrap;
+  }
+
+  .day-table .col-hour {
+    width: 110px;
+    white-space: nowrap;
+  }
+
+  .day-table .col-year,
+  .day-table .col-class {
+    width: 110px;
+    white-space: nowrap;
+  }
+
+  #trainerPlanContent.month-layout .day-block {
+    display: none;
+  }
+
+  .month-column-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .month-column-table th,
+  .month-column-table td {
+    padding: 5px 7px;
+    font-size: 13px;
+    line-height: 1.2;
+    text-align: left;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .month-column-table th {
+    background: var(--color-header);
+    color: #fff;
+    font-weight: 700;
+    font-size: 12px;
+  }
+
+  .month-column-table tr:last-child td {
+    border-bottom: none;
+  }
+
+  .month-column-table .col-date {
+    width: 84px;
+    white-space: nowrap;
+  }
+
+  .month-column-table .col-hour {
+    width: 58px;
+    white-space: nowrap;
+  }
+
+  .month-column-table .col-school {
+    width: 34%;
+  }
+
+  .month-column-table .col-place {
+    width: 17%;
+  }
+
+  .month-column-table .col-year,
+  .month-column-table .col-class {
+    width: 44px;
+    white-space: nowrap;
+    text-align: center;
+  }
+
+  .month-column-table td.col-year,
+  .month-column-table td.col-class {
+    padding-left: 4px;
+    padding-right: 4px;
+  }
+
+  .month-column-table tr.day-separator td {
+    border-top: 3px solid #9fb2c7;
+  }
+
+  @media (max-width: 900px) {
+    #trainerPlanContent.month-layout {
+      grid-template-columns: 1fr;
+    }
+  }
 </style>
 </head>
 <body>
 
-<h1>Plán trenéra</h1>
-<div id="trainerPlanHeader"></div>
-<div id="trainerPlanActions">
-  <button id="exportTrainerPlanPdfButton" type="button">Export PDF</button>
-  <button id="exportTrainerPlanExcelButton" type="button">Export Excel</button>
-  <button id="emailTrainerPlanButton" type="button">Poslat e-mailem</button>
-  <button id="backToScheduleButton" type="button">Zpět do rozvrhu</button>
+<div class="page-header">
+  <div class="page-header-inner">
+    <div class="top-toolbar">
+      <div class="top-toolbar-left">
+        <a href="home.html">Domů</a>
+        <a href="index.html">Rozvrh</a>
+        <a href="schools.html">Školy</a>
+      </div>
+    </div>
+    <h2>PLÁN TRENÉRA</h2>
+  </div>
 </div>
-<div id="trainerPlanContent"></div>
+
+<div class="page-shell">
+  <div class="page-action-box">
+    <div id="trainerPlanHeader"></div>
+    <div id="trainerPlanActions" class="detail-action-buttons">
+      <button id="exportTrainerPlanPdfButton" type="button">Export PDF</button>
+      <button id="exportTrainerPlanExcelButton" type="button">Export Excel</button>
+      <button id="emailTrainerPlanButton" type="button">Poslat e-mailem</button>
+      <button id="backToScheduleButton" type="button">Zpět do rozvrhu</button>
+    </div>
+  </div>
+
+  <div id="trainerPlanSummaryTitle" class="section-title"></div>
+  <div class="school-detail-panel">
+    <div id="trainerPlanContent"></div>
+  </div>
+</div>
 
 <script>
 const trainerPlanHeader = document.getElementById("trainerPlanHeader");
@@ -103,6 +371,11 @@ function getTrainerById(trainerId){
 
 function getSchoolById(schoolId){
   return load("schools", []).find(school => String(school.id) === String(schoolId)) || null;
+}
+
+function getSchoolPlace(school){
+  if(!school) return "-";
+  return school.mesto || school.city || "-";
 }
 
 function getStoredTrainerId(value){
@@ -208,12 +481,14 @@ function renderTrainerPlanPage(){
 
   if(!trainer){
     trainerPlanHeader.textContent = "";
+    trainerPlanContent.className = "";
     trainerPlanContent.textContent = "Trenér nebyl nalezen.";
     return;
   }
 
   if(!periodDate){
     trainerPlanHeader.textContent = "";
+    trainerPlanContent.className = "";
     trainerPlanContent.textContent = "Chybí datum období.";
     return;
   }
@@ -230,32 +505,112 @@ function renderTrainerPlanPage(){
   const entries = getTrainerPlanEntriesForPeriod(trainerId, periodType, periodDate);
 
   if(!entries.length){
+    trainerPlanContent.className = "";
     trainerPlanContent.textContent = "Pro zvolené období nebyl nalezen žádný plán.";
     return;
   }
 
-  const parts = [];
-  let currentDayLines = [];
+  if(periodType === "month"){
+    const days = [];
+    let currentDay = null;
+
+    entries.forEach(entry => {
+      if(!currentDay || currentDay.date !== entry.date){
+        currentDay = { date: entry.date, rows: [] };
+        days.push(currentDay);
+      }
+
+      const school = getSchoolById(entry.schoolId);
+      currentDay.rows.push(`
+        <tr>
+          <td class="col-date">${new Date(entry.date).toLocaleDateString("cs-CZ", { day: "numeric", month: "2-digit", year: "2-digit" })}</td>
+          <td class="col-hour">${entry.hour} hod</td>
+          <td class="col-school">${school?.nazev || "-"}</td>
+          <td class="col-place">${getSchoolPlace(school)}</td>
+          <td class="col-year">${entry.year || "-"}</td>
+          <td class="col-class">${entry.className || "-"}</td>
+        </tr>
+      `);
+    });
+
+    const leftDays = [];
+    const rightDays = [];
+    days.forEach(day => {
+      const dayNumber = new Date(day.date).getDate();
+      (dayNumber <= 15 ? leftDays : rightDays).push(day);
+    });
+
+    function buildMonthColumnTable(dayGroups){
+      return `
+        <table class="month-column-table">
+          <thead>
+            <tr>
+              <th class="col-date">Datum</th>
+              <th class="col-hour">Hodina</th>
+              <th class="col-school">Škola</th>
+              <th class="col-place">Místo</th>
+              <th class="col-year">Ročník</th>
+              <th class="col-class">Třída</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${dayGroups.map((day, index) => `${index ? '<tr class="day-separator"><td colspan="6"></td></tr>' : ""}${day.rows.join("")}`).join("")}
+          </tbody>
+        </table>
+      `;
+    }
+
+    trainerPlanContent.className = "month-layout";
+    trainerPlanContent.innerHTML = `
+      ${buildMonthColumnTable(leftDays)}
+      ${buildMonthColumnTable(rightDays)}
+    `;
+    return;
+  }
+
+  const weekRows = [];
   let lastDate = "";
 
   entries.forEach(entry => {
-    if(entry.date !== lastDate){
-      if(lastDate){
-        parts.push(`<div class="day-block"><div class="day-title">${new Date(lastDate).toLocaleDateString("cs-CZ")}</div>${currentDayLines.join("")}</div>`);
-      }
-      currentDayLines = [];
-      lastDate = entry.date;
+    const school = getSchoolById(entry.schoolId);
+    const isNewDay = lastDate && entry.date !== lastDate;
+
+    if(isNewDay){
+      weekRows.push(`<tr class="day-separator"><td colspan="6"></td></tr>`);
     }
 
-    const school = getSchoolById(entry.schoolId);
-    currentDayLines.push(`<div>${entry.hour}. hodina - ${school?.nazev || "-"} - ročník ${entry.year || "-"} - třída ${entry.className || "-"}</div>`);
+    weekRows.push(`
+      <tr>
+        <td class="col-date">${new Date(entry.date).toLocaleDateString("cs-CZ", { day: "numeric", month: "2-digit", year: "2-digit" })}</td>
+        <td class="col-hour">${entry.hour} hod</td>
+        <td class="col-school">${school?.nazev || "-"}</td>
+        <td class="col-place">${getSchoolPlace(school)}</td>
+        <td class="col-year">${entry.year || "-"}</td>
+        <td class="col-class">${entry.className || "-"}</td>
+      </tr>
+    `);
+
+    lastDate = entry.date;
   });
 
-  if(lastDate){
-    parts.push(`<div class="day-block"><div class="day-title">${new Date(lastDate).toLocaleDateString("cs-CZ")}</div>${currentDayLines.join("")}</div>`);
-  }
-
-  trainerPlanContent.innerHTML = parts.join("");
+  trainerPlanContent.className = "";
+  trainerPlanContent.innerHTML = `
+    <table class="month-column-table">
+      <thead>
+        <tr>
+          <th class="col-date">Datum</th>
+          <th class="col-hour">Hodina</th>
+          <th class="col-school">Škola</th>
+          <th class="col-place">Místo</th>
+          <th class="col-year">Ročník</th>
+          <th class="col-class">Třída</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${weekRows.join("")}
+      </tbody>
+    </table>
+  `;
 }
 
 renderTrainerPlanPage();

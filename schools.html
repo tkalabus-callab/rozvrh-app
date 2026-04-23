@@ -166,6 +166,32 @@ input { margin:2px; width:180px; }
   gap:6px;
 }
 
+.detail-action-buttons button {
+  padding:6px 10px;
+}
+
+#saveNewSchoolButton {
+  background: var(--color-primary);
+  color:#fff;
+  font-weight:700;
+  border:1px solid var(--color-primary-dark);
+}
+
+#saveNewSchoolButton:hover {
+  background: var(--color-primary-dark);
+}
+
+#saveButton {
+  background: var(--color-primary);
+  color:#fff;
+  font-weight:700;
+  border:1px solid var(--color-primary-dark);
+}
+
+#saveButton:hover {
+  background: var(--color-primary-dark);
+}
+
 .assigned-trainers {
   margin-top:8px;
   padding:8px 10px;
@@ -558,7 +584,7 @@ tr:hover {
 
 <body>
 
-<div class="page-header">
+
   <div class="top-toolbar">
     <div class="top-toolbar-left">
       <a href="home.html">Domů</a>
@@ -615,10 +641,8 @@ tr:hover {
     <div id="detailActionButtons" class="detail-action-buttons">
       <button id="saveNewSchoolButton" type="button">Uložit a ukončit editaci</button>
       <button id="saveButton" type="button"></button>
-      <button id="cancelEditButton" type="button">Zrušit</button>
-      <button id="removeCaretakerButton">Odebrat školníka</button>
+      <button id="cancelEditButton" type="button">Zavřít bez uložení</button>
     </div>
-    <div id="detailCloseAction"></div>
   </div>
 </div>
 
@@ -660,12 +684,9 @@ const favoriteTrainersTitle = document.getElementById("favoriteTrainersTitle");
 const favoriteTrainerSearch = document.getElementById("favoriteTrainerSearch");
 const favoriteTrainerSearchResults = document.getElementById("favoriteTrainerSearchResults");
 const favoriteTrainersList = document.getElementById("favoriteTrainersList");
-const saveNewSchoolButton = document.getElementById("saveNewSchoolButton");
 const saveButton = document.getElementById("saveButton");
 const cancelEditButton = document.getElementById("cancelEditButton");
-const removeCaretakerButton = document.getElementById("removeCaretakerButton");
 const detailActionButtons = document.getElementById("detailActionButtons");
-const detailCloseAction = document.getElementById("detailCloseAction");
 const detailTitle = document.getElementById("detailTitle");
 const detail = document.getElementById("detail");
 const listTitle = document.getElementById("listTitle");
@@ -724,7 +745,7 @@ function getCaretakerNameById(caretakerId){
 
   if (!item) return "Bez školníka";
 
-  const fullName = `${item.prijmeni || ""} ${item.jmeno || ""}`.trim();
+  const fullName = `${<div class="page-header">item.prijmeni || ""} ${item.jmeno || ""}`.trim();
   return fullName || item.name || "Bez školníka";
 }
 
@@ -763,6 +784,16 @@ function lightenColor(hex, amount = 0.85){
   return `rgb(${newR}, ${newG}, ${newB})`;
 }
 
+function updateAssignedCaretakerSelectStyle(){
+  const caretakerId = assignedCaretakerId.value;
+  const color = getCaretakerColorById(caretakerId);
+  const bg = caretakerId ? lightenColor(color, 0.88) : "";
+
+  assignedCaretakerId.style.background = bg || "";
+  assignedCaretakerId.style.borderColor = caretakerId ? color : "";
+  assignedCaretakerId.style.fontWeight = caretakerId ? "700" : "";
+}
+
 function initStaticTexts(){
   pageTitle.textContent = TEXTS.schools.title;
   if(backLink) backLink.textContent = "← Zpět na rozvrh";
@@ -776,11 +807,10 @@ function initStaticTexts(){
   telefon.placeholder = TEXTS.common.phone;
   poznamka.placeholder = TEXTS.common.note;
   favoriteTrainerSearch.placeholder = "Hledat trenéra";
-  saveButton.textContent = "Uložit";
+  saveButton.textContent = "Uložit změny";
   saveButton.hidden = true;
-  saveNewSchoolButton.hidden = false;
   cancelEditButton.hidden = true;
-  removeCaretakerButton.hidden = true;
+  updateAssignedCaretakerSelectStyle();
   detailTitle.textContent = "Zadání nové školy";
   detail.textContent = TEXTS.schools.detailPrompt;
   listTitle.textContent = "Seznam";
@@ -789,6 +819,7 @@ function initStaticTexts(){
 }
 
 favoriteTrainersTitle.textContent = TEXTS.schools.favoriteTrainers;
+assignedCaretakerId.addEventListener("change", updateAssignedCaretakerSelectStyle);
 
 function getSelectedFavoriteTrainerIds(){
   return currentFavoriteTrainerIds.slice();
@@ -1168,13 +1199,9 @@ function add(){
   }
 
   localStorage.setItem("schools", JSON.stringify(schools));
-  const savedEditId = editId;
   clearForm();
-  if(savedEditId){
-    showDetail(savedEditId);
-  } else {
-    render();
-  }
+  render();
+  closeSchoolDetailPanel();
 }
 
 function edit(id){
@@ -1245,9 +1272,7 @@ function showDetail(id){
   selectedId = id;
   detailTitle.textContent = "Editace školy";
   saveButton.hidden = false;
-  saveNewSchoolButton.hidden = true;
   cancelEditButton.hidden = false;
-  removeCaretakerButton.hidden = false;
 
   let detailFragment = document.createDocumentFragment();
 
@@ -1289,14 +1314,6 @@ function showDetail(id){
   detailFragment.appendChild(assignedTrainers);
   detailFragment.append(document.createElement("br"));
 
-  let removeButton = document.createElement("button");
-  removeButton.id = "detailRemoveButton";
-  removeButton.textContent = TEXTS.common.unavailableSymbol;
-  removeButton.addEventListener("click", clearForm);
-
-  document.getElementById("detailRemoveButton")?.remove();
-  detailCloseAction.appendChild(removeButton);
-
   detail.replaceChildren(detailFragment);
   render();
 }
@@ -1320,7 +1337,6 @@ function clearForm(){
   saveButton.hidden = true;
   saveNewSchoolButton.hidden = false;
   cancelEditButton.hidden = true;
-  removeCaretakerButton.hidden = true;
   detail.textContent = TEXTS.schools.detailPrompt;
   document.getElementById("detailRemoveButton")?.remove();
   render();
@@ -1477,7 +1493,25 @@ initStaticTexts();
 renderFavoriteTrainerOptions([]);
 renderCaretakerSelect("");
 currentViewMode = "compact";
-saveNewSchoolButton.addEventListener("click", () => {
+saveNewSchoolButton.addEventListener("click", (e) => {
+  e.preventDefault();
+
+  const isEmpty =
+    !nazev.value.trim() &&
+    !ulice.value.trim() &&
+    !mesto.value.trim() &&
+    !psc.value.trim() &&
+    !ico.value.trim() &&
+    !kontakt.value.trim() &&
+    !email.value.trim() &&
+    !telefon.value.trim() &&
+    !poznamka.value.trim();
+
+  if(isEmpty){
+    closeSchoolDetailPanel();
+    return;
+  }
+
   if(!nazev.value) return;
   const selectedFavoriteTrainerIds = getSelectedFavoriteTrainerIds();
 
@@ -1503,7 +1537,7 @@ saveNewSchoolButton.addEventListener("click", () => {
   editId = null;
   render();
   clearForm();
-  closeSchoolDetailPanel();
+  setTimeout(() => closeSchoolDetailPanel(), 0);
 });
 saveButton.addEventListener("click", () => {
   add();
@@ -1514,11 +1548,8 @@ if (newSchoolButton) {
     openSchoolDetailPanel();
   });
 }
-if (removeCaretakerButton) {
-  removeCaretakerButton.addEventListener("click", removeCaretakerFromSchool);
-}
 if (cancelEditButton) {
-  cancelEditButton.addEventListener("click", clearForm);
+  cancelEditButton.addEventListener("click", closeSchoolDetailPanel);
 }
 viewOptionButtons.forEach(button => {
   button.addEventListener("click", () => {

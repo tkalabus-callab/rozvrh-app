@@ -773,6 +773,17 @@ function createPlanStoredValue(trainerId){
   };
 }
 
+function createRealityStoredValue(trainerId){
+  return {
+    trainerId,
+    schoolId: availabilityContext?.schoolId || "",
+    date: availabilityContext?.date || "",
+    year: availabilityContext?.year || "",
+    className: availabilityContext?.cls || "",
+    hour: Number(availabilityContext?.hour)
+  };
+}
+
 function chooseTrainer(trainerId){
   if(!isSelectionMode || !hasSelectionContext) return;
 
@@ -785,7 +796,7 @@ function chooseTrainer(trainerId){
     localStorage.setItem("plans", JSON.stringify(plans));
   } else {
     const reality = JSON.parse(localStorage.getItem("reality") || "{}");
-    reality[key] = trainerId;
+    reality[key] = createRealityStoredValue(trainerId);
     localStorage.setItem("reality", JSON.stringify(reality));
   }
 

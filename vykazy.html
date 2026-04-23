@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <title>Výkazy</title>
+  <style>
+    :root{
+      --color-primary:#1bb3c8;
+      --color-primary-dark:#146f80;
+      --color-bg:#eef3f7;
+      --color-border:#d4dde6;
+      --color-header:#2c3e55;
+    }
+
+    body{
+      margin:0;
+      font-family:Arial, sans-serif;
+      background:var(--color-bg);
+    }
+
+    .page-header{
+      background:var(--color-header);
+      color:#fff;
+      margin-bottom:20px;
+    }
+
+    .page-header-inner{
+      max-width:1100px;
+      margin:0 auto;
+      padding:14px 12px 16px;
+    }
+
+    .page-title{
+      margin:0;
+      padding:0 0 14px;
+      text-align:center;
+      font-size:24px;
+      font-weight:800;
+      letter-spacing:0.3px;
+      border-bottom:1px solid rgba(255,255,255,0.08);
+    }
+
+    .topbar-nav{
+      display:flex;
+      justify-content:center;
+      gap:10px;
+      flex-wrap:wrap;
+      padding-top:14px;
+    }
+
+    .topbar-link{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:150px;
+      padding:12px 18px;
+      border-radius:8px;
+      background:var(--color-primary);
+      color:#111;
+      text-decoration:none;
+      font-weight:bold;
+      box-shadow:0 3px 8px rgba(0,0,0,0.18);
+    }
+
+    .topbar-link:hover{
+      background:#31c0d4;
+    }
+
+    .container{
+      max-width:960px;
+      margin:20px auto;
+      padding:0 12px;
+    }
+
+    .box{
+      background:var(--color-primary);
+      border-radius:12px;
+      padding:16px 18px;
+      margin-bottom:16px;
+      color:#062b25;
+      box-shadow:0 4px 10px rgba(0,0,0,0.08);
+    }
+
+    .box-title{
+      margin:0 0 14px;
+      color:#062b25;
+      font-size:14px;
+      font-weight:800;
+      text-transform:uppercase;
+      letter-spacing:0.3px;
+    }
+
+    .filter-section{
+      display:flex;
+      align-items:center;
+      gap:12px 16px;
+      flex-wrap:wrap;
+      margin-top:10px;
+    }
+
+    .filter-section:first-of-type{
+      margin-top:0;
+    }
+
+    .filter-section-inline{
+      display:block;
+    }
+
+    .filter-section-title{
+      margin:0;
+      color:#0b3340;
+      font-size:inherit;
+      font-weight:bold;
+      letter-spacing:normal;
+      white-space:nowrap;
+    }
+
+    .filters-period,
+    .filters-display{
+      display:flex;
+      gap:10px 16px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+
+    .filters-period{
+      justify-content:flex-start;
+    }
+
+    .filters-display{
+      justify-content:flex-start;
+      gap:10px 16px;
+    }
+
+    .filter-item{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      min-width:0;
+    }
+
+    label{
+      font-weight:bold;
+      white-space:nowrap;
+    }
+
+    input, select{
+      padding:6px 8px;
+      border-radius:6px;
+      border:1px solid var(--color-border);
+      min-width:0;
+      background:#fff;
+    }
+
+    .filter-item select,
+    .filter-item input{
+      width:190px;
+    }
+
+    .section-title{
+      margin:0 0 8px;
+      background:var(--color-header);
+      color:#fff;
+      border-radius:10px;
+      padding:10px 14px;
+      font-size:14px;
+      font-weight:800;
+      text-transform:uppercase;
+    }
+
+    .report-summary{
+      display:grid;
+      grid-template-columns:repeat(4, minmax(0, 1fr));
+      gap:12px;
+      margin-bottom:16px;
+    }
+
+    .summary-card{
+      background:#fff;
+      border:1px solid var(--color-border);
+      border-radius:12px;
+      padding:14px 16px;
+      box-shadow:0 2px 6px rgba(0,0,0,0.05);
+    }
+
+    .summary-label{
+      margin:0 0 6px;
+      color:#5b6978;
+      font-size:12px;
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:0.3px;
+    }
+
+    .summary-value{
+      margin:0;
+      color:#1f2d3d;
+      font-size:18px;
+      font-weight:800;
+      line-height:1.3;
+    }
+
+    .actions-box{
+      display:flex;
+      flex-wrap:wrap;
+      align-items:center;
+      gap:10px 12px;
+      margin-bottom:16px;
+      padding:12px 14px;
+      background:var(--color-primary);
+      border:1px solid rgba(0,0,0,0.08);
+      border-radius:12px;
+      box-shadow:0 4px 10px rgba(0,0,0,0.08);
+    }
+
+    .actions-label{
+      font-size:12px;
+      font-weight:800;
+      color:#0b3340;
+      text-transform:uppercase;
+      letter-spacing:0.3px;
+    }
+
+    .action-button{
+      border:1px solid rgba(44,62,85,0.18);
+      border-radius:8px;
+      background:#fff;
+      color:var(--color-header);
+      font-weight:700;
+      padding:9px 14px;
+      cursor:pointer;
+      box-shadow:0 2px 6px rgba(0,0,0,0.08);
+    }
+
+    .action-button:hover{
+      background:#f3f6f9;
+    }
+
+    .action-button-primary{
+      background:var(--color-header);
+      color:#fff;
+      border-color:var(--color-header);
+    }
+
+    .action-button-primary:hover{
+      background:#3a5675;
+    }
+
+    .table-wrap{
+      background:#fff;
+      border:1px solid var(--color-border);
+      border-radius:12px;
+      overflow:hidden;
+    }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      background:#fff;
+    }
+
+    th{
+      background:var(--color-header);
+      color:#fff;
+      padding:8px;
+      text-align:left;
+    }
+
+    td{
+      border:1px solid var(--color-border);
+      padding:6px 8px;
+    }
+
+    th.align-center,
+    td.align-center{
+      text-align:center;
+    }
+
+    th.align-right,
+    td.align-right{
+      text-align:right;
+    }
+
+    @media (max-width: 860px){
+      .filter-section{
+        align-items:flex-start;
+      }
+
+      .report-summary{
+        grid-template-columns:1fr 1fr;
+      }
+    }
+
+    @media (max-width: 620px){
+      .filter-item{
+        align-items:flex-start;
+        flex-direction:column;
+        gap:6px;
+      }
+
+      .filter-item select,
+      .filter-item input{
+        width:100%;
+      }
+
+      .report-summary{
+        grid-template-columns:1fr;
+      }
+    }
+
+    @media print{
+      .page-header,
+      .box,
+      .actions-box{
+        display:none !important;
+      }
+
+      .container{
+        max-width:none;
+        margin:0;
+        padding:0;
+      }
+
+      .summary-card,
+      .table-wrap{
+        box-shadow:none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="page-header">
+    <div class="page-header-inner">
+      <h1 class="page-title">VÝKAZY</h1>
+      <div class="topbar-nav">
+        <a class="topbar-link" href="home.html">Domů</a>
+        <a class="topbar-link" href="index.html">Zpět na rozvrh</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+
+    <div class="box">
+      <div class="box-title">FILTRY</div>
+      <div class="filter-section">
+        <div class="filter-section-title">Období:</div>
+        <div class="filters-period">
+          <div class="filter-item">
+            <label for="year">Rok:</label>
+            <select id="year"></select>
+          </div>
+
+          <div class="filter-item">
+            <label for="month">Měsíc:</label>
+            <select id="month"></select>
+          </div>
+        </div>
+      </div>
+
+      <div class="filter-section filter-section-inline">
+        <div class="filters-display">
+          <div class="filter-item">
+            <label for="reportGroup">Zobrazit podle:</label>
+            <select id="reportGroup">
+              <option value="schools">Škol</option>
+              <option value="trainers">Trenérů</option>
+            </select>
+          </div>
+
+          <div id="schoolFilterWrap" class="filter-item">
+            <label for="schoolFilter">Škola:</label>
+            <select id="schoolFilter"></select>
+          </div>
+
+          <div id="trainerFilterWrap" class="filter-item">
+            <label for="trainerFilter">Trenér:</label>
+            <select id="trainerFilter"></select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="reportSummaryTitle" class="section-title">SEZNAM</div>
+    <div class="report-summary">
+      <div class="summary-card">
+        <div class="summary-label">Období</div>
+        <div id="summaryPeriod" class="summary-value">-</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-label">Zobrazení</div>
+        <div id="summaryMode" class="summary-value">-</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-label">Celkem hodin</div>
+        <div id="summaryHours" class="summary-value">0</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-label">Počet záznamů</div>
+        <div id="summaryRecords" class="summary-value">0</div>
+      </div>
+    </div>
+    <div class="actions-box">
+      <div class="actions-label">Akce</div>
+      <button id="exportExcelButton" class="action-button" type="button">Export Excel</button>
+      <button id="exportPdfButton" class="action-button" type="button">Export PDF</button>
+      <select id="emailFormatSelect">
+        <option value="excel">E-mail: Excel</option>
+        <option value="pdf">E-mail: PDF</option>
+      </select>
+      <button id="emailReportButton" class="action-button" type="button">Poslat e-mailem</button>
+      <button id="archiveReportButton" class="action-button action-button-primary" type="button">Uložit do archivu</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th class="align-right">Datum</th>
+            <th class="align-right">Škola</th>
+            <th class="align-right">Místo</th>
+            <th class="align-right">Trenér</th>
+            <th class="align-center">Ročník</th>
+            <th class="align-center">Třída</th>
+            <th class="align-center">Hodiny</th>
+          </tr>
+        </thead>
+        <tbody id="reportBody">
+          <tr>
+            <td colspan="7">Zatím bez dat</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <script>
+    (function(){
+      const yearSelect = document.getElementById("year");
+      const monthSelect = document.getElementById("month");
+      const reportGroupSelect = document.getElementById("reportGroup");
+      const schoolFilterWrap = document.getElementById("schoolFilterWrap");
+      const trainerFilterWrap = document.getElementById("trainerFilterWrap");
+      const schoolFilter = document.getElementById("schoolFilter");
+      const trainerFilter = document.getElementById("trainerFilter");
+      const reportSummaryTitle = document.getElementById("reportSummaryTitle");
+      const summaryPeriod = document.getElementById("summaryPeriod");
+      const summaryMode = document.getElementById("summaryMode");
+      const summaryHours = document.getElementById("summaryHours");
+      const summaryRecords = document.getElementById("summaryRecords");
+      const reportBody = document.getElementById("reportBody");
+      const exportExcelButton = document.getElementById("exportExcelButton");
+      const exportPdfButton = document.getElementById("exportPdfButton");
+      const emailFormatSelect = document.getElementById("emailFormatSelect");
+      const emailReportButton = document.getElementById("emailReportButton");
+      const archiveReportButton = document.getElementById("archiveReportButton");
+      if(!yearSelect || !monthSelect || !reportGroupSelect || !schoolFilterWrap || !trainerFilterWrap || !schoolFilter || !trainerFilter || !reportSummaryTitle || !summaryPeriod || !summaryMode || !summaryHours || !summaryRecords || !reportBody || !exportExcelButton || !exportPdfButton || !emailFormatSelect || !emailReportButton || !archiveReportButton) return;
+
+      const now = new Date();
+      const currentYear = now.getFullYear();
+      const currentMonth = now.getMonth() + 1;
+
+      // roky (rozsah ±3 roky)
+      for(let y = currentYear - 3; y <= currentYear + 1; y++){
+        const opt = document.createElement("option");
+        opt.value = y;
+        opt.textContent = y;
+        if(y === currentYear) opt.selected = true;
+        yearSelect.appendChild(opt);
+      }
+
+      const months = [
+        "Leden","Únor","Březen","Duben","Květen","Červen",
+        "Červenec","Srpen","Září","Říjen","Listopad","Prosinec"
+      ];
+
+      months.forEach((name, i) => {
+        const m = i + 1;
+        const opt = document.createElement("option");
+        opt.value = m;
+        opt.textContent = name;
+        if(m === currentMonth) opt.selected = true;
+        monthSelect.appendChild(opt);
+      });
+
+      function loadSchools(){
+        try{
+          return JSON.parse(localStorage.getItem("schools") || "[]");
+        }catch(e){
+          return [];
+        }
+      }
+
+      function loadTrainers(){
+        try{
+          return JSON.parse(localStorage.getItem("trainers") || "[]");
+        }catch(e){
+          return [];
+        }
+      }
+
+      function loadPlans(){
+        try{
+          return JSON.parse(localStorage.getItem("plans") || "{}");
+        }catch(e){
+          return {};
+        }
+      }
+
+      function loadReality(){
+        try{
+          return JSON.parse(localStorage.getItem("reality") || "{}");
+        }catch(e){
+          return {};
+        }
+      }
+
+      function getSchoolLabel(item){
+        if(!item) return "Bez názvu školy";
+        return item.name || item.nazev || item.skola || "Bez názvu školy";
+      }
+
+      function getTrainerLabel(item){
+        if(!item) return "Bez trenéra";
+        const fullName = `${item.prijmeni || ""} ${item.jmeno || ""}`.trim();
+        return fullName || item.name || "Bez trenéra";
+      }
+
+      function parseKey(key){
+        const parts = String(key).split("_");
+
+        if(parts.length === 4){
+          const [date, year, cls, hour] = parts;
+          return { date, year, cls, hour: Number(hour) };
+        }
+
+        const [date, cls, hour] = parts;
+        return { date, year: "", cls, hour: Number(hour) };
+      }
+
+      function getStoredTrainerId(value){
+        return value && typeof value === "object" ? value.trainerId : value;
+      }
+
+      function normalizePlanEntry(key, value){
+        const parsed = parseKey(key);
+        const isObjectValue = !!value && typeof value === "object";
+
+        return {
+          trainerId: getStoredTrainerId(value),
+          schoolId: isObjectValue ? String(value.schoolId ?? "") : "",
+          date: isObjectValue ? value.date || parsed.date : parsed.date,
+          year: isObjectValue ? value.year || parsed.year || "" : parsed.year || "",
+          className: isObjectValue ? value.className || parsed.cls : parsed.cls,
+          hour: isObjectValue ? Number(value.hour ?? parsed.hour) : parsed.hour
+        };
+      }
+
+      function normalizeRealityEntry(key, value){
+        const parsed = parseKey(key);
+        const isObjectValue = !!value && typeof value === "object";
+
+        return {
+          trainerId: getStoredTrainerId(value),
+          schoolId: isObjectValue ? String(value.schoolId ?? "") : "",
+          date: isObjectValue ? value.date || parsed.date : parsed.date,
+          year: isObjectValue ? value.year || parsed.year || "" : parsed.year || "",
+          className: isObjectValue ? value.className || parsed.cls : parsed.cls,
+          hour: isObjectValue
+            ? Number(value.hour ?? parsed.hour)
+            : Number(parsed.hour)
+        };
+      }
+
+      function getSchoolById(schoolId){
+        return loadSchools().find(item => String(item.id) === String(schoolId)) || null;
+      }
+
+      function getTrainerById(trainerId){
+        return loadTrainers().find(item => String(item.id) === String(trainerId)) || null;
+      }
+
+      function getSchoolPlace(item){
+        if(!item) return "-";
+        return item.mesto || item.city || "-";
+      }
+
+      function getMonthEntries(){
+        const year = Number(yearSelect.value);
+        const month = Number(monthSelect.value);
+        const selectedSchoolId = schoolFilter.value;
+        const selectedTrainerId = trainerFilter.value;
+
+        return Object.entries(loadReality())
+          .map(([key, value]) => normalizeRealityEntry(key, value))
+          .filter(entry => {
+            if(!entry.date) return false;
+            if(!entry.trainerId || entry.trainerId === "X") return false;
+
+            const date = new Date(entry.date);
+            if(Number.isNaN(date.getTime())) return false;
+            if(date.getFullYear() !== year) return false;
+            if(date.getMonth() + 1 !== month) return false;
+            if(selectedSchoolId && String(entry.schoolId) !== String(selectedSchoolId)) return false;
+            if(selectedTrainerId && String(entry.trainerId) !== String(selectedTrainerId)) return false;
+
+            return true;
+          })
+          .map(entry => {
+            const school = getSchoolById(entry.schoolId);
+            const trainer = getTrainerById(entry.trainerId);
+
+            return {
+              ...entry,
+              schoolName: getSchoolLabel(school),
+              trainerName: getTrainerLabel(trainer),
+              place: getSchoolPlace(school)
+            };
+          })
+          .sort((a, b) => {
+            if(reportGroupSelect.value === "schools"){
+              const schoolCompare = String(a.schoolName).localeCompare(String(b.schoolName), "cs");
+              if(schoolCompare !== 0) return schoolCompare;
+            } else {
+              const trainerCompare = String(a.trainerName).localeCompare(String(b.trainerName), "cs");
+              if(trainerCompare !== 0) return trainerCompare;
+            }
+
+            if(a.date !== b.date) return String(a.date).localeCompare(String(b.date));
+            return Number(a.hour) - Number(b.hour);
+          });
+      }
+
+      function fillSchoolFilter(){
+        const schools = loadSchools();
+        schoolFilter.innerHTML = "";
+
+        const defaultOption = document.createElement("option");
+        defaultOption.value = "";
+        defaultOption.textContent = "Všechny školy";
+        schoolFilter.appendChild(defaultOption);
+
+        schools.forEach(item => {
+          const opt = document.createElement("option");
+          opt.value = item.id || "";
+          opt.textContent = getSchoolLabel(item);
+          schoolFilter.appendChild(opt);
+        });
+      }
+
+      function fillTrainerFilter(){
+        const trainers = loadTrainers();
+        trainerFilter.innerHTML = "";
+
+        const defaultOption = document.createElement("option");
+        defaultOption.value = "";
+        defaultOption.textContent = "Všichni trenéři";
+        trainerFilter.appendChild(defaultOption);
+
+        trainers.forEach(item => {
+          const opt = document.createElement("option");
+          opt.value = item.id || "";
+          opt.textContent = getTrainerLabel(item);
+          trainerFilter.appendChild(opt);
+        });
+      }
+
+      function updateSpecificFiltersVisibility(){
+        schoolFilterWrap.style.display = "";
+        trainerFilterWrap.style.display = "";
+      }
+
+      function getSelectedOptionText(select){
+        return select.options[select.selectedIndex]?.textContent || "";
+      }
+
+      function sanitizeCsvValue(value){
+        return String(value ?? "-")
+          .replace(/"/g, "\"\"")
+          .replace(/\r?\n/g, " ");
+      }
+
+      function sanitizeFileNamePart(value, fallback){
+        return String(value || fallback || "value")
+          .replace(/[<>:"/\\|?*\x00-\x1F]/g, "-")
+          .trim() || fallback || "value";
+      }
+
+      function getReportContext(){
+        const entries = getMonthEntries();
+        const group = reportGroupSelect.value;
+        const monthText = getSelectedOptionText(monthSelect);
+        const yearText = getSelectedOptionText(yearSelect);
+        const schoolText = getSelectedOptionText(schoolFilter) || "Všechny školy";
+        const trainerText = getSelectedOptionText(trainerFilter) || "Všichni trenéři";
+        const totalHours = entries.length;
+        const totalRecords = entries.length;
+        const totalTrainers = new Set(entries.map(entry => String(entry.trainerId || ""))).size;
+        const totalSchools = new Set(entries.map(entry => String(entry.schoolId || ""))).size;
+
+        return {
+          entries,
+          group,
+          schoolText,
+          trainerText,
+          totalHours,
+          totalRecords,
+          totalTrainers,
+          totalSchools,
+          periodText: `${monthText} ${yearText}`.trim(),
+          titleText: group === "schools"
+            ? `Škola: ${schoolText} | Trenéři: ${trainerText}`
+            : `Trenér: ${trainerText} | Školy: ${schoolText}`
+        };
+      }
+
+      function saveReportArchive(format){
+        const context = getReportContext();
+        const archive = (() => {
+          try{
+            return JSON.parse(localStorage.getItem("reportsArchive") || "[]");
+          }catch(e){
+            return [];
+          }
+        })();
+
+        archive.unshift({
+          createdAt: new Date().toISOString(),
+          format,
+          period: context.periodText,
+          group: context.group,
+          schoolFilter: schoolFilter.value || "",
+          schoolLabel: context.schoolText,
+          trainerFilter: trainerFilter.value || "",
+          trainerLabel: context.trainerText,
+          records: context.totalRecords,
+          hours: context.totalHours,
+          trainers: context.totalTrainers
+        });
+
+        localStorage.setItem("reportsArchive", JSON.stringify(archive.slice(0, 100)));
+      }
+
+      function exportReportCsv(options = {}){
+        const context = getReportContext();
+        const shouldArchive = options.archive !== false;
+        const rows = [
+          `"Období";"${sanitizeCsvValue(context.periodText)}"`,
+          `"Zobrazení";"${sanitizeCsvValue(context.group === "schools" ? "Podle škol" : "Podle trenérů")}"`,
+          `"Filtr";"${sanitizeCsvValue(context.titleText)}"`,
+          `"Celkem hodin";"${sanitizeCsvValue(context.totalHours)}"`,
+          `"Počet trenérů";"${sanitizeCsvValue(context.totalTrainers)}"`,
+          `"Počet záznamů";"${sanitizeCsvValue(context.totalRecords)}"`,
+          "",
+          "Datum;Škola;Místo;Trenér;Ročník;Třída;Hodiny",
+          ...context.entries.map(entry => {
+            const values = [
+              entry.date || "-",
+              entry.schoolName || "-",
+              entry.place || "-",
+              entry.trainerName || "-",
+              entry.year || "-",
+              entry.className || "-",
+              `${entry.hour || "-"} hod`
+            ];
+
+            return values.map(value => `"${sanitizeCsvValue(value)}"`).join(";");
+          })
+        ];
+
+        const csvContent = "\uFEFF" + rows.join("\r\n");
+        const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        const fileName = `vykaz-${sanitizeFileNamePart(context.group, "report")}-${sanitizeFileNamePart(yearSelect.value, "year")}-${sanitizeFileNamePart(monthSelect.value, "month")}.csv`;
+
+        link.href = url;
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        if(shouldArchive) saveReportArchive("excel");
+        return fileName;
+      }
+
+      function exportReportPdf(options = {}){
+        const shouldArchive = options.archive !== false;
+        if(shouldArchive) saveReportArchive("pdf");
+        window.print();
+      }
+
+      function emailReport(){
+        const context = getReportContext();
+        const format = emailFormatSelect.value === "pdf" ? "PDF" : "Excel";
+        const fileName = format === "Excel"
+          ? exportReportCsv({ archive: true })
+          : `vykaz-${sanitizeFileNamePart(context.group, "report")}-${sanitizeFileNamePart(yearSelect.value, "year")}-${sanitizeFileNamePart(monthSelect.value, "month")}.pdf`;
+
+        if(format === "PDF"){
+          exportReportPdf({ archive: true });
+        }
+
+        const subject = `Výkaz ${context.periodText}`;
+        const body = [
+          `Dobrý den,`,
+          ``,
+          `posílám výkaz za období ${context.periodText}.`,
+          `Zobrazení: ${context.group === "schools" ? "Podle škol" : "Podle trenérů"}`,
+          `${context.titleText}`,
+          `Celkem hodin: ${context.totalHours}`,
+          `Počet trenérů: ${context.totalTrainers}`,
+          `Počet záznamů: ${context.totalRecords}`,
+          `Preferovaný formát přílohy: ${format}`,
+          `Přiložte soubor: ${fileName}`,
+          ``,
+          `Pozn.: přílohu přidejte ručně po otevření e-mailu.`
+        ].join("\n");
+
+        window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        alert(`Soubor ${fileName} byl připraven. Přiložte ho prosím ručně do otevřeného e-mailu.`);
+      }
+
+      function updateReportSummaryCards(){
+        const group = reportGroupSelect.value;
+        const context = getReportContext();
+
+        summaryPeriod.textContent = context.periodText;
+        summaryMode.textContent = group === "schools"
+          ? `Podle škol`
+          : `Podle trenérů`;
+        summaryHours.textContent = String(context.totalHours);
+        summaryRecords.textContent = `${context.totalRecords} záznamů / ${context.totalTrainers} trenérů`;
+      }
+
+      function updateReportSummaryTitle(){
+        const group = reportGroupSelect.value;
+        const schoolText = getSelectedOptionText(schoolFilter) || "Všechny školy";
+        const trainerText = getSelectedOptionText(trainerFilter) || "Všichni trenéři";
+
+        if(group === "schools"){
+          reportSummaryTitle.textContent = `Škola: ${schoolText} | Trenéři: ${trainerText}`;
+          return;
+        }
+
+        reportSummaryTitle.textContent = `Trenér: ${trainerText} | Školy: ${schoolText}`;
+      }
+
+      function renderReportTable(){
+        const entries = getMonthEntries();
+
+        if(!reportBody) return;
+
+        if(!entries.length){
+          reportBody.innerHTML = `
+            <tr>
+              <td colspan="7">Pro zadané filtry nebyla nalezena žádná data</td>
+            </tr>
+          `;
+          return;
+        }
+
+        reportBody.innerHTML = entries.map(entry => `
+          <tr>
+            <td class="align-right">${new Date(entry.date).toLocaleDateString("cs-CZ")}</td>
+            <td class="align-right">${entry.schoolName || "-"}</td>
+            <td class="align-right">${entry.place || "-"}</td>
+            <td class="align-right">${entry.trainerName || "-"}</td>
+            <td class="align-center">${entry.year || "-"}</td>
+            <td class="align-center">${entry.className || "-"}</td>
+            <td class="align-center">${entry.hour} hod</td>
+          </tr>
+        `).join("");
+      }
+
+      reportGroupSelect.addEventListener("change", updateSpecificFiltersVisibility);
+      reportGroupSelect.addEventListener("change", updateReportSummaryTitle);
+      reportGroupSelect.addEventListener("change", updateReportSummaryCards);
+      reportGroupSelect.addEventListener("change", renderReportTable);
+      schoolFilter.addEventListener("change", updateReportSummaryTitle);
+      schoolFilter.addEventListener("change", updateReportSummaryCards);
+      schoolFilter.addEventListener("change", renderReportTable);
+      trainerFilter.addEventListener("change", updateReportSummaryTitle);
+      trainerFilter.addEventListener("change", updateReportSummaryCards);
+      trainerFilter.addEventListener("change", renderReportTable);
+      yearSelect.addEventListener("change", updateReportSummaryTitle);
+      yearSelect.addEventListener("change", updateReportSummaryCards);
+      yearSelect.addEventListener("change", renderReportTable);
+      monthSelect.addEventListener("change", updateReportSummaryTitle);
+      monthSelect.addEventListener("change", updateReportSummaryCards);
+      monthSelect.addEventListener("change", renderReportTable);
+      exportExcelButton.addEventListener("click", exportReportCsv);
+      exportPdfButton.addEventListener("click", exportReportPdf);
+      emailReportButton.addEventListener("click", emailReport);
+      archiveReportButton.addEventListener("click", () => {
+        saveReportArchive("archive");
+        alert("Období bylo uloženo do archivu.");
+      });
+
+      fillSchoolFilter();
+      fillTrainerFilter();
+      updateSpecificFiltersVisibility();
+      updateReportSummaryTitle();
+      updateReportSummaryCards();
+      renderReportTable();
+    })();
+  </script>
+
+</body>
+</html>

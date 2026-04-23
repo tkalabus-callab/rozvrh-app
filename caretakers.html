@@ -330,9 +330,10 @@ tr.active:hover {
 }
 
 .assigned-schools-detail td {
-  padding:6px 10px;
+  padding:8px 12px;
   font-size:12px;
-  background:#f9fbfd;
+  background:#f4f8fb;
+  border-top:1px solid var(--color-border);
 }
 
 .assigned-schools-detail ul {
@@ -341,8 +342,14 @@ tr.active:hover {
 }
 
 .assigned-schools-detail li {
-  margin:2px 0;
-  line-height:1.25;
+  margin:3px 0;
+  line-height:1.35;
+}
+
+.assigned-schools-empty {
+  font-style:italic;
+  color:#6c7a89;
+  padding:4px 0;
 }
 
 .assigned-schools-toggle-active {
@@ -958,7 +965,15 @@ function render(){
       const assignedSchools = getAssignedSchools(caretaker.id);
       detailCell.colSpan = 7;
 
-      if(assignedSchools.length){
+      const count = assignedSchools.length;
+
+      const info = document.createElement("div");
+      info.style.fontWeight = "600";
+      info.style.marginBottom = "4px";
+      info.textContent = `Počet škol: ${count}`;
+      detailCell.appendChild(info);
+
+      if(count){
         const schoolList = document.createElement("ul");
         assignedSchools.forEach(school => {
           const item = document.createElement("li");
@@ -967,7 +982,10 @@ function render(){
         });
         detailCell.appendChild(schoolList);
       } else {
-        detailCell.textContent = "Žádné přidělené školy.";
+        const empty = document.createElement("div");
+        empty.className = "assigned-schools-empty";
+        empty.textContent = "Tomuto školníkovi zatím není přiřazena žádná škola";
+        detailCell.appendChild(empty);
       }
 
       detailRow.appendChild(detailCell);

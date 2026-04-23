@@ -2403,7 +2403,7 @@ function assignTrainerToCell(trainerId){
     plans[getKey(cellDate, cls, cellHour)] = createPlanStoredValue(trainerId, cellDate, cls, cellHour);
     localStorage.setItem("plans", JSON.stringify(plans));
   } else {
-    reality[getKey(cellDate, cls, cellHour)] = trainerId;
+    reality[getKey(cellDate, cls, cellHour)] = createRealityStoredValue(trainerId, cellDate, cls, cellHour);
     localStorage.setItem("reality", JSON.stringify(reality));
   }
 
@@ -2703,7 +2703,7 @@ function openMenu(e, date, cls, h, type, availableOnly = false, promptText = "",
       localStorage.setItem("plans", JSON.stringify(plans));
     } else {
       if(val){
-        reality[getKey(date, cls, h)] = val;
+        reality[getKey(date, cls, h)] = createRealityStoredValue(val, date, cls, h);
       } else {
         deleteStoredValue(reality, date, cls, h);
       }
@@ -2906,6 +2906,19 @@ function getStoredTrainerId(value){
 }
 
 function createPlanStoredValue(trainerId, date, cls, hour){
+  if(!trainerId || trainerId === "X") return trainerId;
+
+  return {
+    trainerId,
+    schoolId: schoolSelect?.value || "",
+    date: formatDate(date),
+    year: getSelectedYear(),
+    className: cls,
+    hour: Number(hour)
+  };
+}
+
+function createRealityStoredValue(trainerId, date, cls, hour){
   if(!trainerId || trainerId === "X") return trainerId;
 
   return {
@@ -3476,7 +3489,7 @@ function renderScheduleCore(){
             return;
           }
 
-          reality[getKey(dayDate, cls, hour)] = trainerId;
+          reality[getKey(dayDate, cls, hour)] = createRealityStoredValue(trainerId, dayDate, cls, hour);
           localStorage.setItem("reality", JSON.stringify(reality));
           renderScheduleSafe();
         });
