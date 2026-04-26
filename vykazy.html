@@ -3,15 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <title>Výkazy</title>
+  <link rel="stylesheet" href="styles.css">
   <style>
-    :root{
-      --color-primary:#1bb3c8;
-      --color-primary-dark:#146f80;
-      --color-bg:#eef3f7;
-      --color-border:#d4dde6;
-      --color-header:#2c3e55;
-    }
-
     body{
       margin:0;
       font-family:Arial, sans-serif;
@@ -25,27 +18,35 @@
     }
 
     .page-header-inner{
-      max-width:1100px;
-      margin:0 auto;
-      padding:14px 12px 16px;
+      width:100%;
+      margin:0;
+      padding:0;
+      display:flex;
+      flex-direction:column;
     }
 
     .page-title{
+      order:1;
       margin:0;
-      padding:0 0 14px;
+      padding:16px;
+      background:var(--color-header);
       text-align:center;
-      font-size:24px;
-      font-weight:800;
-      letter-spacing:0.3px;
-      border-bottom:1px solid rgba(255,255,255,0.08);
+      font-size:30px;
+      font-weight:900;
+      letter-spacing:1px;
+      text-transform:uppercase;
+      text-shadow:0 2px 4px rgba(0,0,0,0.35);
+      border-bottom:5px solid var(--color-primary);
+      box-shadow:0 4px 14px rgba(0,0,0,0.18);
     }
 
     .topbar-nav{
       display:flex;
+      order:2;
       justify-content:center;
       gap:10px;
       flex-wrap:wrap;
-      padding-top:14px;
+      padding:14px 16px;
     }
 
     .topbar-link{
@@ -90,16 +91,29 @@
       letter-spacing:0.3px;
     }
 
+    .filters-layout{
+      display:grid;
+      grid-template-columns:minmax(250px, 1fr) minmax(320px, 1.2fr) minmax(250px, 1fr);
+      gap:22px;
+      align-items:start;
+    }
+
+    .filters-column{
+      min-width:0;
+    }
+
     .filter-section{
       display:flex;
       align-items:center;
       gap:12px 16px;
       flex-wrap:wrap;
-      margin-top:10px;
+      margin-top:0;
     }
 
-    .filter-section:first-of-type{
-      margin-top:0;
+    .filter-control-card{
+      display:grid;
+      grid-template-columns:1fr;
+      gap:8px;
     }
 
     .filter-section-inline{
@@ -108,6 +122,9 @@
 
     .filter-section-title{
       margin:0;
+      min-height:32px;
+      display:flex;
+      align-items:center;
       color:#0b3340;
       font-size:inherit;
       font-weight:bold;
@@ -117,26 +134,58 @@
 
     .filters-period,
     .filters-display{
-      display:flex;
-      gap:10px 16px;
-      flex-wrap:wrap;
+      display:grid;
+      grid-template-columns:1fr;
+      gap:8px;
+    }
+
+    .filters-control-summary{
+      display:grid;
+      grid-template-columns:1fr;
+      gap:8px;
+    }
+
+    .filter-summary-card{
+      min-height:32px;
+      display:grid;
+      grid-template-columns:minmax(0, 1fr) auto;
       align-items:center;
+      gap:12px;
+      padding:0 12px;
+      border-radius:6px;
+      background:#ffffff;
+      border:1px solid var(--color-border);
+      box-shadow:0 2px 6px rgba(0,0,0,0.08);
+      box-sizing:border-box;
     }
 
-    .filters-period{
-      justify-content:flex-start;
+    .filter-summary-label{
+      margin:0;
+      color:var(--color-header);
+      font-size:12px;
+      font-weight:800;
+      text-transform:uppercase;
+      letter-spacing:0.3px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
     }
 
-    .filters-display{
-      justify-content:flex-start;
-      gap:10px 16px;
+    .filter-summary-value{
+      margin:0;
+      color:#1f2d3d;
+      font-size:20px;
+      line-height:1.1;
+      font-weight:900;
     }
 
     .filter-item{
-      display:flex;
+      display:grid;
+      grid-template-columns:120px minmax(0, 1fr);
       align-items:center;
       gap:8px;
       min-width:0;
+      min-height:32px;
     }
 
     label{
@@ -145,6 +194,7 @@
     }
 
     input, select{
+      height:32px;
       padding:6px 8px;
       border-radius:6px;
       border:1px solid var(--color-border);
@@ -154,50 +204,136 @@
 
     .filter-item select,
     .filter-item input{
-      width:190px;
+      width:100%;
+      box-sizing:border-box;
     }
 
-    .section-title{
-      margin:0 0 8px;
-      background:var(--color-header);
-      color:#fff;
-      border-radius:10px;
-      padding:10px 14px;
-      font-size:14px;
-      font-weight:800;
-      text-transform:uppercase;
-    }
-
-    .report-summary{
+    .report-focus-panel{
+      margin:0 0 16px;
       display:grid;
-      grid-template-columns:repeat(4, minmax(0, 1fr));
-      gap:12px;
-      margin-bottom:16px;
-    }
-
-    .summary-card{
-      background:#fff;
-      border:1px solid var(--color-border);
+      grid-template-columns:188px minmax(0, 1fr) 188px;
+      gap:18px;
+      align-items:center;
+      padding:18px 20px;
       border-radius:12px;
-      padding:14px 16px;
-      box-shadow:0 2px 6px rgba(0,0,0,0.05);
+      background:#ffffff;
+      border:1px solid var(--color-border);
+      border-top:6px solid var(--color-primary);
+      box-shadow:0 5px 14px rgba(44,62,85,0.16);
     }
 
-    .summary-label{
-      margin:0 0 6px;
-      color:#5b6978;
+    .report-focus-panel.is-archive{
+      border-top-color:#f59e0b;
+      background:#fff8eb;
+    }
+
+    .report-focus-main{
+      min-width:0;
+      text-align:center;
+    }
+
+    .report-focus-mode{
+      display:inline-flex;
+      align-items:center;
+      min-height:28px;
+      padding:0 10px;
+      border-radius:999px;
+      background:var(--color-header);
+      color:#ffffff;
       font-size:12px;
-      font-weight:700;
+      font-weight:900;
       text-transform:uppercase;
-      letter-spacing:0.3px;
+      letter-spacing:0.4px;
     }
 
-    .summary-value{
-      margin:0;
-      color:#1f2d3d;
-      font-size:18px;
+    .report-archive-badge{
+      display:inline-flex;
+      align-items:center;
+      min-height:28px;
+      margin-left:8px;
+      padding:0 10px;
+      border-radius:999px;
+      background:#f59e0b;
+      color:#111827;
+      font-size:12px;
+      font-weight:900;
+      text-transform:uppercase;
+      letter-spacing:0.4px;
+    }
+
+    .report-archive-badge[hidden]{
+      display:none;
+    }
+
+    .status-message{
+      margin:-6px 0 12px;
+      padding:10px 14px;
+      border-radius:10px;
+      border:1px solid transparent;
       font-weight:800;
-      line-height:1.3;
+      box-shadow:0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .status-message[hidden]{
+      display:none;
+    }
+
+    .status-message.is-archive{
+      background:#fff8eb;
+      border-color:#f59e0b;
+      color:#92400e;
+    }
+
+    .status-message.is-success{
+      background:#ecfdf5;
+      border-color:#22c55e;
+      color:#166534;
+    }
+
+    .status-message.is-live{
+      background:#eff6ff;
+      border-color:#60a5fa;
+      color:#1d4ed8;
+    }
+
+    .report-focus-subject{
+      margin-top:8px;
+      color:var(--color-header);
+      font-size:30px;
+      line-height:1.1;
+      font-weight:900;
+      text-transform:uppercase;
+      text-shadow:0 1px 0 rgba(0,0,0,0.12);
+    }
+
+    .report-focus-tile{
+      min-width:0;
+      min-height:92px;
+      align-self:stretch;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      border-radius:10px;
+      background:var(--color-header);
+      color:#ffffff;
+      text-align:center;
+      padding:12px 14px;
+    }
+
+    .report-focus-tile-label{
+      font-size:12px;
+      font-weight:800;
+      text-transform:uppercase;
+      color:#d9f7fb;
+    }
+
+    .report-focus-tile-value{
+      margin-top:4px;
+      font-size:34px;
+      line-height:1;
+      font-weight:900;
+      color:#ffffff;
     }
 
     .actions-box{
@@ -246,6 +382,183 @@
       background:#3a5675;
     }
 
+    #openArchiveButton{
+      margin-left:auto;
+    }
+
+    .archive-modal{
+      position:fixed;
+      inset:0;
+      z-index:2000;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:20px;
+      background:rgba(10,18,30,0.55);
+    }
+
+    .archive-modal[hidden]{
+      display:none;
+    }
+
+    .archive-dialog{
+      width:min(980px, 100%);
+      max-height:min(720px, 92vh);
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      padding:18px;
+      border-radius:12px;
+      background:#ffffff;
+      border:1px solid var(--color-border);
+      box-shadow:0 16px 36px rgba(0,0,0,0.28);
+    }
+
+    .archive-header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      border-bottom:1px solid var(--color-border);
+      padding-bottom:10px;
+    }
+
+    .archive-title{
+      margin:0;
+      color:var(--color-header);
+      font-size:20px;
+      font-weight:900;
+      text-transform:uppercase;
+    }
+
+    .archive-close{
+      min-width:38px;
+      min-height:34px;
+      border:1px solid var(--color-border);
+      border-radius:8px;
+      background:#ffffff;
+      color:var(--color-header);
+      font-size:20px;
+      font-weight:900;
+      cursor:pointer;
+    }
+
+    .archive-columns{
+      display:grid;
+      grid-template-columns:minmax(0, 1fr) minmax(0, 1fr);
+      gap:14px;
+      min-height:0;
+      overflow:auto;
+      padding-right:4px;
+    }
+
+    .archive-column{
+      min-width:0;
+      display:grid;
+      align-content:start;
+      gap:10px;
+    }
+
+    .archive-column-title{
+      margin:0;
+      padding:10px 12px;
+      border-radius:8px;
+      background:var(--color-primary);
+      color:#062b25;
+      font-size:15px;
+      font-weight:900;
+      text-transform:uppercase;
+    }
+
+    .archive-list{
+      display:grid;
+      align-content:start;
+      gap:10px;
+      min-width:0;
+    }
+
+    .archive-month-group{
+      border:1px solid var(--color-border);
+      border-radius:10px;
+      overflow:hidden;
+      background:#ffffff;
+    }
+
+    .archive-month-title{
+      width:100%;
+      margin:0;
+      padding:10px 12px;
+      border:0;
+      background:var(--color-primary);
+      color:#062b25;
+      font-size:15px;
+      font-weight:900;
+      text-transform:uppercase;
+      text-align:left;
+      cursor:pointer;
+    }
+
+    .archive-month-title::after{
+      content:"Rozbalit";
+      float:right;
+      font-size:12px;
+      text-transform:none;
+      color:#08313a;
+    }
+
+    .archive-month-group.is-open .archive-month-title::after{
+      content:"Sbalit";
+    }
+
+    .archive-month-items{
+      display:none;
+      gap:8px;
+      padding:10px;
+      background:#f8fbfd;
+    }
+
+    .archive-month-group.is-open .archive-month-items{
+      display:grid;
+    }
+
+    .archive-item .action-button{
+      background:var(--color-primary);
+      color:#062b25;
+    }
+
+    .archive-item{
+      display:grid;
+      grid-template-columns:minmax(0, 1fr) auto;
+      gap:12px;
+      align-items:center;
+      padding:12px;
+      border:1px solid var(--color-border);
+      border-radius:10px;
+      background:#ffffff;
+    }
+
+    .archive-item-title{
+      color:var(--color-header);
+      font-weight:900;
+    }
+
+    .archive-item-meta{
+      margin-top:4px;
+      color:#536273;
+      font-size:13px;
+      font-weight:700;
+    }
+
+    .archive-empty{
+      padding:18px;
+      border:1px dashed var(--color-border);
+      border-radius:10px;
+      color:var(--color-header);
+      font-weight:800;
+      text-align:center;
+      background:#f8fbfd;
+    }
+
     .table-wrap{
       background:#fff;
       border:1px solid var(--color-border);
@@ -281,20 +594,69 @@
       text-align:right;
     }
 
+    .print-report{
+      display:none;
+    }
+
+    .report-export-table{
+      width:100%;
+      border-collapse:collapse;
+      table-layout:fixed;
+      background:#ffffff;
+      color:#000000;
+      font-family:Arial, sans-serif;
+      font-size:11pt;
+    }
+
+    .report-export-table td,
+    .report-export-table th{
+      border:1px solid #d9d9d9;
+      padding:4px 6px;
+      color:#000000;
+      background:#ffffff;
+      text-align:left;
+      font-weight:400;
+      vertical-align:middle;
+      overflow:hidden;
+      white-space:nowrap;
+    }
+
+    .report-export-table th{
+      font-weight:700;
+    }
+
+    .report-export-table .report-export-spacer td{
+      height:22px;
+      border-left:0;
+      border-right:0;
+    }
+
+    .report-export-table .report-export-number{
+      text-align:right;
+    }
+
     @media (max-width: 860px){
+      .filters-layout{
+        grid-template-columns:1fr;
+      }
+
       .filter-section{
         align-items:flex-start;
       }
 
-      .report-summary{
-        grid-template-columns:1fr 1fr;
+      .report-focus-panel{
+        grid-template-columns:1fr;
+      }
+
+      .report-focus-tile{
+        align-items:center;
       }
     }
 
     @media (max-width: 620px){
       .filter-item{
+        grid-template-columns:1fr;
         align-items:flex-start;
-        flex-direction:column;
         gap:6px;
       }
 
@@ -303,14 +665,15 @@
         width:100%;
       }
 
-      .report-summary{
-        grid-template-columns:1fr;
+      .report-focus-subject{
+        font-size:24px;
       }
     }
 
     @media print{
       .page-header,
       .box,
+      .report-focus-panel,
       .actions-box{
         display:none !important;
       }
@@ -321,9 +684,18 @@
         padding:0;
       }
 
-      .summary-card,
+      .report-focus-panel,
+      .filter-summary-card,
       .table-wrap{
         box-shadow:none;
+      }
+
+      .table-wrap{
+        display:none !important;
+      }
+
+      .print-report{
+        display:block !important;
       }
     }
   </style>
@@ -344,73 +716,88 @@
 
     <div class="box">
       <div class="box-title">FILTRY</div>
-      <div class="filter-section">
-        <div class="filter-section-title">Období:</div>
-        <div class="filters-period">
-          <div class="filter-item">
-            <label for="year">Rok:</label>
-            <select id="year"></select>
-          </div>
+      <div class="filters-layout">
+        <div class="filters-column">
+          <div class="filter-section filter-control-card">
+            <div class="filter-section-title">Období:</div>
+            <div class="filters-period">
+              <div class="filter-item">
+                <label for="year">Rok:</label>
+                <select id="year"></select>
+              </div>
 
-          <div class="filter-item">
-            <label for="month">Měsíc:</label>
-            <select id="month"></select>
+              <div class="filter-item">
+                <label for="month">Měsíc:</label>
+                <select id="month"></select>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="filter-section filter-section-inline">
-        <div class="filters-display">
-          <div class="filter-item">
-            <label for="reportGroup">Zobrazit podle:</label>
-            <select id="reportGroup">
-              <option value="schools">Škol</option>
-              <option value="trainers">Trenérů</option>
-            </select>
+        <div class="filters-column">
+          <div class="filter-section filter-section-inline filter-control-card">
+            <div class="filters-display">
+              <div class="filter-item">
+                <label for="reportGroup">Zobrazit podle:</label>
+                <select id="reportGroup">
+                  <option value="schools">Fakturace školy</option>
+                  <option value="trainers">Kontrola trenéra</option>
+                </select>
+              </div>
+
+              <div id="schoolFilterWrap" class="filter-item">
+                <label for="schoolFilter">Škola:</label>
+                <select id="schoolFilter"></select>
+              </div>
+
+              <div id="trainerFilterWrap" class="filter-item">
+                <label for="trainerFilter">Trenér:</label>
+                <select id="trainerFilter"></select>
+              </div>
+            </div>
           </div>
+        </div>
 
-          <div id="schoolFilterWrap" class="filter-item">
-            <label for="schoolFilter">Škola:</label>
-            <select id="schoolFilter"></select>
+        <div class="filters-control-summary">
+          <div class="filter-summary-card">
+            <div class="filter-summary-label">Součet škol</div>
+            <div id="summarySchoolHours" class="filter-summary-value">0</div>
           </div>
-
-          <div id="trainerFilterWrap" class="filter-item">
-            <label for="trainerFilter">Trenér:</label>
-            <select id="trainerFilter"></select>
+          <div class="filter-summary-card">
+            <div class="filter-summary-label">Součet trenérů</div>
+            <div id="summaryTrainerHours" class="filter-summary-value">0</div>
+          </div>
+          <div class="filter-summary-card">
+            <div class="filter-summary-label">Kontrola součtů</div>
+            <div id="summaryHoursCheck" class="filter-summary-value">-</div>
           </div>
         </div>
       </div>
     </div>
 
-    <div id="reportSummaryTitle" class="section-title">SEZNAM</div>
-    <div class="report-summary">
-      <div class="summary-card">
-        <div class="summary-label">Období</div>
-        <div id="summaryPeriod" class="summary-value">-</div>
+    <div id="reportSummaryTitle" class="report-focus-panel">
+      <div class="report-focus-tile">
+        <div class="report-focus-tile-label">Období</div>
+        <div id="summaryPeriod" class="report-focus-tile-value">-</div>
       </div>
-      <div class="summary-card">
-        <div class="summary-label">Zobrazení</div>
-        <div id="summaryMode" class="summary-value">-</div>
+      <div class="report-focus-main">
+        <div id="reportFocusMode" class="report-focus-mode">Výkaz</div>
+        <div id="reportArchiveBadge" class="report-archive-badge" hidden>Archiv</div>
+        <div id="reportFocusSubject" class="report-focus-subject">Vyber výkaz</div>
       </div>
-      <div class="summary-card">
-        <div class="summary-label">Celkem hodin</div>
-        <div id="summaryHours" class="summary-value">0</div>
-      </div>
-      <div class="summary-card">
-        <div class="summary-label">Počet záznamů</div>
-        <div id="summaryRecords" class="summary-value">0</div>
+      <div class="report-focus-tile">
+        <div class="report-focus-tile-label">Celkem hodin</div>
+        <div id="reportFocusHours" class="report-focus-tile-value">0</div>
       </div>
     </div>
+    <div id="reportStatusMessage" class="status-message" hidden></div>
     <div class="actions-box">
       <div class="actions-label">Akce</div>
       <button id="exportExcelButton" class="action-button" type="button">Export Excel</button>
       <button id="exportPdfButton" class="action-button" type="button">Export PDF</button>
-      <select id="emailFormatSelect">
-        <option value="excel">E-mail: Excel</option>
-        <option value="pdf">E-mail: PDF</option>
-      </select>
       <button id="emailReportButton" class="action-button" type="button">Poslat e-mailem</button>
       <button id="archiveReportButton" class="action-button action-button-primary" type="button">Uložit do archivu</button>
+      <button id="openArchiveButton" class="action-button" type="button">Archiv</button>
     </div>
     <div class="table-wrap">
       <table>
@@ -434,6 +821,25 @@
     </div>
 
   </div>
+  <div id="reportArchiveModal" class="archive-modal" hidden>
+    <div class="archive-dialog" role="dialog" aria-modal="true" aria-labelledby="reportArchiveTitle">
+      <div class="archive-header">
+        <h2 id="reportArchiveTitle" class="archive-title">Archiv výkazů</h2>
+        <button id="closeArchiveButton" class="archive-close" type="button" aria-label="Zavřít archiv">×</button>
+      </div>
+      <div class="archive-columns">
+        <section class="archive-column" aria-labelledby="schoolArchiveTitle">
+          <h3 id="schoolArchiveTitle" class="archive-column-title">Školy</h3>
+          <div id="schoolArchiveList" class="archive-list"></div>
+        </section>
+        <section class="archive-column" aria-labelledby="trainerArchiveTitle">
+          <h3 id="trainerArchiveTitle" class="archive-column-title">Trenéři</h3>
+          <div id="trainerArchiveList" class="archive-list"></div>
+        </section>
+      </div>
+    </div>
+  </div>
+  <div id="printReport" class="print-report"></div>
 
   <script>
     (function(){
@@ -445,17 +851,29 @@
       const schoolFilter = document.getElementById("schoolFilter");
       const trainerFilter = document.getElementById("trainerFilter");
       const reportSummaryTitle = document.getElementById("reportSummaryTitle");
+      const reportFocusMode = document.getElementById("reportFocusMode");
+      const reportArchiveBadge = document.getElementById("reportArchiveBadge");
+      const reportFocusSubject = document.getElementById("reportFocusSubject");
+      const reportFocusHours = document.getElementById("reportFocusHours");
+      const reportStatusMessage = document.getElementById("reportStatusMessage");
       const summaryPeriod = document.getElementById("summaryPeriod");
-      const summaryMode = document.getElementById("summaryMode");
-      const summaryHours = document.getElementById("summaryHours");
-      const summaryRecords = document.getElementById("summaryRecords");
+      const summarySchoolHours = document.getElementById("summarySchoolHours");
+      const summaryTrainerHours = document.getElementById("summaryTrainerHours");
+      const summaryHoursCheck = document.getElementById("summaryHoursCheck");
       const reportBody = document.getElementById("reportBody");
+      const printReport = document.getElementById("printReport");
       const exportExcelButton = document.getElementById("exportExcelButton");
       const exportPdfButton = document.getElementById("exportPdfButton");
-      const emailFormatSelect = document.getElementById("emailFormatSelect");
       const emailReportButton = document.getElementById("emailReportButton");
       const archiveReportButton = document.getElementById("archiveReportButton");
-      if(!yearSelect || !monthSelect || !reportGroupSelect || !schoolFilterWrap || !trainerFilterWrap || !schoolFilter || !trainerFilter || !reportSummaryTitle || !summaryPeriod || !summaryMode || !summaryHours || !summaryRecords || !reportBody || !exportExcelButton || !exportPdfButton || !emailFormatSelect || !emailReportButton || !archiveReportButton) return;
+      const openArchiveButton = document.getElementById("openArchiveButton");
+      const reportArchiveModal = document.getElementById("reportArchiveModal");
+      const closeArchiveButton = document.getElementById("closeArchiveButton");
+      const schoolArchiveList = document.getElementById("schoolArchiveList");
+      const trainerArchiveList = document.getElementById("trainerArchiveList");
+      if(!yearSelect || !monthSelect || !reportGroupSelect || !schoolFilterWrap || !trainerFilterWrap || !schoolFilter || !trainerFilter || !reportSummaryTitle || !reportFocusMode || !reportArchiveBadge || !reportFocusSubject || !reportFocusHours || !reportStatusMessage || !summaryPeriod || !summarySchoolHours || !summaryTrainerHours || !summaryHoursCheck || !reportBody || !printReport || !exportExcelButton || !exportPdfButton || !emailReportButton || !archiveReportButton || !openArchiveButton || !reportArchiveModal || !closeArchiveButton || !schoolArchiveList || !trainerArchiveList) return;
+
+      let loadedArchiveContext = null;
 
       const now = new Date();
       const currentYear = now.getFullYear();
@@ -543,13 +961,18 @@
         return value && typeof value === "object" ? value.trainerId : value;
       }
 
+      function getStoredSchoolId(value){
+        if(!value || typeof value !== "object") return "";
+        return String(value.schoolId ?? value.school?.id ?? value.school?.schoolId ?? "");
+      }
+
       function normalizePlanEntry(key, value){
         const parsed = parseKey(key);
         const isObjectValue = !!value && typeof value === "object";
 
         return {
           trainerId: getStoredTrainerId(value),
-          schoolId: isObjectValue ? String(value.schoolId ?? "") : "",
+          schoolId: isObjectValue ? getStoredSchoolId(value) : "",
           date: isObjectValue ? value.date || parsed.date : parsed.date,
           year: isObjectValue ? value.year || parsed.year || "" : parsed.year || "",
           className: isObjectValue ? value.className || parsed.cls : parsed.cls,
@@ -557,19 +980,20 @@
         };
       }
 
-      function normalizeRealityEntry(key, value){
+      function normalizeRealityEntry(key, value, planEntry = null){
         const parsed = parseKey(key);
         const isObjectValue = !!value && typeof value === "object";
+        const schoolId = isObjectValue ? getStoredSchoolId(value) : "";
 
         return {
           trainerId: getStoredTrainerId(value),
-          schoolId: isObjectValue ? String(value.schoolId ?? "") : "",
-          date: isObjectValue ? value.date || parsed.date : parsed.date,
-          year: isObjectValue ? value.year || parsed.year || "" : parsed.year || "",
-          className: isObjectValue ? value.className || parsed.cls : parsed.cls,
+          schoolId: schoolId || planEntry?.schoolId || "",
+          date: isObjectValue ? value.date || parsed.date || planEntry?.date : parsed.date || planEntry?.date,
+          year: isObjectValue ? value.year || parsed.year || planEntry?.year || "" : parsed.year || planEntry?.year || "",
+          className: isObjectValue ? value.className || parsed.cls || planEntry?.className : parsed.cls || planEntry?.className,
           hour: isObjectValue
-            ? Number(value.hour ?? parsed.hour)
-            : Number(parsed.hour)
+            ? Number(value.hour ?? parsed.hour ?? planEntry?.hour)
+            : Number(parsed.hour ?? planEntry?.hour)
         };
       }
 
@@ -586,14 +1010,53 @@
         return item.mesto || item.city || "-";
       }
 
-      function getMonthEntries(){
+      function aggregateEntriesByHours(entries){
+        const groups = new Map();
+
+        entries.forEach(entry => {
+          const key = [
+            entry.date || "",
+            entry.schoolId || "",
+            entry.trainerId || "",
+            entry.year || "",
+            entry.className || ""
+          ].join("|");
+
+          if(!groups.has(key)){
+            groups.set(key, {
+              ...entry,
+              taughtHourNumbers: new Set()
+            });
+          }
+
+          const group = groups.get(key);
+          if(Number.isFinite(Number(entry.hour))){
+            group.taughtHourNumbers.add(Number(entry.hour));
+          }
+        });
+
+        return Array.from(groups.values()).map(entry => {
+          const taughtHours = entry.taughtHourNumbers.size || 1;
+          const taughtHourNumbers = Array.from(entry.taughtHourNumbers).sort((a, b) => a - b);
+          const { taughtHourNumbers: _set, ...cleanEntry } = entry;
+
+          return {
+            ...cleanEntry,
+            taughtHours,
+            taughtHourNumbers
+          };
+        });
+      }
+
+      function getMonthEntriesBase(){
         const year = Number(yearSelect.value);
         const month = Number(monthSelect.value);
-        const selectedSchoolId = schoolFilter.value;
-        const selectedTrainerId = trainerFilter.value;
+        const plansByKey = Object.fromEntries(
+          Object.entries(loadPlans()).map(([key, value]) => [key, normalizePlanEntry(key, value)])
+        );
 
         return Object.entries(loadReality())
-          .map(([key, value]) => normalizeRealityEntry(key, value))
+          .map(([key, value]) => normalizeRealityEntry(key, value, plansByKey[key]))
           .filter(entry => {
             if(!entry.date) return false;
             if(!entry.trainerId || entry.trainerId === "X") return false;
@@ -602,8 +1065,6 @@
             if(Number.isNaN(date.getTime())) return false;
             if(date.getFullYear() !== year) return false;
             if(date.getMonth() + 1 !== month) return false;
-            if(selectedSchoolId && String(entry.schoolId) !== String(selectedSchoolId)) return false;
-            if(selectedTrainerId && String(entry.trainerId) !== String(selectedTrainerId)) return false;
 
             return true;
           })
@@ -617,14 +1078,52 @@
               trainerName: getTrainerLabel(trainer),
               place: getSchoolPlace(school)
             };
-          })
+          });
+      }
+
+      function sumGroupedHours(entries, groupFields){
+        const grouped = aggregateEntriesByHours(entries.map(entry => ({
+          ...entry,
+          schoolId: groupFields.includes("schoolId") ? entry.schoolId : "",
+          trainerId: groupFields.includes("trainerId") ? entry.trainerId : "",
+          year: groupFields.includes("year") ? entry.year : "",
+          className: groupFields.includes("className") ? entry.className : ""
+        })));
+
+        return grouped.reduce((sum, entry) => sum + Number(entry.taughtHours || 0), 0);
+      }
+
+      function getMonthControlTotals(){
+        const entries = getMonthEntriesBase();
+
+        return {
+          schoolHours: sumGroupedHours(entries, ["schoolId", "trainerId", "year", "className"]),
+          trainerHours: sumGroupedHours(entries, ["trainerId", "schoolId", "year", "className"])
+        };
+      }
+
+      function getMonthEntries(){
+        const reportMode = reportGroupSelect.value;
+        const selectedSchoolId = schoolFilter.value;
+        const selectedTrainerId = trainerFilter.value;
+
+        if(reportMode === "schools" && !selectedSchoolId) return [];
+        if(reportMode === "trainers" && !selectedTrainerId) return [];
+
+        const entries = getMonthEntriesBase()
+          .filter(entry => {
+            if(reportMode === "schools") return String(entry.schoolId) === String(selectedSchoolId);
+            return String(entry.trainerId) === String(selectedTrainerId);
+          });
+
+        return aggregateEntriesByHours(entries)
           .sort((a, b) => {
             if(reportGroupSelect.value === "schools"){
-              const schoolCompare = String(a.schoolName).localeCompare(String(b.schoolName), "cs");
-              if(schoolCompare !== 0) return schoolCompare;
-            } else {
               const trainerCompare = String(a.trainerName).localeCompare(String(b.trainerName), "cs");
               if(trainerCompare !== 0) return trainerCompare;
+            } else {
+              const schoolCompare = String(a.schoolName).localeCompare(String(b.schoolName), "cs");
+              if(schoolCompare !== 0) return schoolCompare;
             }
 
             if(a.date !== b.date) return String(a.date).localeCompare(String(b.date));
@@ -638,7 +1137,7 @@
 
         const defaultOption = document.createElement("option");
         defaultOption.value = "";
-        defaultOption.textContent = "Všechny školy";
+        defaultOption.textContent = "Vyber školu";
         schoolFilter.appendChild(defaultOption);
 
         schools.forEach(item => {
@@ -655,7 +1154,7 @@
 
         const defaultOption = document.createElement("option");
         defaultOption.value = "";
-        defaultOption.textContent = "Všichni trenéři";
+        defaultOption.textContent = "Vyber trenéra";
         trainerFilter.appendChild(defaultOption);
 
         trainers.forEach(item => {
@@ -667,8 +1166,22 @@
       }
 
       function updateSpecificFiltersVisibility(){
-        schoolFilterWrap.style.display = "";
-        trainerFilterWrap.style.display = "";
+        const invoiceMode = reportGroupSelect.value === "schools";
+        schoolFilterWrap.style.display = invoiceMode ? "" : "none";
+        trainerFilterWrap.style.display = invoiceMode ? "none" : "";
+      }
+
+      function handleReportModeChange(){
+        loadedArchiveContext = null;
+        if(reportGroupSelect.value === "schools"){
+          trainerFilter.value = "";
+        } else {
+          schoolFilter.value = "";
+        }
+        updateSpecificFiltersVisibility();
+        updateReportSummaryTitle();
+        updateReportSummaryCards();
+        renderReportTable();
       }
 
       function getSelectedOptionText(select){
@@ -687,17 +1200,319 @@
           .trim() || fallback || "value";
       }
 
+      function escapeHtml(value){
+        return String(value ?? "-")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;");
+      }
+
+      function getExportPeriodText(){
+        const romanMonths = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"];
+        const monthIndex = Math.max(0, Number(monthSelect.value || 1) - 1);
+        const yearShort = String(yearSelect.value || "").slice(-2);
+        return `${romanMonths[monthIndex] || monthSelect.value}.${yearShort}`;
+      }
+
+      function getReportExportRows(context){
+        return [
+          ["Období", getExportPeriodText()],
+          ["Zobrazení", context.exportModeText],
+          ["Filtr", context.exportFilterText],
+          ["Celkem hodin", context.totalHours],
+          ["Počet trenérů", context.totalTrainers],
+          ["Počet záznamů", context.totalRecords],
+          [],
+          ["Datum", "Škola", "Místo", "Trenér", "Ročník", "Třída", "Hodiny"],
+          ...context.entries.map(entry => [
+            entry.date ? new Date(entry.date).toLocaleDateString("cs-CZ") : "-",
+            entry.schoolName || "-",
+            entry.place || "-",
+            entry.trainerName || "-",
+            entry.year || "-",
+            entry.className || "-",
+            `${entry.taughtHours || "-"} hod`
+          ])
+        ];
+      }
+
+      function buildReportExportTable(context){
+        const rows = getReportExportRows(context);
+        const colWidths = [92, 170, 130, 170, 74, 74, 84];
+
+        return `
+          <table class="report-export-table">
+            <colgroup>
+              ${colWidths.map(width => `<col style="width:${width}px">`).join("")}
+            </colgroup>
+            <tbody>
+              ${rows.map((row, index) => {
+                if(!row.length){
+                  return `<tr class="report-export-spacer"><td colspan="7"></td></tr>`;
+                }
+
+                const tag = index === 7 ? "th" : "td";
+                return `<tr>${row.map((cell, cellIndex) => {
+                  const numericClass = typeof cell === "number" || (index > 7 && cellIndex === 4)
+                    ? " class=\"report-export-number\""
+                    : "";
+                  return `<${tag}${numericClass}>${escapeHtml(cell)}</${tag}>`;
+                }).join("")}</tr>`;
+              }).join("")}
+            </tbody>
+          </table>
+        `;
+      }
+
+      function buildExcelDocument(context){
+        return buildXlsxBlob(context);
+      }
+
+      function escapeXml(value){
+        return String(value ?? "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&apos;");
+      }
+
+      function columnName(index){
+        let name = "";
+        let value = index + 1;
+        while(value > 0){
+          const remainder = (value - 1) % 26;
+          name = String.fromCharCode(65 + remainder) + name;
+          value = Math.floor((value - 1) / 26);
+        }
+        return name;
+      }
+
+      function buildSheetXml(context){
+        const rows = getReportExportRows(context);
+        const widths = [12, 28, 18, 28, 10, 10, 12];
+        const sheetRows = rows.map((row, rowIndex) => {
+          const rowNumber = rowIndex + 1;
+          if(!row.length) return `<row r="${rowNumber}" ht="18"></row>`;
+
+          const cells = row.map((cell, cellIndex) => {
+            const ref = `${columnName(cellIndex)}${rowNumber}`;
+            const isNumber = typeof cell === "number";
+            const style = rowIndex === 7 ? 1 : 0;
+            if(isNumber){
+              return `<c r="${ref}" s="${style}"><v>${cell}</v></c>`;
+            }
+            return `<c r="${ref}" s="${style}" t="inlineStr"><is><t>${escapeXml(cell)}</t></is></c>`;
+          }).join("");
+          return `<row r="${rowNumber}">${cells}</row>`;
+        }).join("");
+
+        return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+  <cols>${widths.map((width, index) => `<col min="${index + 1}" max="${index + 1}" width="${width}" customWidth="1"/>`).join("")}</cols>
+  <sheetData>${sheetRows}</sheetData>
+</worksheet>`;
+      }
+
+      function makeCrcTable(){
+        const table = new Uint32Array(256);
+        for(let i = 0; i < 256; i++){
+          let c = i;
+          for(let k = 0; k < 8; k++){
+            c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1;
+          }
+          table[i] = c >>> 0;
+        }
+        return table;
+      }
+
+      const crcTable = makeCrcTable();
+
+      function crc32(bytes){
+        let crc = 0xFFFFFFFF;
+        for(let i = 0; i < bytes.length; i++){
+          crc = crcTable[(crc ^ bytes[i]) & 0xFF] ^ (crc >>> 8);
+        }
+        return (crc ^ 0xFFFFFFFF) >>> 0;
+      }
+
+      function writeUint16(buffer, offset, value){
+        buffer[offset] = value & 0xFF;
+        buffer[offset + 1] = (value >>> 8) & 0xFF;
+      }
+
+      function writeUint32(buffer, offset, value){
+        buffer[offset] = value & 0xFF;
+        buffer[offset + 1] = (value >>> 8) & 0xFF;
+        buffer[offset + 2] = (value >>> 16) & 0xFF;
+        buffer[offset + 3] = (value >>> 24) & 0xFF;
+      }
+
+      function concatBytes(parts){
+        const total = parts.reduce((sum, part) => sum + part.length, 0);
+        const output = new Uint8Array(total);
+        let offset = 0;
+        parts.forEach(part => {
+          output.set(part, offset);
+          offset += part.length;
+        });
+        return output;
+      }
+
+      function createZip(entries){
+        const encoder = new TextEncoder();
+        const localParts = [];
+        const centralParts = [];
+        let offset = 0;
+
+        entries.forEach(entry => {
+          const nameBytes = encoder.encode(entry.name);
+          const dataBytes = encoder.encode(entry.content);
+          const crc = crc32(dataBytes);
+
+          const local = new Uint8Array(30 + nameBytes.length);
+          writeUint32(local, 0, 0x04034b50);
+          writeUint16(local, 4, 20);
+          writeUint16(local, 6, 0x0800);
+          writeUint16(local, 8, 0);
+          writeUint16(local, 10, 0);
+          writeUint16(local, 12, 0);
+          writeUint32(local, 14, crc);
+          writeUint32(local, 18, dataBytes.length);
+          writeUint32(local, 22, dataBytes.length);
+          writeUint16(local, 26, nameBytes.length);
+          writeUint16(local, 28, 0);
+          local.set(nameBytes, 30);
+          localParts.push(local, dataBytes);
+
+          const central = new Uint8Array(46 + nameBytes.length);
+          writeUint32(central, 0, 0x02014b50);
+          writeUint16(central, 4, 20);
+          writeUint16(central, 6, 20);
+          writeUint16(central, 8, 0x0800);
+          writeUint16(central, 10, 0);
+          writeUint16(central, 12, 0);
+          writeUint16(central, 14, 0);
+          writeUint32(central, 16, crc);
+          writeUint32(central, 20, dataBytes.length);
+          writeUint32(central, 24, dataBytes.length);
+          writeUint16(central, 28, nameBytes.length);
+          writeUint16(central, 30, 0);
+          writeUint16(central, 32, 0);
+          writeUint16(central, 34, 0);
+          writeUint16(central, 36, 0);
+          writeUint32(central, 38, 0);
+          writeUint32(central, 42, offset);
+          central.set(nameBytes, 46);
+          centralParts.push(central);
+
+          offset += local.length + dataBytes.length;
+        });
+
+        const centralDirectory = concatBytes(centralParts);
+        const end = new Uint8Array(22);
+        writeUint32(end, 0, 0x06054b50);
+        writeUint16(end, 8, entries.length);
+        writeUint16(end, 10, entries.length);
+        writeUint32(end, 12, centralDirectory.length);
+        writeUint32(end, 16, offset);
+        writeUint16(end, 20, 0);
+
+        return concatBytes([...localParts, centralDirectory, end]);
+      }
+
+      function buildXlsxBlob(context){
+        const entries = [
+          {
+            name: "[Content_Types].xml",
+            content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml" ContentType="application/xml"/>
+  <Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>
+  <Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>
+  <Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>
+</Types>`
+          },
+          {
+            name: "_rels/.rels",
+            content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>
+</Relationships>`
+          },
+          {
+            name: "xl/workbook.xml",
+            content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+  <sheets><sheet name="Výkaz" sheetId="1" r:id="rId1"/></sheets>
+</workbook>`
+          },
+          {
+            name: "xl/_rels/workbook.xml.rels",
+            content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>
+  <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
+</Relationships>`
+          },
+          {
+            name: "xl/styles.xml",
+            content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+  <fonts count="2"><font><sz val="11"/><name val="Arial"/></font><font><b/><sz val="11"/><name val="Arial"/></font></fonts>
+  <fills count="1"><fill><patternFill patternType="none"/></fill></fills>
+  <borders count="1"><border><left style="thin"/><right style="thin"/><top style="thin"/><bottom style="thin"/><diagonal/></border></borders>
+  <cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>
+  <cellXfs count="2"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0"/></cellXfs>
+</styleSheet>`
+          },
+          {
+            name: "xl/worksheets/sheet1.xml",
+            content: buildSheetXml(context)
+          }
+        ];
+
+        return new Blob([createZip(entries)], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+      }
+
+      function getFreshReportContext(){
+        updateSpecificFiltersVisibility();
+        updateReportSummaryTitle();
+        updateReportSummaryCards();
+        renderReportTable();
+        return getReportContext();
+      }
+
+      function showStatusMessage(message, type = "live"){
+        reportStatusMessage.textContent = message;
+        reportStatusMessage.className = `status-message is-${type}`;
+        reportStatusMessage.hidden = false;
+      }
+
+      function clearStatusMessage(){
+        reportStatusMessage.hidden = true;
+        reportStatusMessage.textContent = "";
+        reportStatusMessage.className = "status-message";
+      }
+
       function getReportContext(){
+        if(loadedArchiveContext) return loadedArchiveContext;
+
         const entries = getMonthEntries();
         const group = reportGroupSelect.value;
         const monthText = getSelectedOptionText(monthSelect);
         const yearText = getSelectedOptionText(yearSelect);
-        const schoolText = getSelectedOptionText(schoolFilter) || "Všechny školy";
-        const trainerText = getSelectedOptionText(trainerFilter) || "Všichni trenéři";
-        const totalHours = entries.length;
+        const schoolText = schoolFilter.value ? getSelectedOptionText(schoolFilter) : "Vyber školu";
+        const trainerText = trainerFilter.value ? getSelectedOptionText(trainerFilter) : "Vyber trenéra";
+        const totalHours = entries.reduce((sum, entry) => sum + Number(entry.taughtHours || 0), 0);
         const totalRecords = entries.length;
         const totalTrainers = new Set(entries.map(entry => String(entry.trainerId || ""))).size;
         const totalSchools = new Set(entries.map(entry => String(entry.schoolId || ""))).size;
+        const controlTotals = getMonthControlTotals();
+        const totalsMatch = controlTotals.schoolHours === controlTotals.trainerHours;
 
         return {
           entries,
@@ -708,15 +1523,26 @@
           totalRecords,
           totalTrainers,
           totalSchools,
+          schoolHoursTotal: controlTotals.schoolHours,
+          trainerHoursTotal: controlTotals.trainerHours,
+          totalsMatch,
+          yearValue: yearSelect.value,
+          monthValue: monthSelect.value,
           periodText: `${monthText} ${yearText}`.trim(),
+          modeText: group === "schools" ? "Fakturace školy" : "Kontrola trenéra",
+          subjectText: group === "schools" ? schoolText : trainerText,
+          exportModeText: group === "schools" ? "Podle škol" : "Podle trenérů",
+          exportFilterText: group === "schools"
+            ? `Škola: ${schoolText} | Trenéři: Všichni trenéři`
+            : `Trenér: ${trainerText} | Školy: Všechny školy`,
           titleText: group === "schools"
-            ? `Škola: ${schoolText} | Trenéři: ${trainerText}`
-            : `Trenér: ${trainerText} | Školy: ${schoolText}`
+            ? `Fakturace školy: ${schoolText} | Trenéři: všichni, kteří učili`
+            : `Kontrola trenéra: ${trainerText} | Školy: všechny, kde učil`
         };
       }
 
       function saveReportArchive(format){
-        const context = getReportContext();
+        const context = getFreshReportContext();
         const archive = (() => {
           try{
             return JSON.parse(localStorage.getItem("reportsArchive") || "[]");
@@ -729,6 +1555,8 @@
           createdAt: new Date().toISOString(),
           format,
           period: context.periodText,
+          yearValue: context.yearValue,
+          monthValue: context.monthValue,
           group: context.group,
           schoolFilter: schoolFilter.value || "",
           schoolLabel: context.schoolText,
@@ -736,44 +1564,200 @@
           trainerLabel: context.trainerText,
           records: context.totalRecords,
           hours: context.totalHours,
-          trainers: context.totalTrainers
+          schoolHoursTotal: context.schoolHoursTotal,
+          trainerHoursTotal: context.trainerHoursTotal,
+          totalsMatch: context.totalsMatch,
+          trainers: context.totalTrainers,
+          totalSchools: context.totalSchools,
+          entries: context.entries,
+          modeText: context.modeText,
+          subjectText: context.subjectText,
+          exportModeText: context.exportModeText,
+          exportFilterText: context.exportFilterText,
+          titleText: context.titleText
         });
 
         localStorage.setItem("reportsArchive", JSON.stringify(archive.slice(0, 100)));
       }
 
-      function exportReportCsv(options = {}){
-        const context = getReportContext();
-        const shouldArchive = options.archive !== false;
-        const rows = [
-          `"Období";"${sanitizeCsvValue(context.periodText)}"`,
-          `"Zobrazení";"${sanitizeCsvValue(context.group === "schools" ? "Podle škol" : "Podle trenérů")}"`,
-          `"Filtr";"${sanitizeCsvValue(context.titleText)}"`,
-          `"Celkem hodin";"${sanitizeCsvValue(context.totalHours)}"`,
-          `"Počet trenérů";"${sanitizeCsvValue(context.totalTrainers)}"`,
-          `"Počet záznamů";"${sanitizeCsvValue(context.totalRecords)}"`,
-          "",
-          "Datum;Škola;Místo;Trenér;Ročník;Třída;Hodiny",
-          ...context.entries.map(entry => {
-            const values = [
-              entry.date || "-",
-              entry.schoolName || "-",
-              entry.place || "-",
-              entry.trainerName || "-",
-              entry.year || "-",
-              entry.className || "-",
-              `${entry.hour || "-"} hod`
-            ];
+      function loadReportArchive(){
+        try{
+          return JSON.parse(localStorage.getItem("reportsArchive") || "[]");
+        }catch(e){
+          return [];
+        }
+      }
 
-            return values.map(value => `"${sanitizeCsvValue(value)}"`).join(";");
-          })
-        ];
+      function buildArchiveContext(item){
+        const group = item.group || "schools";
+        const entries = Array.isArray(item.entries) ? item.entries : [];
+        const schoolText = item.schoolLabel || "Vyber školu";
+        const trainerText = item.trainerLabel || "Vyber trenéra";
+        const totalHours = Number(item.hours || 0);
+        const totalRecords = Number(item.records || entries.length || 0);
+        const totalTrainers = Number(item.trainers || new Set(entries.map(entry => String(entry.trainerId || ""))).size || 0);
+        const totalSchools = Number(item.totalSchools || new Set(entries.map(entry => String(entry.schoolId || ""))).size || 0);
+        const schoolHoursTotal = Number(item.schoolHoursTotal || totalHours || 0);
+        const trainerHoursTotal = Number(item.trainerHoursTotal || totalHours || 0);
+        const totalsMatch = Boolean(item.totalsMatch ?? (schoolHoursTotal === trainerHoursTotal));
 
-        const csvContent = "\uFEFF" + rows.join("\r\n");
-        const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+        return {
+          entries,
+          group,
+          schoolText,
+          trainerText,
+          totalHours,
+          totalRecords,
+          totalTrainers,
+          totalSchools,
+          schoolHoursTotal,
+          trainerHoursTotal,
+          totalsMatch,
+          yearValue: item.yearValue || yearSelect.value,
+          monthValue: item.monthValue || monthSelect.value,
+          periodText: item.period || "",
+          modeText: item.modeText || (group === "schools" ? "Fakturace školy" : "Kontrola trenéra"),
+          subjectText: item.subjectText || (group === "schools" ? schoolText : trainerText),
+          exportModeText: item.exportModeText || (group === "schools" ? "Podle škol" : "Podle trenérů"),
+          exportFilterText: item.exportFilterText || (group === "schools"
+            ? `Škola: ${schoolText} | Trenéři: Všichni trenéři`
+            : `Trenér: ${trainerText} | Školy: Všechny školy`),
+          titleText: item.titleText || (group === "schools"
+            ? `Fakturace školy: ${schoolText} | Trenéři: všichni, kteří učili`
+            : `Kontrola trenéra: ${trainerText} | Školy: všechny, kde učil`)
+        };
+      }
+
+      function getArchiveMonthKey(item){
+        if(item.yearValue && item.monthValue){
+          const year = String(item.yearValue).padStart(4, "0");
+          const month = String(item.monthValue).padStart(2, "0");
+          return `${year}-${month}`;
+        }
+
+        const created = item.createdAt ? new Date(item.createdAt) : new Date(0);
+        return `${created.getFullYear()}-${String(created.getMonth() + 1).padStart(2, "0")}`;
+      }
+
+      function getArchiveMonthLabel(key){
+        const [year, month] = key.split("-").map(Number);
+        if(!year || !month) return "Neznámé období";
+        return new Date(year, month - 1, 1).toLocaleDateString("cs-CZ", {
+          month: "long",
+          year: "numeric"
+        });
+      }
+
+      function renderArchiveList(){
+        const archive = loadReportArchive().map((item, index) => ({ item, index }));
+        renderArchiveColumn(schoolArchiveList, archive, "schools", "Školy");
+        renderArchiveColumn(trainerArchiveList, archive, "trainers", "Trenéři");
+      }
+
+      function renderArchiveColumn(target, archive, group, label){
+        const groupArchive = archive.filter(({ item }) => (item.group || "schools") === group);
+
+        if(!groupArchive.length){
+          target.innerHTML = `<div class="archive-empty">V sekci ${label} zatím není uložený žádný výkaz.</div>`;
+          return;
+        }
+
+        const groups = new Map();
+        groupArchive.forEach(({ item, index }) => {
+          const key = getArchiveMonthKey(item);
+          if(!groups.has(key)) groups.set(key, []);
+          groups.get(key).push({ item, index });
+        });
+
+        const monthSections = Array.from(groups.entries())
+          .sort(([a], [b]) => b.localeCompare(a))
+          .map(([monthKey, items]) => {
+            const section = document.createElement("section");
+            section.className = "archive-month-group";
+
+            const heading = document.createElement("button");
+            heading.type = "button";
+            heading.className = "archive-month-title";
+            heading.textContent = getArchiveMonthLabel(monthKey);
+
+            const list = document.createElement("div");
+            list.className = "archive-month-items";
+            list.replaceChildren(...items.map(({ item, index }) => {
+              const context = buildArchiveContext(item);
+              const row = document.createElement("div");
+              row.className = "archive-item";
+
+              const main = document.createElement("div");
+              const title = document.createElement("div");
+              title.className = "archive-item-title";
+              title.textContent = context.subjectText;
+
+              const meta = document.createElement("div");
+              meta.className = "archive-item-meta";
+              const savedAt = item.createdAt ? new Date(item.createdAt).toLocaleString("cs-CZ") : "-";
+              meta.textContent = `${context.totalHours} hod | ${context.totalRecords} záznamů | uloženo ${savedAt}`;
+              main.append(title, meta);
+
+              const loadButton = document.createElement("button");
+              loadButton.type = "button";
+              loadButton.className = "action-button";
+              loadButton.textContent = "Načíst";
+              loadButton.addEventListener("click", () => loadArchivedReport(index));
+
+              row.append(main, loadButton);
+              return row;
+            }));
+
+            heading.addEventListener("click", () => {
+              section.classList.toggle("is-open");
+            });
+            section.append(heading, list);
+            return section;
+          });
+
+        target.replaceChildren(...monthSections);
+      }
+
+      function openArchive(){
+        renderArchiveList();
+        reportArchiveModal.hidden = false;
+      }
+
+      function closeArchive(){
+        reportArchiveModal.hidden = true;
+      }
+
+      function loadArchivedReport(index){
+        const item = loadReportArchive()[index];
+        if(!item) return;
+
+        if(item.yearValue) yearSelect.value = item.yearValue;
+        if(item.monthValue) monthSelect.value = item.monthValue;
+        reportGroupSelect.value = item.group || "schools";
+        updateSpecificFiltersVisibility();
+
+        if(item.schoolFilter) schoolFilter.value = item.schoolFilter;
+        if(item.trainerFilter) trainerFilter.value = item.trainerFilter;
+
+        loadedArchiveContext = Array.isArray(item.entries) && item.entries.length
+          ? buildArchiveContext(item)
+          : null;
+
+        updateReportSummaryTitle();
+        updateReportSummaryCards();
+        renderReportTable();
+        showStatusMessage(`Archivní výkaz načten: ${loadedArchiveContext?.modeText || "Výkaz"} - ${loadedArchiveContext?.subjectText || ""} (${loadedArchiveContext?.periodText || "-"})`, "archive");
+        closeArchive();
+      }
+
+      function exportReportExcel(options = {}){
+        const context = getFreshReportContext();
+        const shouldArchive = options?.archive !== false;
+        const blob = buildExcelDocument(context);
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
-        const fileName = `vykaz-${sanitizeFileNamePart(context.group, "report")}-${sanitizeFileNamePart(yearSelect.value, "year")}-${sanitizeFileNamePart(monthSelect.value, "month")}.csv`;
+        const subjectFilePart = context.group === "schools" ? context.schoolText : context.trainerText;
+        const fileName = `vykaz-${sanitizeFileNamePart(context.group, "report")}-${sanitizeFileNamePart(subjectFilePart, "filtr")}-${sanitizeFileNamePart(yearSelect.value, "year")}-${sanitizeFileNamePart(monthSelect.value, "month")}-${Date.now()}.xlsx`;
 
         link.href = url;
         link.download = fileName;
@@ -786,30 +1770,29 @@
       }
 
       function exportReportPdf(options = {}){
-        const shouldArchive = options.archive !== false;
+        const shouldArchive = options?.archive !== false;
+        const context = getFreshReportContext();
+        printReport.innerHTML = buildReportExportTable(context);
         if(shouldArchive) saveReportArchive("pdf");
         window.print();
       }
 
       function emailReport(){
         const context = getReportContext();
-        const format = emailFormatSelect.value === "pdf" ? "PDF" : "Excel";
-        const fileName = format === "Excel"
-          ? exportReportCsv({ archive: true })
-          : `vykaz-${sanitizeFileNamePart(context.group, "report")}-${sanitizeFileNamePart(yearSelect.value, "year")}-${sanitizeFileNamePart(monthSelect.value, "month")}.pdf`;
-
-        if(format === "PDF"){
-          exportReportPdf({ archive: true });
-        }
+        const format = "Excel";
+        const fileName = exportReportExcel({ archive: true });
 
         const subject = `Výkaz ${context.periodText}`;
         const body = [
           `Dobrý den,`,
           ``,
           `posílám výkaz za období ${context.periodText}.`,
-          `Zobrazení: ${context.group === "schools" ? "Podle škol" : "Podle trenérů"}`,
+          `Zobrazení: ${context.group === "schools" ? "Fakturace školy" : "Kontrola trenéra"}`,
           `${context.titleText}`,
           `Celkem hodin: ${context.totalHours}`,
+          `Součet škol: ${context.schoolHoursTotal}`,
+          `Součet trenérů: ${context.trainerHoursTotal}`,
+          `Kontrola součtů: ${context.totalsMatch ? "sedí" : "nesedí"}`,
           `Počet trenérů: ${context.totalTrainers}`,
           `Počet záznamů: ${context.totalRecords}`,
           `Preferovaný formát přílohy: ${format}`,
@@ -823,39 +1806,40 @@
       }
 
       function updateReportSummaryCards(){
-        const group = reportGroupSelect.value;
         const context = getReportContext();
 
         summaryPeriod.textContent = context.periodText;
-        summaryMode.textContent = group === "schools"
-          ? `Podle škol`
-          : `Podle trenérů`;
-        summaryHours.textContent = String(context.totalHours);
-        summaryRecords.textContent = `${context.totalRecords} záznamů / ${context.totalTrainers} trenérů`;
+        summarySchoolHours.textContent = String(context.schoolHoursTotal);
+        summaryTrainerHours.textContent = String(context.trainerHoursTotal);
+        summaryHoursCheck.textContent = context.totalsMatch ? "Sedí" : "Nesedí";
+        summaryHoursCheck.style.color = context.totalsMatch ? "#166534" : "#b91c1c";
       }
 
       function updateReportSummaryTitle(){
-        const group = reportGroupSelect.value;
-        const schoolText = getSelectedOptionText(schoolFilter) || "Všechny školy";
-        const trainerText = getSelectedOptionText(trainerFilter) || "Všichni trenéři";
-
-        if(group === "schools"){
-          reportSummaryTitle.textContent = `Škola: ${schoolText} | Trenéři: ${trainerText}`;
-          return;
-        }
-
-        reportSummaryTitle.textContent = `Trenér: ${trainerText} | Školy: ${schoolText}`;
+        const context = getReportContext();
+        reportFocusMode.textContent = context.modeText;
+        reportArchiveBadge.hidden = !loadedArchiveContext;
+        reportSummaryTitle.classList.toggle("is-archive", Boolean(loadedArchiveContext));
+        reportFocusSubject.textContent = context.subjectText;
+        reportFocusHours.textContent = String(context.totalHours);
       }
 
       function renderReportTable(){
-        const entries = getMonthEntries();
+        const entries = getReportContext().entries;
 
         if(!reportBody) return;
 
         if(!entries.length){
+          const missingSelection = reportGroupSelect.value === "schools"
+            ? !schoolFilter.value
+            : !trainerFilter.value;
+          const message = missingSelection
+            ? (reportGroupSelect.value === "schools" ? "Vyber školu pro fakturaci." : "Vyber trenéra pro kontrolu.")
+            : "Pro zadané období nebyla ve skutečnosti nalezena žádná data.";
+
           reportBody.innerHTML = `
             <tr>
-              <td colspan="7">Pro zadané filtry nebyla nalezena žádná data</td>
+              <td colspan="7">${message}</td>
             </tr>
           `;
           return;
@@ -869,33 +1853,40 @@
             <td class="align-right">${entry.trainerName || "-"}</td>
             <td class="align-center">${entry.year || "-"}</td>
             <td class="align-center">${entry.className || "-"}</td>
-            <td class="align-center">${entry.hour} hod</td>
+            <td class="align-center">${entry.taughtHours} hod</td>
           </tr>
         `).join("");
       }
 
-      reportGroupSelect.addEventListener("change", updateSpecificFiltersVisibility);
-      reportGroupSelect.addEventListener("change", updateReportSummaryTitle);
-      reportGroupSelect.addEventListener("change", updateReportSummaryCards);
-      reportGroupSelect.addEventListener("change", renderReportTable);
-      schoolFilter.addEventListener("change", updateReportSummaryTitle);
-      schoolFilter.addEventListener("change", updateReportSummaryCards);
-      schoolFilter.addEventListener("change", renderReportTable);
-      trainerFilter.addEventListener("change", updateReportSummaryTitle);
-      trainerFilter.addEventListener("change", updateReportSummaryCards);
-      trainerFilter.addEventListener("change", renderReportTable);
-      yearSelect.addEventListener("change", updateReportSummaryTitle);
-      yearSelect.addEventListener("change", updateReportSummaryCards);
-      yearSelect.addEventListener("change", renderReportTable);
-      monthSelect.addEventListener("change", updateReportSummaryTitle);
-      monthSelect.addEventListener("change", updateReportSummaryCards);
-      monthSelect.addEventListener("change", renderReportTable);
-      exportExcelButton.addEventListener("click", exportReportCsv);
-      exportPdfButton.addEventListener("click", exportReportPdf);
+      function refreshCurrentReport(){
+        const wasArchive = Boolean(loadedArchiveContext);
+        loadedArchiveContext = null;
+        if(wasArchive){
+          showStatusMessage("Zobrazení přepnuto zpět na aktuální data ze skutečnosti.", "live");
+        } else {
+          clearStatusMessage();
+        }
+        updateReportSummaryTitle();
+        updateReportSummaryCards();
+        renderReportTable();
+      }
+
+      reportGroupSelect.addEventListener("change", handleReportModeChange);
+      schoolFilter.addEventListener("change", refreshCurrentReport);
+      trainerFilter.addEventListener("change", refreshCurrentReport);
+      yearSelect.addEventListener("change", refreshCurrentReport);
+      monthSelect.addEventListener("change", refreshCurrentReport);
+      exportExcelButton.addEventListener("click", () => exportReportExcel());
+      exportPdfButton.addEventListener("click", () => exportReportPdf());
       emailReportButton.addEventListener("click", emailReport);
       archiveReportButton.addEventListener("click", () => {
         saveReportArchive("archive");
-        alert("Období bylo uloženo do archivu.");
+        showStatusMessage("Výkaz byl uložen do archivu.", "success");
+      });
+      openArchiveButton.addEventListener("click", openArchive);
+      closeArchiveButton.addEventListener("click", closeArchive);
+      reportArchiveModal.addEventListener("click", (event) => {
+        if(event.target === reportArchiveModal) closeArchive();
       });
 
       fillSchoolFilter();

@@ -3,17 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <title>Školníci</title>
+<link rel="stylesheet" href="styles.css">
 
 <style>
-:root {
-  --color-primary: #1bb3c8;
-  --color-primary-dark: #146f80;
-  --color-header: #2c3e55;
-  --color-border: #d4dde6;
-  --color-bg: #eef3f7;
-  --color-text: #24364b;
-  --content-max-width:960px;
-}
 
 body {
   display:flex;
@@ -28,13 +20,30 @@ body > h2 {
   order:1;
   margin:0;
   padding:16px;
-  background:var(--color-header);
+  background:var(--color-header) !important;
   color:#ffffff;
   text-align:center;
   text-transform:uppercase;
-  letter-spacing:0.3px;
+  letter-spacing:1px;
+  font-size:30px;
+  font-weight:900;
+  text-shadow:0 2px 4px rgba(0,0,0,0.35);
+  border-bottom:5px solid var(--color-primary);
+  box-shadow:0 4px 14px rgba(0,0,0,0.18);
   box-sizing:border-box;
   width:100%;
+}
+
+body.manager-mode > h2 {
+  background:#7f1d1d !important;
+  color:#ffffff;
+  border:0;
+  border-bottom:5px solid var(--color-primary);
+  box-shadow:0 4px 14px rgba(0,0,0,0.18);
+  font-size:30px;
+  font-weight:900;
+  letter-spacing:1px;
+  text-shadow:0 2px 4px rgba(0,0,0,0.35);
 }
 
 .caretaker-form-panel {
@@ -166,32 +175,6 @@ body > h2 {
   font-size:14px;
   line-height:1.2;
   width:100%;
-}
-
-.view-option-button {
-  min-height:40px;
-  padding:0 14px;
-  border-radius:8px;
-  border:1px solid #d4dde6;
-  background:#ffffff;
-  color:var(--color-header);
-  font-weight:700;
-  line-height:1;
-  cursor:pointer;
-  transition:background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
-  box-shadow:0 2px 6px rgba(0,0,0,0.18);
-}
-
-.view-option-button:hover {
-  border-color:var(--color-primary);
-  background:#eef6fb;
-}
-
-.view-option-button.is-active {
-  border-width:2px;
-  border-color:var(--color-primary);
-  background:#eef6fb;
-  box-shadow:0 2px 6px rgba(0,0,0,0.12);
 }
 
 #newCaretakerButton {
@@ -352,6 +335,84 @@ tr.active:hover {
   padding:4px 0;
 }
 
+.manager-group-row td {
+  padding:10px 12px;
+  background:var(--color-header);
+  color:#ffffff;
+  font-size:14px;
+  font-weight:800;
+  text-transform:uppercase;
+}
+
+.manager-school-title {
+  color:var(--color-header);
+  font-weight:800;
+}
+
+.manager-school-meta {
+  margin-top:2px;
+  color:#5b6b7c;
+  font-size:12px;
+}
+
+.manager-assignment-row {
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+.manager-assignment-row select {
+  width:240px;
+  max-width:100%;
+}
+
+.manager-mode-info {
+  order:3;
+  width:100%;
+  max-width:var(--content-max-width);
+  margin:16px auto 0;
+  padding:14px 16px;
+  border:2px solid #7f1d1d;
+  border-radius:10px;
+  background:#fff7ed;
+  color:#451a03;
+  box-sizing:border-box;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  flex-wrap:wrap;
+}
+
+.manager-mode-info[hidden] {
+  display:none;
+}
+
+.manager-mode-info strong {
+  display:block;
+  margin-bottom:3px;
+  color:#7f1d1d;
+  text-transform:uppercase;
+}
+
+#exitManagerModeButton {
+  min-height:38px;
+  padding:0 14px;
+  border:1px solid #7f1d1d;
+  border-radius:8px;
+  background:#7f1d1d;
+  color:#ffffff;
+  font-weight:800;
+  cursor:pointer;
+}
+
+#exitManagerModeButton:hover,
+#exitManagerModeButton:focus {
+  background:#991b1b;
+  border-color:#991b1b;
+}
+
 .assigned-schools-toggle-active {
   border-color:var(--color-header);
   background:var(--color-header);
@@ -448,81 +509,15 @@ tr.active:hover {
 
 .top-toolbar {
   order:2;
-  z-index:100;
-  display:flex;
-  align-items:stretch;
-  justify-content:center;
-  gap:14px;
-  margin:0 0 16px 0;
-  padding:14px 16px;
-  max-width:100%;
-  box-sizing:border-box;
   background:var(--color-header);
-  border:0;
-  border-top:1px solid rgba(255,255,255,0.08);
-  flex-wrap:wrap;
-}
-
-.top-toolbar-left,
-.top-toolbar-actions,
-.top-toolbar-modules {
-  display:flex;
-  align-items:stretch;
-  gap:14px;
-  flex-wrap:wrap;
-}
-
-.top-toolbar a {
-  box-sizing:border-box;
-  color:#062b25;
-  text-decoration:none;
-  padding:0 16px;
-  border-radius:6px;
-  font-weight:600;
-  transition:background-color 0.2s ease, box-shadow 0.2s ease;
-  white-space:nowrap;
-  background:var(--color-primary);
-  border:1px solid rgba(0,0,0,0.35);
-  box-shadow:
-    0 2px 4px rgba(0,0,0,0.25),
-    inset 0 1px 0 rgba(255,255,255,0.06);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  min-width:160px;
-  height:46px;
-  line-height:1;
-  text-align:center;
-  overflow:hidden;
-  margin:0;
-}
-
-.top-toolbar a:hover {
-  background:var(--color-primary);
-  box-shadow:
-    0 4px 10px rgba(0,0,0,0.35),
-    inset 0 1px 0 rgba(255,255,255,0.10);
-  border-color:#6b84a3;
-  color:#062b25;
-}
-
-.top-toolbar a.active {
-  color:#062b25;
-  border-color:#ffffff;
-  background:var(--color-primary);
-  box-shadow: inset 0 0 0 4px #ffffff;
-}
-
-.top-toolbar a.active:hover {
-  background:var(--color-primary);
-  border-color:#ffffff;
+  margin-bottom:16px;
 }
 </style>
 </head>
 
 <body>
 
-<h2>Školníci</h2>
+<h2 id="pageTitle">Školníci</h2>
 <div class="top-toolbar">
   <div class="top-toolbar-left">
     <a href="home.html">Domů</a>
@@ -560,6 +555,28 @@ tr.active:hover {
   <button id="newCaretakerButton" class="view-option-button" type="button">+ Nový školník</button>
   <button id="allCaretakersViewButton" class="view-option-button is-active" type="button">Všichni školníci</button>
   <button id="expandedCaretakersViewButton" class="view-option-button" type="button">Školníci + přidělené školy</button>
+  <button id="managerViewButton" class="view-option-button" type="button">Manažer</button>
+</div>
+
+<div id="managerModeInfo" class="manager-mode-info" hidden>
+  <div>
+    <strong>Režim manažer</strong>
+    Přiřazuješ školy školníkům. Změny se projeví na stránce Školy i v rozvrhu.
+  </div>
+  <button id="exitManagerModeButton" type="button">Ukončit režim manažera</button>
+</div>
+
+<div id="managerAuthModal" class="manager-auth-modal" hidden>
+  <div class="manager-auth-dialog" role="dialog" aria-modal="true" aria-labelledby="managerAuthTitle">
+    <h3 id="managerAuthTitle" class="manager-auth-title">Režim manažer</h3>
+    <p class="manager-auth-text">Zadej heslo pro přiřazování škol školníkům.</p>
+    <input id="managerAuthInput" class="manager-auth-input" type="password" autocomplete="current-password">
+    <div id="managerAuthError" class="manager-auth-error"></div>
+    <div class="manager-auth-actions">
+      <button id="managerAuthCancel" class="manager-auth-cancel" type="button">Zrušit</button>
+      <button id="managerAuthConfirm" class="manager-auth-confirm" type="button">Vstoupit</button>
+    </div>
+  </div>
 </div>
 
 <h3>Seznam</h3>
@@ -581,8 +598,12 @@ tr.active:hover {
 <script>
 const STORAGE_KEY = "caretakers";
 const CARETAKER_ROLE_STORAGE_KEY = "caretakerId";
+const MANAGER_PASSWORD = "1111";
+const MANAGER_SESSION_KEY = "managerModeUnlocked";
+const MANAGER_RETURN_KEY = "managerModeReturnTo";
 
 const jmeno = document.getElementById("jmeno");
+const pageTitle = document.getElementById("pageTitle");
 const prijmeni = document.getElementById("prijmeni");
 const telefon = document.getElementById("telefon");
 const email = document.getElementById("email");
@@ -596,6 +617,14 @@ const newButton = document.getElementById("newButton");
 const newCaretakerButton = document.getElementById("newCaretakerButton");
 const allCaretakersViewButton = document.getElementById("allCaretakersViewButton");
 const expandedCaretakersViewButton = document.getElementById("expandedCaretakersViewButton");
+const managerViewButton = document.getElementById("managerViewButton");
+const managerModeInfo = document.getElementById("managerModeInfo");
+const exitManagerModeButton = document.getElementById("exitManagerModeButton");
+const managerAuthModal = document.getElementById("managerAuthModal");
+const managerAuthInput = document.getElementById("managerAuthInput");
+const managerAuthError = document.getElementById("managerAuthError");
+const managerAuthCancel = document.getElementById("managerAuthCancel");
+const managerAuthConfirm = document.getElementById("managerAuthConfirm");
 const deleteButton = document.getElementById("deleteButton");
 const openSchoolsButton = document.getElementById("openSchoolsButton");
 const clearCaretakerRoleButton = document.getElementById("clearCaretakerRoleButton");
@@ -634,6 +663,10 @@ function loadSchools(){
   } catch {
     return [];
   }
+}
+
+function saveSchools(schools){
+  localStorage.setItem("schools", JSON.stringify(schools));
 }
 
 function saveCaretakers(){
@@ -871,9 +904,245 @@ function isCaretakerExpanded(caretakerId){
 function syncCaretakerViewButtons(){
   allCaretakersViewButton.classList.toggle("is-active", caretakerViewMode === "default");
   expandedCaretakersViewButton.classList.toggle("is-active", caretakerViewMode === "expanded");
+  managerViewButton.classList.toggle("is-active", caretakerViewMode === "manager");
+  newCaretakerButton.hidden = caretakerViewMode === "manager";
+  managerModeInfo.hidden = caretakerViewMode !== "manager";
+  document.body.classList.toggle("manager-mode", caretakerViewMode === "manager");
+  pageTitle.textContent = caretakerViewMode === "manager" ? "REŽIM MANAŽER" : "Školníci";
+}
+
+function setDefaultTableHead(){
+  caretakersTable.querySelector("thead").innerHTML = `
+    <tr>
+      <th>#</th>
+      <th>Školník</th>
+      <th>Barva</th>
+      <th>Počet škol</th>
+      <th>Zobrazit přidělené školy</th>
+      <th>Použít jako profil</th>
+      <th>Upravit</th>
+    </tr>
+  `;
+}
+
+function setManagerTableHead(){
+  caretakersTable.querySelector("thead").innerHTML = `
+    <tr>
+      <th>#</th>
+      <th>Škola</th>
+      <th>Město</th>
+      <th>Aktuální školník</th>
+      <th>Přiřadit školníka</th>
+    </tr>
+  `;
+}
+
+function compareSchools(a, b){
+  const nameCompare = (a.nazev || "").localeCompare(b.nazev || "", "cs");
+  if(nameCompare) return nameCompare;
+  return (a.mesto || "").localeCompare(b.mesto || "", "cs");
+}
+
+function assignCaretakerToSchool(schoolId, caretakerId){
+  const schools = loadSchools().map((school) => String(school.id) === String(schoolId)
+    ? { ...school, assignedCaretakerId: caretakerId || "" }
+    : school
+  );
+  saveSchools(schools);
+}
+
+function createManagerGroupRow(title, count){
+  const row = document.createElement("tr");
+  row.className = "manager-group-row";
+  const cell = document.createElement("td");
+  cell.colSpan = 5;
+  cell.textContent = `${title} (${count})`;
+  row.appendChild(cell);
+  return row;
+}
+
+function createManagerSchoolRow(school, order){
+  const row = document.createElement("tr");
+
+  const orderCell = document.createElement("td");
+  orderCell.textContent = order;
+  row.appendChild(orderCell);
+
+  const nameCell = document.createElement("td");
+  const title = document.createElement("div");
+  title.className = "manager-school-title";
+  title.textContent = school.nazev || "-";
+  nameCell.appendChild(title);
+  const meta = document.createElement("div");
+  meta.className = "manager-school-meta";
+  meta.textContent = [school.ulice, school.psc].filter(Boolean).join(", ");
+  if(meta.textContent) nameCell.appendChild(meta);
+  row.appendChild(nameCell);
+
+  const cityCell = document.createElement("td");
+  cityCell.textContent = school.mesto || "-";
+  row.appendChild(cityCell);
+
+  const currentCell = document.createElement("td");
+  currentCell.textContent = getCaretakerNameById(school.assignedCaretakerId);
+  row.appendChild(currentCell);
+
+  const assignmentCell = document.createElement("td");
+  const assignmentRow = document.createElement("div");
+  assignmentRow.className = "manager-assignment-row";
+
+  const select = document.createElement("select");
+  const emptyOption = document.createElement("option");
+  emptyOption.value = "";
+  emptyOption.textContent = "Bez školníka";
+  select.appendChild(emptyOption);
+
+  sortCaretakers(caretakers).forEach((caretaker) => {
+    const option = document.createElement("option");
+    option.value = caretaker.id;
+    option.textContent = getDisplayName(caretaker);
+    option.selected = String(school.assignedCaretakerId || "") === String(caretaker.id);
+    select.appendChild(option);
+  });
+
+  const saveButton = document.createElement("button");
+  saveButton.type = "button";
+  saveButton.textContent = "Uložit";
+  saveButton.addEventListener("click", () => {
+    assignCaretakerToSchool(school.id, select.value);
+    render();
+  });
+
+  assignmentRow.appendChild(select);
+  assignmentRow.appendChild(saveButton);
+  assignmentCell.appendChild(assignmentRow);
+  row.appendChild(assignmentCell);
+
+  return row;
+}
+
+function getCaretakerNameById(caretakerId){
+  if(!caretakerId) return "Bez školníka";
+  const caretaker = caretakers.find(item => String(item.id) === String(caretakerId));
+  return caretaker ? getDisplayName(caretaker) : "Bez školníka";
+}
+
+function renderManagerView(){
+  setManagerTableHead();
+  closeCaretakerEditPanel();
+  caretakerAssignedSchools.hidden = true;
+
+  const fragment = document.createDocumentFragment();
+  const schools = loadSchools();
+
+  if(!schools.length){
+    const row = document.createElement("tr");
+    const cell = document.createElement("td");
+    cell.colSpan = 5;
+    cell.className = "assigned-schools-empty";
+    cell.textContent = "Zatím nejsou založené žádné školy.";
+    row.appendChild(cell);
+    fragment.appendChild(row);
+    list.replaceChildren(fragment);
+    return;
+  }
+
+  let order = 1;
+  const unassigned = schools.filter(school => !school.assignedCaretakerId).sort(compareSchools);
+  if(unassigned.length){
+    fragment.appendChild(createManagerGroupRow("Bez přiřazeného školníka", unassigned.length));
+    unassigned.forEach((school) => {
+      fragment.appendChild(createManagerSchoolRow(school, order));
+      order += 1;
+    });
+  }
+
+  sortCaretakers(caretakers).forEach((caretaker) => {
+    const assigned = schools
+      .filter(school => String(school.assignedCaretakerId || "") === String(caretaker.id))
+      .sort(compareSchools);
+
+    if(assigned.length){
+      fragment.appendChild(createManagerGroupRow(getDisplayName(caretaker), assigned.length));
+      assigned.forEach((school) => {
+        fragment.appendChild(createManagerSchoolRow(school, order));
+        order += 1;
+      });
+    }
+  });
+
+  list.replaceChildren(fragment);
+}
+
+function requestManagerPassword(){
+  return new Promise((resolve) => {
+    managerAuthInput.value = "";
+    managerAuthError.textContent = "";
+    managerAuthModal.hidden = false;
+    setTimeout(() => managerAuthInput.focus(), 0);
+
+    const cleanup = () => {
+      managerAuthConfirm.removeEventListener("click", handleConfirm);
+      managerAuthCancel.removeEventListener("click", handleCancel);
+      managerAuthInput.removeEventListener("keydown", handleKeydown);
+      managerAuthModal.removeEventListener("click", handleBackdrop);
+    };
+
+    const close = (result) => {
+      cleanup();
+      managerAuthModal.hidden = true;
+      resolve(result);
+    };
+
+    const handleConfirm = () => {
+      if(managerAuthInput.value === MANAGER_PASSWORD){
+        close(true);
+        return;
+      }
+      managerAuthError.textContent = "Nesprávné heslo.";
+      managerAuthInput.select();
+      managerAuthInput.focus();
+    };
+
+    const handleCancel = () => close(false);
+
+    const handleKeydown = (event) => {
+      if(event.key === "Enter") handleConfirm();
+      if(event.key === "Escape") handleCancel();
+    };
+
+    const handleBackdrop = (event) => {
+      if(event.target === managerAuthModal) handleCancel();
+    };
+
+    managerAuthConfirm.addEventListener("click", handleConfirm);
+    managerAuthCancel.addEventListener("click", handleCancel);
+    managerAuthInput.addEventListener("keydown", handleKeydown);
+    managerAuthModal.addEventListener("click", handleBackdrop);
+  });
+}
+
+async function unlockManagerMode(){
+  if(sessionStorage.getItem(MANAGER_SESSION_KEY) === "1" || localStorage.getItem(MANAGER_SESSION_KEY) === "1") {
+    sessionStorage.setItem(MANAGER_SESSION_KEY, "1");
+    return true;
+  }
+  if(await requestManagerPassword()){
+    sessionStorage.setItem(MANAGER_SESSION_KEY, "1");
+    localStorage.setItem(MANAGER_SESSION_KEY, "1");
+    return true;
+  }
+  return false;
 }
 
 function render(){
+  if(caretakerViewMode === "manager"){
+    syncCaretakerViewButtons();
+    renderManagerView();
+    return;
+  }
+
+  setDefaultTableHead();
   const fragment = document.createDocumentFragment();
   const sorted = sortCaretakers(caretakers);
   syncCaretakerViewButtons();
@@ -1016,6 +1285,32 @@ expandedCaretakersViewButton.addEventListener("click", () => {
   expandedCaretakerId = null;
   render();
 });
+managerViewButton.addEventListener("click", async () => {
+  if(!await unlockManagerMode()) return;
+  caretakerViewMode = "manager";
+  expandedCaretakerId = null;
+  editId = null;
+  selectedId = null;
+  render();
+});
+exitManagerModeButton.addEventListener("click", () => {
+  const returnTo = localStorage.getItem(MANAGER_RETURN_KEY);
+  sessionStorage.removeItem(MANAGER_SESSION_KEY);
+  localStorage.removeItem(MANAGER_SESSION_KEY);
+  localStorage.removeItem(MANAGER_RETURN_KEY);
+  if(returnTo === "schools.html"){
+    window.location.href = "schools.html";
+    return;
+  }
+  caretakerViewMode = "default";
+  expandedCaretakerId = null;
+  editId = null;
+  selectedId = null;
+  const url = new URL(window.location.href);
+  url.searchParams.delete("mode");
+  window.history.replaceState({}, "", url.pathname + url.search);
+  render();
+});
 deleteButton.addEventListener("click", removeCurrent);
 openSchoolsButton.addEventListener("click", openSchoolsForCaretaker);
 clearCaretakerRoleButton.addEventListener("click", () => {
@@ -1026,7 +1321,12 @@ clearCaretakerRoleButton.addEventListener("click", () => {
 editId = null;
 selectedId = null;
 closeCaretakerEditPanel();
-render();
+(async function initPage(){
+  if(new URLSearchParams(window.location.search).get("mode") === "manager" && await unlockManagerMode()){
+    caretakerViewMode = "manager";
+  }
+  render();
+})();
 </script>
 
 </body>

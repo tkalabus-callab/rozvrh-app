@@ -3,42 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <title>Školy</title>
+<link rel="stylesheet" href="styles.css">
 
 <style>
-:root {
-  --color-primary: #1bb3c8;
-  --color-primary-dark: #146f80;
-  --color-bg: #eef3f7;
-  --color-border: #d4dde6;
-  --color-header: #2c3e55;
-  --color-text: #24364b;
-}
 
 body {
   font-family: Arial;
   padding:20px;
   background:#eef3f7;
   color:var(--color-text);
-}
-
-.page-header {
-  background:var(--color-header);
-  width:100%;
-  box-sizing:border-box;
-}
-
-#pageTitle {
-  background:transparent;
-  color:#fff;
-  padding:10px 16px 16px 16px;
-  margin:0;
-  font-weight:700;
-  letter-spacing:0.3px;
-  text-align:center;
-  display:block;
-  width:100%;
-  max-width:100%;
-  box-sizing:border-box;
 }
 
 input { margin:2px; width:180px; }
@@ -289,6 +262,200 @@ tbody tr:last-child td {
   background:#f8fbfd;
 }
 
+.school-workbook {
+  margin:14px 0;
+  display:grid;
+  grid-template-columns:minmax(620px, 2fr) minmax(240px, 0.7fr);
+  gap:12px;
+  align-items:start;
+}
+
+.school-workbook-section {
+  border:1px solid var(--color-border);
+  border-radius:8px;
+  background:#f8fbfd;
+  padding:10px;
+}
+
+.school-workbook-section-plan,
+.school-workbook-section-exceptions {
+  min-width:0;
+}
+
+.school-workbook-title {
+  margin:0 0 8px;
+  color:var(--color-header);
+  font-weight:800;
+  text-transform:uppercase;
+}
+
+.school-workbook-form,
+.school-workbook-actions {
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  align-items:center;
+}
+
+.school-workbook-form select,
+.school-workbook-form input,
+.school-workbook-form button,
+.school-workbook-actions button,
+.school-workbook-row button {
+  min-height:32px;
+  border-radius:6px;
+  border:1px solid var(--color-border);
+  padding:0 10px;
+  box-sizing:border-box;
+}
+
+.school-workbook-form button,
+.school-workbook-actions button,
+.school-workbook-row button {
+  background:var(--color-primary);
+  color:#000000;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.school-workbook-list {
+  margin-top:10px;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+
+.weekly-plan-grid {
+  width:100%;
+  margin-top:10px;
+  border-collapse:separate;
+  border-spacing:0;
+  table-layout:fixed;
+  border:1px solid var(--color-border);
+  border-radius:8px;
+  overflow:hidden;
+  font-size:12px;
+}
+
+.weekly-plan-hour-col {
+  width:44px;
+}
+
+.weekly-plan-day-col {
+  width:calc((100% - 44px) / 5);
+}
+
+.weekly-plan-grid th,
+.weekly-plan-grid td {
+  border:0;
+  border-right:1px solid rgba(44,62,85,0.14);
+  border-bottom:1px solid rgba(44,62,85,0.14);
+  padding:6px;
+  text-align:center;
+  vertical-align:middle;
+}
+
+.weekly-plan-grid th:last-child,
+.weekly-plan-grid td:last-child {
+  border-right:0;
+}
+
+.weekly-plan-grid tr:last-child td {
+  border-bottom:0;
+}
+
+.weekly-plan-hour {
+  width:44px;
+  color:var(--color-header);
+  font-weight:800;
+  background:#eef6fb;
+}
+
+.weekly-plan-cell {
+  min-height:42px;
+  background:#ffffff;
+  cursor:pointer;
+  transition:background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.weekly-plan-cell:hover {
+  background:#eef6fb;
+}
+
+.weekly-plan-cell.has-lesson {
+  background:#dff4f7;
+  color:var(--color-header);
+  font-weight:800;
+}
+
+.weekly-plan-cell.is-unassigned {
+  background:#ffe3e3;
+  color:#9a1616;
+  font-weight:900;
+}
+
+.weekly-plan-cell.is-selected {
+  box-shadow:inset 0 0 0 3px var(--color-primary-dark);
+  background:#fff7d6;
+}
+
+.weekly-plan-cell.is-selected.is-unassigned {
+  background:#ffe3e3;
+}
+
+.weekly-plan-cell-trainer {
+  display:block;
+  margin-top:2px;
+  color:#526173;
+  font-size:11px;
+  font-weight:700;
+}
+
+.weekly-plan-cell.is-unassigned .weekly-plan-cell-trainer {
+  color:#9a1616;
+  font-size:12px;
+  font-weight:900;
+}
+
+.school-workbook-row {
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:8px;
+  align-items:center;
+  padding:8px;
+  border:1px solid rgba(44,62,85,0.14);
+  border-radius:8px;
+  background:#ffffff;
+}
+
+.school-workbook-row-main {
+  color:var(--color-header);
+  font-weight:800;
+}
+
+.school-workbook-row-meta {
+  margin-top:2px;
+  color:#5b6b7c;
+  font-size:12px;
+}
+
+@media (max-width: 900px) {
+  .school-workbook {
+    grid-template-columns:1fr;
+  }
+}
+
+.school-workbook-empty {
+  color:#5b6b7c;
+  font-size:13px;
+}
+
+@media (max-width:900px) {
+  .school-workbook {
+    grid-template-columns:1fr;
+  }
+}
+
 .compact-school-list {
   display:grid;
   grid-template-columns:1fr 1fr;
@@ -406,136 +573,6 @@ tr:hover {
   cursor:pointer;
 }
 
-.top-toolbar {
-  z-index:100;
-  display:flex;
-  align-items:stretch;
-  justify-content:center;
-  gap:14px;
-  margin:0;
-  padding:14px 16px;
-  max-width:100%;
-  box-sizing:border-box;
-  background:transparent;
-  border:0;
-  border-bottom:1px solid rgba(255,255,255,0.08);
-  flex-wrap:wrap;
-}
-
-.top-toolbar-left,
-.top-toolbar-actions,
-.top-toolbar-modules {
-  display:flex;
-  align-items:stretch;
-  gap:14px;
-  flex-wrap:wrap;
-}
-
-.top-toolbar a,
-.top-toolbar button {
-  box-sizing:border-box;
-  color:#062b25;
-  text-decoration:none;
-  padding:0 16px;
-  border-radius:6px;
-  font-weight:600;
-  transition:background-color 0.2s ease, box-shadow 0.2s ease;
-  white-space:nowrap;
-  background:var(--color-primary);
-  border:1px solid rgba(0,0,0,0.35);
-  box-shadow:
-    0 2px 4px rgba(0,0,0,0.25),
-    inset 0 1px 0 rgba(255,255,255,0.06);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  min-width:160px;
-  height:46px;
-  line-height:1;
-  text-align:center;
-  overflow:hidden;
-  margin:0;
-}
-
-.top-toolbar a:hover,
-.top-toolbar button:hover {
-  background:var(--color-primary);
-  box-shadow:
-    0 4px 10px rgba(0,0,0,0.35),
-    inset 0 1px 0 rgba(255,255,255,0.10);
-  border-color:#6b84a3;
-  color:#062b25;
-}
-
-.top-toolbar a.active {
-  color:#062b25;
-  border-color:#ffffff;
-  background:var(--color-primary);
-  box-shadow: inset 0 0 0 4px #ffffff;
-}
-
-.top-toolbar a.active:hover {
-  background:var(--color-primary);
-  border-color:#ffffff;
-}
-
-.page-action-box {
-  margin:16px auto;
-  padding:16px 18px;
-  max-width:960px;
-  width:100%;
-  border:0;
-  border-radius:12px;
-  background:var(--color-primary);
-  box-sizing:border-box;
-  display:flex;
-  align-items:center;
-  justify-content:flex-start;
-  gap:14px;
-  flex-wrap:wrap;
-}
-
-.view-options {
-  display:flex;
-  align-items:center;
-  gap:8px;
-  flex-wrap:wrap;
-  min-height:32px;
-  border-left:0;
-  padding-left:0;
-}
-
-.view-options-title {
-  color:#000000;
-  font-weight:800;
-  text-transform:uppercase;
-  font-size:14px;
-  line-height:1.2;
-  width:100%;
-  margin-bottom:10px;
-}
-
-.view-option-button {
-  min-height:40px;
-  padding:0 14px;
-  border-radius:8px;
-  border:1px solid var(--color-border);
-  background:#ffffff;
-  color:var(--color-header);
-  font-weight:700;
-  line-height:1;
-  cursor:pointer;
-  transition:background 0.15s ease, border-color 0.15s ease;
-  box-shadow:0 2px 6px rgba(0,0,0,0.18);
-}
-
-.view-option-button.is-active {
-  border-width:2px;
-  border-color:var(--color-primary);
-  background:#eef6fb;
-  box-shadow:0 2px 6px rgba(0,0,0,0.12);
-}
-
 .specific-caretaker-picker {
   position:relative;
   display:inline-flex;
@@ -584,7 +621,7 @@ tr:hover {
 
 <body>
 
-
+<div class="page-header">
   <div class="top-toolbar">
     <div class="top-toolbar-left">
       <a href="home.html">Domů</a>
@@ -598,6 +635,7 @@ tr:hover {
 <div class="page-action-box">
   <span class="view-options-title">Zobrazení</span>
   <button id="newSchoolButton" type="button">+ NOVÁ ŠKOLA</button>
+  <button id="managerModeButton" class="view-option-button" type="button">Manažer</button>
   <div class="view-options">
     <button class="view-option-button" type="button" data-view-mode="caretakers">Podle školníků</button>
     <div class="specific-caretaker-picker">
@@ -606,6 +644,19 @@ tr:hover {
     </div>
     <button class="view-option-button is-active" type="button" data-view-mode="compact">Kompaktní přehled</button>
     <button class="view-option-button" type="button" data-view-mode="all">Všechny školy</button>
+  </div>
+</div>
+
+<div id="managerAuthModal" class="manager-auth-modal" hidden>
+  <div class="manager-auth-dialog" role="dialog" aria-modal="true" aria-labelledby="managerAuthTitle">
+    <h3 id="managerAuthTitle" class="manager-auth-title">Režim manažer</h3>
+    <p class="manager-auth-text">Zadej heslo pro přiřazování škol školníkům.</p>
+    <input id="managerAuthInput" class="manager-auth-input" type="password" autocomplete="current-password">
+    <div id="managerAuthError" class="manager-auth-error"></div>
+    <div class="manager-auth-actions">
+      <button id="managerAuthCancel" class="manager-auth-cancel" type="button">Zrušit</button>
+      <button id="managerAuthConfirm" class="manager-auth-confirm" type="button">Vstoupit</button>
+    </div>
   </div>
 </div>
 
@@ -625,16 +676,44 @@ tr:hover {
   <input id="email">
   <input id="telefon">
 </div>
-<label for="assignedCaretakerId">Školník</label>
-<select id="assignedCaretakerId"></select>
-<br>
+<label id="assignedCaretakerLabel" for="assignedCaretakerId" hidden>Školník</label>
+<select id="assignedCaretakerId" hidden></select>
 <input id="poznamka" style="width:370px">
 
-<div id="favoriteTrainersBox" class="favorite-trainers">
+<div id="favoriteTrainersBox" class="favorite-trainers" hidden>
   <div id="favoriteTrainersTitle" class="favorite-trainers-title"></div>
   <input id="favoriteTrainerSearch">
   <div id="favoriteTrainerSearchResults" class="favorite-trainer-search-results"></div>
   <div id="favoriteTrainersList" class="favorite-trainers-list"></div>
+</div>
+
+<div class="school-workbook">
+  <section class="school-workbook-section school-workbook-section-plan">
+    <h4 class="school-workbook-title">Týdenní rozvrh hodin</h4>
+    <div class="school-workbook-form">
+      <select id="weeklyPlanYear"></select>
+      <select id="weeklyPlanClass"></select>
+      <select id="weeklyPlanTrainer"></select>
+      <button id="removeWeeklyPlanLessonButton" type="button">Smazat vybranou buňku</button>
+    </div>
+    <div id="weeklyPlanGrid"></div>
+  </section>
+
+  <section class="school-workbook-section school-workbook-section-exceptions">
+    <h4 class="school-workbook-title">Výjimky</h4>
+    <div class="school-workbook-form">
+      <input id="exceptionDate" type="date">
+      <select id="exceptionReason">
+        <option value="Prázdniny">Prázdniny</option>
+        <option value="Státní svátek">Státní svátek</option>
+        <option value="Ředitelské volno">Ředitelské volno</option>
+        <option value="Jiný důvod">Jiný důvod</option>
+      </select>
+      <input id="exceptionNote" placeholder="Poznámka">
+      <button id="addExceptionButton" type="button">Přidat výjimku</button>
+    </div>
+    <div id="exceptionsList" class="school-workbook-list"></div>
+  </section>
 </div>
 
   <div class="detail-actions">
@@ -666,9 +745,19 @@ tr:hover {
 <script type="module">
 import { TEXTS } from "./texts.js";
 
+const MANAGER_PASSWORD = "1111";
+const MANAGER_SESSION_KEY = "managerModeUnlocked";
+const MANAGER_RETURN_KEY = "managerModeReturnTo";
+
 const pageTitle = document.getElementById("pageTitle");
 const backLink = document.getElementById("backLink");
 const newSchoolButton = document.getElementById("newSchoolButton");
+const managerModeButton = document.getElementById("managerModeButton");
+const managerAuthModal = document.getElementById("managerAuthModal");
+const managerAuthInput = document.getElementById("managerAuthInput");
+const managerAuthError = document.getElementById("managerAuthError");
+const managerAuthCancel = document.getElementById("managerAuthCancel");
+const managerAuthConfirm = document.getElementById("managerAuthConfirm");
 const schoolDetailPanel = document.getElementById("schoolDetailPanel");
 const nazev = document.getElementById("nazev");
 const ulice = document.getElementById("ulice");
@@ -684,6 +773,17 @@ const favoriteTrainersTitle = document.getElementById("favoriteTrainersTitle");
 const favoriteTrainerSearch = document.getElementById("favoriteTrainerSearch");
 const favoriteTrainerSearchResults = document.getElementById("favoriteTrainerSearchResults");
 const favoriteTrainersList = document.getElementById("favoriteTrainersList");
+const weeklyPlanYear = document.getElementById("weeklyPlanYear");
+const weeklyPlanClass = document.getElementById("weeklyPlanClass");
+const weeklyPlanTrainer = document.getElementById("weeklyPlanTrainer");
+const removeWeeklyPlanLessonButton = document.getElementById("removeWeeklyPlanLessonButton");
+const weeklyPlanGrid = document.getElementById("weeklyPlanGrid");
+const exceptionDate = document.getElementById("exceptionDate");
+const exceptionReason = document.getElementById("exceptionReason");
+const exceptionNote = document.getElementById("exceptionNote");
+const addExceptionButton = document.getElementById("addExceptionButton");
+const exceptionsList = document.getElementById("exceptionsList");
+const saveNewSchoolButton = document.getElementById("saveNewSchoolButton");
 const saveButton = document.getElementById("saveButton");
 const cancelEditButton = document.getElementById("cancelEditButton");
 const detailActionButtons = document.getElementById("detailActionButtons");
@@ -704,7 +804,13 @@ let selectedId = null;
 let currentFavoriteTrainerIds = [];
 let currentViewMode = "compact";
 let currentSpecificCaretakerId = "";
+let selectedWeeklyPlanCell = null;
 const caretakers = JSON.parse(localStorage.getItem("caretakers")) || [];
+const SCHOOL_YEAR_PLAN_KEY = "schoolYearPlan";
+const SCHOOL_YEAR_EXCEPTIONS_KEY = "schoolYearExceptions";
+const UNASSIGNED_TRAINER_VALUE = "X";
+const SCHOOL_DAYS = ["Pondělí", "Úterý", "Středa", "Čtvrtek", "Pátek"];
+const SCHOOL_CLASSES = ["A", "B", "C", "D"];
 
 function normalizeSchool(school){
   return {
@@ -745,7 +851,7 @@ function getCaretakerNameById(caretakerId){
 
   if (!item) return "Bez školníka";
 
-  const fullName = `${<div class="page-header">item.prijmeni || ""} ${item.jmeno || ""}`.trim();
+  const fullName = `${item.prijmeni || ""} ${item.jmeno || ""}`.trim();
   return fullName || item.name || "Bez školníka";
 }
 
@@ -760,6 +866,7 @@ function getCaretakerColorById(caretakerId){
 
 function getTrainerNameById(trainerId){
   if (!trainerId) return "Bez trenéra";
+  if (String(trainerId) === UNASSIGNED_TRAINER_VALUE) return "Neobsazeno";
 
   const trainers = loadTrainers();
   const item = trainers.find(t => String(t.id) === String(trainerId));
@@ -768,6 +875,304 @@ function getTrainerNameById(trainerId){
 
   const fullName = `${item.prijmeni || ""} ${item.jmeno || ""}`.trim();
   return fullName || item.name || "Bez trenéra";
+}
+
+function fillSelect(select, items, selectedValue = ""){
+  if(!select) return;
+  select.replaceChildren();
+  items.forEach(item => {
+    const option = document.createElement("option");
+    option.value = String(item.value);
+    option.textContent = item.label;
+    option.selected = String(item.value) === String(selectedValue);
+    select.appendChild(option);
+  });
+}
+
+function loadSchoolYearPlan(){
+  try {
+    return JSON.parse(localStorage.getItem(SCHOOL_YEAR_PLAN_KEY) || "[]");
+  } catch {
+    return [];
+  }
+}
+
+function saveSchoolYearPlan(items){
+  localStorage.setItem(SCHOOL_YEAR_PLAN_KEY, JSON.stringify(items));
+}
+
+function loadSchoolYearExceptions(){
+  try {
+    return JSON.parse(localStorage.getItem(SCHOOL_YEAR_EXCEPTIONS_KEY) || "[]");
+  } catch {
+    return [];
+  }
+}
+
+function saveSchoolYearExceptions(items){
+  localStorage.setItem(SCHOOL_YEAR_EXCEPTIONS_KEY, JSON.stringify(items));
+}
+
+function initSchoolWorkbookControls(){
+  fillSelect(weeklyPlanYear, Array.from({ length: 9 }, (_, index) => ({
+    value: index + 1,
+    label: `${index + 1}. ročník`
+  })));
+  fillSelect(weeklyPlanClass, SCHOOL_CLASSES.map(cls => ({ value: cls, label: `Třída ${cls}` })));
+  refreshWeeklyPlanTrainerSelect();
+}
+
+function refreshWeeklyPlanTrainerSelect(){
+  const selectedValue = weeklyPlanTrainer?.value || "";
+  const trainerItems = loadTrainers()
+    .map(trainer => ({
+      value: trainer.id,
+      label: `${trainer.prijmeni || ""} ${trainer.jmeno || ""}`.trim() || trainer.name || ""
+    }))
+    .filter(item => item.value && item.label)
+    .sort((a, b) => a.label.localeCompare(b.label, "cs"));
+
+  fillSelect(weeklyPlanTrainer, [
+    { value: "", label: "Vyber trenéra" },
+    { value: UNASSIGNED_TRAINER_VALUE, label: "Neobsazeno" },
+    ...trainerItems
+  ], selectedValue);
+}
+
+function getCurrentSchoolId(){
+  return String(editId || selectedId || "");
+}
+
+function getWeeklyPlanForCurrentSchool(){
+  const schoolId = getCurrentSchoolId();
+  return loadSchoolYearPlan()
+    .filter(item => String(item.schoolId || "") === schoolId)
+    .sort((a, b) =>
+      Number(a.year) - Number(b.year) ||
+      Number(a.dayIndex) - Number(b.dayIndex) ||
+      Number(a.hour) - Number(b.hour) ||
+      String(a.className).localeCompare(String(b.className), "cs")
+    );
+}
+
+function getSelectedWeeklyPlanLesson(dayIndex, hour){
+  return getWeeklyPlanForCurrentSchool().find(item =>
+    String(item.year) === String(weeklyPlanYear.value) &&
+    String(item.className) === String(weeklyPlanClass.value) &&
+    Number(item.dayIndex) === Number(dayIndex) &&
+    Number(item.hour) === Number(hour)
+  );
+}
+
+function setWeeklyPlanTrainerSelectFromSelectedCell(){
+  if(!selectedWeeklyPlanCell){
+    weeklyPlanTrainer.value = "";
+    return;
+  }
+
+  const lesson = getSelectedWeeklyPlanLesson(selectedWeeklyPlanCell.dayIndex, selectedWeeklyPlanCell.hour);
+  weeklyPlanTrainer.value = lesson?.trainerId ? String(lesson.trainerId) : "";
+}
+
+function renderWeeklyPlanLessons(){
+  if(!weeklyPlanGrid) return;
+
+  if(!getCurrentSchoolId()){
+    weeklyPlanGrid.innerHTML = '<div class="school-workbook-empty">Nejdřív ulož nebo vyber školu.</div>';
+    return;
+  }
+
+  const table = document.createElement("table");
+  table.className = "weekly-plan-grid";
+  const colgroup = document.createElement("colgroup");
+  const hourCol = document.createElement("col");
+  hourCol.className = "weekly-plan-hour-col";
+  colgroup.appendChild(hourCol);
+  SCHOOL_DAYS.forEach(() => {
+    const dayCol = document.createElement("col");
+    dayCol.className = "weekly-plan-day-col";
+    colgroup.appendChild(dayCol);
+  });
+  table.appendChild(colgroup);
+
+  const thead = document.createElement("thead");
+  const headRow = document.createElement("tr");
+  const blank = document.createElement("th");
+  blank.textContent = "H";
+  headRow.appendChild(blank);
+
+  SCHOOL_DAYS.forEach(day => {
+    const th = document.createElement("th");
+    th.textContent = day;
+    headRow.appendChild(th);
+  });
+  thead.appendChild(headRow);
+  table.appendChild(thead);
+
+  const tbody = document.createElement("tbody");
+  for(let hour = 1; hour <= 8; hour++){
+    const row = document.createElement("tr");
+    const hourCell = document.createElement("td");
+    hourCell.className = "weekly-plan-hour";
+    hourCell.textContent = hour;
+    row.appendChild(hourCell);
+
+    SCHOOL_DAYS.forEach((day, dayIndex) => {
+      const lesson = getSelectedWeeklyPlanLesson(dayIndex, hour);
+      const cell = document.createElement("td");
+      cell.className = "weekly-plan-cell";
+      if(lesson) cell.classList.add("has-lesson");
+      if(String(lesson?.trainerId || "") === UNASSIGNED_TRAINER_VALUE) cell.classList.add("is-unassigned");
+      if(selectedWeeklyPlanCell && selectedWeeklyPlanCell.dayIndex === dayIndex && selectedWeeklyPlanCell.hour === hour){
+        cell.classList.add("is-selected");
+      }
+
+      cell.dataset.dayIndex = String(dayIndex);
+      cell.dataset.hour = String(hour);
+      if(lesson){
+        const classLabel = document.createElement("strong");
+        classLabel.textContent = weeklyPlanClass.value;
+        const trainerLabel = document.createElement("span");
+        trainerLabel.className = "weekly-plan-cell-trainer";
+        trainerLabel.textContent = getTrainerNameById(lesson.trainerId);
+        cell.replaceChildren(classLabel, trainerLabel);
+      }
+      cell.title = `${day} | ${hour}. hodina`;
+      cell.addEventListener("click", () => selectWeeklyPlanCell(dayIndex, hour));
+      row.appendChild(cell);
+    });
+
+    tbody.appendChild(row);
+  }
+  table.appendChild(tbody);
+  weeklyPlanGrid.replaceChildren(table);
+}
+
+function selectWeeklyPlanCell(dayIndex, hour){
+  selectedWeeklyPlanCell = { dayIndex, hour };
+  setWeeklyPlanTrainerSelectFromSelectedCell();
+  renderWeeklyPlanLessons();
+}
+
+function saveWeeklyPlanTrainerToSelectedCell(){
+  const schoolId = getCurrentSchoolId();
+  if(!schoolId || !selectedWeeklyPlanCell || !weeklyPlanTrainer.value) return;
+
+  const lesson = {
+    id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    schoolId,
+    year: weeklyPlanYear.value,
+    className: weeklyPlanClass.value,
+    dayIndex: Number(selectedWeeklyPlanCell.dayIndex),
+    hour: Number(selectedWeeklyPlanCell.hour),
+    trainerId: weeklyPlanTrainer.value
+  };
+
+  const items = loadSchoolYearPlan().filter(item => !(
+    String(item.schoolId) === lesson.schoolId &&
+    String(item.year) === String(lesson.year) &&
+    String(item.className) === String(lesson.className) &&
+    Number(item.dayIndex) === lesson.dayIndex &&
+    Number(item.hour) === lesson.hour
+  ));
+
+  saveSchoolYearPlan([...items, lesson]);
+  renderWeeklyPlanLessons();
+}
+
+function removeSelectedWeeklyPlanLesson(){
+  if(!selectedWeeklyPlanCell) return;
+  const schoolId = getCurrentSchoolId();
+  const { dayIndex, hour } = selectedWeeklyPlanCell;
+
+  saveSchoolYearPlan(loadSchoolYearPlan().filter(item => !(
+    String(item.schoolId) === schoolId &&
+    String(item.year) === String(weeklyPlanYear.value) &&
+    String(item.className) === String(weeklyPlanClass.value) &&
+    Number(item.dayIndex) === Number(dayIndex) &&
+    Number(item.hour) === Number(hour)
+  )));
+  weeklyPlanTrainer.value = "";
+  renderWeeklyPlanLessons();
+}
+
+function getExceptionsForCurrentSchool(){
+  const schoolId = getCurrentSchoolId();
+  return loadSchoolYearExceptions()
+    .filter(item => String(item.schoolId || "") === schoolId)
+    .sort((a, b) => String(a.date || "").localeCompare(String(b.date || "")));
+}
+
+function renderExceptions(){
+  if(!exceptionsList) return;
+  const items = getExceptionsForCurrentSchool();
+
+  if(!getCurrentSchoolId()){
+    exceptionsList.innerHTML = '<div class="school-workbook-empty">Nejdřív ulož nebo vyber školu.</div>';
+    return;
+  }
+
+  if(!items.length){
+    exceptionsList.innerHTML = '<div class="school-workbook-empty">Zatím nejsou zadané žádné výjimky.</div>';
+    return;
+  }
+
+  exceptionsList.replaceChildren(...items.map(item => {
+    const row = document.createElement("div");
+    row.className = "school-workbook-row";
+
+    const main = document.createElement("div");
+    const title = document.createElement("div");
+    title.className = "school-workbook-row-main";
+    title.textContent = `${new Date(item.date).toLocaleDateString("cs-CZ")} | ${item.reason || "Výjimka"}`;
+    const meta = document.createElement("div");
+    meta.className = "school-workbook-row-meta";
+    meta.textContent = item.note || "";
+    main.append(title, meta);
+
+    const removeButton = document.createElement("button");
+    removeButton.type = "button";
+    removeButton.textContent = "Smazat";
+    removeButton.addEventListener("click", () => {
+      saveSchoolYearExceptions(loadSchoolYearExceptions().filter(exception => exception.id !== item.id));
+      renderExceptions();
+    });
+
+    row.append(main, removeButton);
+    return row;
+  }));
+}
+
+function addException(){
+  const schoolId = getCurrentSchoolId();
+  if(!schoolId || !exceptionDate.value) return;
+
+  const item = {
+    id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    schoolId,
+    date: exceptionDate.value,
+    reason: exceptionReason.value,
+    note: exceptionNote.value
+  };
+
+  const items = loadSchoolYearExceptions().filter(existing => !(
+    String(existing.schoolId) === schoolId &&
+    String(existing.date) === String(item.date)
+  ));
+
+  saveSchoolYearExceptions([...items, item]);
+  exceptionNote.value = "";
+  renderExceptions();
+}
+
+function renderSchoolWorkbook(){
+  refreshWeeklyPlanTrainerSelect();
+  if(!selectedWeeklyPlanCell){
+    selectedWeeklyPlanCell = { dayIndex: 0, hour: 1 };
+  }
+  setWeeklyPlanTrainerSelectFromSelectedCell();
+  renderWeeklyPlanLessons();
+  renderExceptions();
 }
 
 function lightenColor(hex, amount = 0.85){
@@ -816,10 +1221,72 @@ function initStaticTexts(){
   listTitle.textContent = "Seznam";
   nameHeader.textContent = "Název školy";
   cityHeader.textContent = "Město";
+  initSchoolWorkbookControls();
 }
 
 favoriteTrainersTitle.textContent = TEXTS.schools.favoriteTrainers;
 assignedCaretakerId.addEventListener("change", updateAssignedCaretakerSelectStyle);
+
+function requestManagerPassword(){
+  return new Promise((resolve) => {
+    managerAuthInput.value = "";
+    managerAuthError.textContent = "";
+    managerAuthModal.hidden = false;
+    setTimeout(() => managerAuthInput.focus(), 0);
+
+    const cleanup = () => {
+      managerAuthConfirm.removeEventListener("click", handleConfirm);
+      managerAuthCancel.removeEventListener("click", handleCancel);
+      managerAuthInput.removeEventListener("keydown", handleKeydown);
+      managerAuthModal.removeEventListener("click", handleBackdrop);
+    };
+
+    const close = (result) => {
+      cleanup();
+      managerAuthModal.hidden = true;
+      resolve(result);
+    };
+
+    const handleConfirm = () => {
+      if(managerAuthInput.value === MANAGER_PASSWORD){
+        close(true);
+        return;
+      }
+      managerAuthError.textContent = "Nesprávné heslo.";
+      managerAuthInput.select();
+      managerAuthInput.focus();
+    };
+
+    const handleCancel = () => close(false);
+
+    const handleKeydown = (event) => {
+      if(event.key === "Enter") handleConfirm();
+      if(event.key === "Escape") handleCancel();
+    };
+
+    const handleBackdrop = (event) => {
+      if(event.target === managerAuthModal) handleCancel();
+    };
+
+    managerAuthConfirm.addEventListener("click", handleConfirm);
+    managerAuthCancel.addEventListener("click", handleCancel);
+    managerAuthInput.addEventListener("keydown", handleKeydown);
+    managerAuthModal.addEventListener("click", handleBackdrop);
+  });
+}
+
+async function unlockManagerMode(){
+  if(sessionStorage.getItem(MANAGER_SESSION_KEY) === "1" || localStorage.getItem(MANAGER_SESSION_KEY) === "1") {
+    sessionStorage.setItem(MANAGER_SESSION_KEY, "1");
+    return true;
+  }
+  if(await requestManagerPassword()){
+    sessionStorage.setItem(MANAGER_SESSION_KEY, "1");
+    localStorage.setItem(MANAGER_SESSION_KEY, "1");
+    return true;
+  }
+  return false;
+}
 
 function getSelectedFavoriteTrainerIds(){
   return currentFavoriteTrainerIds.slice();
@@ -1167,6 +1634,17 @@ function clearHighlight(headerRow){
 }
 
 favoriteTrainerSearch.addEventListener("input", renderFavoriteTrainerSearchResults);
+weeklyPlanYear.addEventListener("change", () => {
+  setWeeklyPlanTrainerSelectFromSelectedCell();
+  renderWeeklyPlanLessons();
+});
+weeklyPlanClass.addEventListener("change", () => {
+  setWeeklyPlanTrainerSelectFromSelectedCell();
+  renderWeeklyPlanLessons();
+});
+weeklyPlanTrainer.addEventListener("change", saveWeeklyPlanTrainerToSelectedCell);
+removeWeeklyPlanLessonButton.addEventListener("click", removeSelectedWeeklyPlanLesson);
+addExceptionButton.addEventListener("click", addException);
 
 function add(){
   if(!nazev.value) return;
@@ -1174,8 +1652,6 @@ function add(){
   const existingSchool = editId
     ? schools.find(s => String(s.id) === String(editId))
     : null;
-  const selectedFavoriteTrainerIds = getSelectedFavoriteTrainerIds();
-
   let obj = {
     id: editId || Date.now().toString(),
     nazev: nazev.value,
@@ -1187,9 +1663,9 @@ function add(){
     email: email.value,
     telefon: telefon.value,
     poznamka: poznamka.value,
-    favoriteTrainers: selectedFavoriteTrainerIds,
+    favoriteTrainers: [],
     assignedTrainerId: existingSchool?.assignedTrainerId ?? null,
-    assignedCaretakerId: document.getElementById("assignedCaretakerId")?.value || ""
+    assignedCaretakerId: existingSchool?.assignedCaretakerId || ""
   };
 
   if(editId){
@@ -1299,22 +1775,8 @@ function showDetail(id){
   appendDetailTextLine(detailFragment, `${TEXTS.common.note}: ${s.poznamka || TEXTS.common.placeholderDash}`);
   detailFragment.append(document.createElement("br"));
 
-  const trainers = loadTrainers();
-  const trainersById = new Map(trainers.map(trainer => [String(trainer.id), trainer]));
-  const favoriteTrainerItems = (s.favoriteTrainers || [])
-    .map(id => trainersById.get(String(id)))
-    .filter(Boolean);
-  const favoriteTrainerNames = favoriteTrainerItems.map(trainer => `${trainer.prijmeni} ${trainer.jmeno}`);
-  const assignedTrainers = document.createElement("div");
-  assignedTrainers.className = "assigned-trainers";
-  appendDetailTextLine(
-    assignedTrainers,
-    `${TEXTS.schools.favoriteTrainers}: ${favoriteTrainerNames.length ? favoriteTrainerNames.join(", ") : TEXTS.common.placeholderDash}`
-  );
-  detailFragment.appendChild(assignedTrainers);
-  detailFragment.append(document.createElement("br"));
-
   detail.replaceChildren(detailFragment);
+  renderSchoolWorkbook();
   render();
 }
 
@@ -1339,6 +1801,7 @@ function clearForm(){
   cancelEditButton.hidden = true;
   detail.textContent = TEXTS.schools.detailPrompt;
   document.getElementById("detailRemoveButton")?.remove();
+  renderSchoolWorkbook();
   render();
 }
 
@@ -1492,6 +1955,7 @@ window.add = add;
 initStaticTexts();
 renderFavoriteTrainerOptions([]);
 renderCaretakerSelect("");
+renderSchoolWorkbook();
 currentViewMode = "compact";
 saveNewSchoolButton.addEventListener("click", (e) => {
   e.preventDefault();
@@ -1513,8 +1977,6 @@ saveNewSchoolButton.addEventListener("click", (e) => {
   }
 
   if(!nazev.value) return;
-  const selectedFavoriteTrainerIds = getSelectedFavoriteTrainerIds();
-
   let obj = {
     id: Date.now().toString(),
     nazev: nazev.value,
@@ -1526,9 +1988,9 @@ saveNewSchoolButton.addEventListener("click", (e) => {
     email: email.value,
     telefon: telefon.value,
     poznamka: poznamka.value,
-    favoriteTrainers: selectedFavoriteTrainerIds,
+    favoriteTrainers: [],
     assignedTrainerId: null,
-    assignedCaretakerId: document.getElementById("assignedCaretakerId")?.value || ""
+    assignedCaretakerId: ""
   };
 
   schools.push(obj);
@@ -1546,6 +2008,13 @@ if (newSchoolButton) {
   newSchoolButton.addEventListener("click", () => {
     clearForm();
     openSchoolDetailPanel();
+  });
+}
+if (managerModeButton) {
+  managerModeButton.addEventListener("click", async () => {
+    if(!await unlockManagerMode()) return;
+    localStorage.setItem(MANAGER_RETURN_KEY, "schools.html");
+    window.location.href = "caretakers.html?mode=manager";
   });
 }
 if (cancelEditButton) {

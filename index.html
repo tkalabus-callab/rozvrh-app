@@ -3,103 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <title>ROZVRH</title>
+<link rel="stylesheet" href="styles.css">
 
 <style>
-
-/* === TOP NAV === */
-.page-header {
-  background:var(--color-header);
-  width:100%;
-  box-sizing:border-box;
-}
-
-.top-nav {
-  background:transparent;
-  padding:14px 16px;
-  display:flex;
-  gap:14px;
-  align-items:stretch;
-  justify-content:center;
-  flex-wrap:wrap;
-  width:100%;
-  max-width:100%;
-  margin:0;
-  border-bottom:1px solid rgba(255,255,255,0.08);
-  box-sizing:border-box;
-}
-
-.top-nav a,
-.page-header .top-nav a {
-  box-sizing:border-box;
-  color:#062b25;
-  text-decoration:none;
-  padding:0 16px;
-  border-radius:6px;
-  font-weight:600;
-  transition:background-color 0.2s ease, box-shadow 0.2s ease;
-  white-space:nowrap;
-  background:var(--color-primary) !important;
-  border:1px solid rgba(0,0,0,0.35) !important;
-  box-shadow:
-    0 2px 4px rgba(0,0,0,0.25),
-    inset 0 1px 0 rgba(255,255,255,0.06);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  flex:0 0 160px;
-  height:46px;
-  line-height:1;
-  text-align:center;
-  overflow:hidden;
-  margin:0;
-}
-
-.top-nav a:hover {
-  background:var(--color-primary) !important;
-  box-shadow:
-    0 4px 10px rgba(0,0,0,0.35),
-    inset 0 1px 0 rgba(255,255,255,0.10);
-  border-color:#6b84a3;
-  color:#062b25;
-}
-
-.top-nav a.is-current,
-.top-nav a[aria-current="page"],
-.top-nav a.is-current:hover,
-.top-nav a[aria-current="page"]:hover {
-  background:var(--color-primary) !important;
-  border-color:#ffffff !important;
-  color:#062b25 !important;
-  height:46px;
-}
-
-.top-nav a.is-current,
-.top-nav a[aria-current="page"] {
-  box-shadow: inset 0 0 0 4px #ffffff;
-}
-
-#pageTitle {
-  background:transparent;
-  color:#fff;
-  padding:10px 16px 16px 16px;
-  margin:0;
-  font-weight:700;
-  letter-spacing:0.3px;
-  text-align:center;
-  display:block;
-  width:100%;
-  max-width:100%;
-  box-sizing:border-box;
-}
-
-:root {
-  --color-primary: #1bb3c8;
-  --color-primary-dark: #146f80;
-  --color-bg: #eef3f7;
-  --color-border: #d4dde6;
-  --color-header: #2c3e55;
-  --color-text: #24364b;
-}
 
 body {
   font-family: Arial;
@@ -186,7 +92,6 @@ a[href="index.html"],
 a[href="schools.html"],
 a[href="caretakers.html"],
 a[href="trainers.html"],
-a[href="managers.html"],
 a[href="trainer-plan.html"] {
   display:inline-block;
   padding:7px 12px;
@@ -207,7 +112,6 @@ a[href="index.html"]:hover,
 a[href="schools.html"]:hover,
 a[href="caretakers.html"]:hover,
 a[href="trainers.html"]:hover,
-a[href="managers.html"]:hover,
 a[href="trainer-plan.html"]:hover {
   background:#3a5675;
   border-color:#3a5675;
@@ -222,7 +126,6 @@ a[href="index.html"]:active,
 a[href="schools.html"]:active,
 a[href="caretakers.html"]:active,
 a[href="trainers.html"]:active,
-a[href="managers.html"]:active,
 a[href="trainer-plan.html"]:active {
   transform:translateY(1px);
 }
@@ -235,7 +138,6 @@ a[href="index.html"][aria-current="page"],
 a[href="schools.html"][aria-current="page"],
 a[href="caretakers.html"][aria-current="page"],
 a[href="trainers.html"][aria-current="page"],
-a[href="managers.html"][aria-current="page"],
 a[href="trainer-plan.html"][aria-current="page"] {
   background:#3a5675;
   border-color:#6f8aa8;
@@ -571,6 +473,16 @@ th.today-column::before {
   font-weight:600;
 }
 
+.menu-item-planned {
+  color:var(--color-header);
+  font-weight:800;
+  background:#e9f8fb;
+}
+
+.menu-item-planned:hover {
+  background:#d7f1f6;
+}
+
 .trainer-panel {
   display:flex;
   flex-wrap:wrap;
@@ -687,7 +599,8 @@ th.today-column::before {
 
 /* rozložení:
    A | C
-   B | . */
+   B | D
+   E | E */
 #group-week{
   grid-column:1;
   grid-row:1;
@@ -716,6 +629,11 @@ th.today-column::before {
   background:var(--color-primary);
   border-color:var(--color-primary);
   color:#000000;
+}
+
+#group-schedule-archive{
+  grid-column:1 / span 2;
+  grid-row:3;
 }
 
 .grouped-toolbar{
@@ -799,19 +717,22 @@ th.today-column::before {
 #group-week,
 #group-trainers,
 #group-trainer-plan,
+#group-schedule-archive,
 #group-caretaker-mode{
   min-height:100%;
 }
 
 #group-week,
-#group-trainer-plan{
+#group-trainer-plan,
+#group-schedule-archive{
   width:100%;
   box-sizing:border-box;
 }
 
 #group-week .toolbar-group-body,
 #group-trainers .toolbar-group-body,
-#group-trainer-plan .toolbar-group-body{
+#group-trainer-plan .toolbar-group-body,
+#group-schedule-archive .toolbar-group-body{
   align-items:center;
 }
 
@@ -825,7 +746,8 @@ th.today-column::before {
 /* všechny tlačítka ve skupinách stejně vysoké a zarovnané */
 #group-week .toolbar-group-body button,
 #group-trainers .toolbar-group-body button,
-#group-trainer-plan .toolbar-group-body button{
+#group-trainer-plan .toolbar-group-body button,
+#group-schedule-archive .toolbar-group-body button{
   height:32px;
   min-height:32px;
   padding:0 12px;
@@ -841,7 +763,8 @@ th.today-column::before {
 #group-trainers .toolbar-group-body input,
 #group-trainers .toolbar-group-body select,
 #group-trainer-plan .toolbar-group-body input,
-#group-trainer-plan .toolbar-group-body select{
+#group-trainer-plan .toolbar-group-body select,
+#group-schedule-archive .toolbar-group-body select{
   height:32px;
   min-height:32px;
   box-sizing:border-box;
@@ -849,8 +772,20 @@ th.today-column::before {
 
 #group-week .toolbar-group-body > *,
 #group-trainers .toolbar-group-body > *,
-#group-trainer-plan .toolbar-group-body > *{
+#group-trainer-plan .toolbar-group-body > *,
+#group-schedule-archive .toolbar-group-body > *{
   margin:0;
+}
+
+#scheduleArchiveSelect{
+  min-width:280px;
+  max-width:100%;
+}
+
+#scheduleArchiveStatus{
+  color:var(--color-header);
+  font-size:13px;
+  font-weight:700;
 }
 
 #group-trainer-plan .toolbar-group-body{
@@ -1006,58 +941,6 @@ th.today-column::before {
   display: inline-flex;
   align-items: center;
   padding: 0 4px;
-}
-
-.top-toolbar {
-  position:sticky;
-  top:0;
-  z-index:100;
-  display:inline-flex;
-  flex-direction:column;
-  align-items:flex-start;
-  gap:4px;
-  margin:0 0 12px 0;
-  padding:0;
-  max-width:100%;
-  box-sizing:border-box;
-  background:rgba(255,255,255,0.94);
-  border:0;
-}
-
-.top-toolbar-left,
-.top-toolbar-actions,
-.top-toolbar-modules {
-  display:flex;
-  align-items:center;
-  gap:4px;
-  flex-wrap:wrap;
-}
-
-.top-toolbar a {
-  color:#222;
-  font-weight:bold;
-  text-decoration:none;
-  padding:3px 8px;
-  border:1px solid #aaa;
-  border-radius:4px;
-  background:#f5f5f5;
-  transition:background 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
-}
-
-.top-toolbar a:hover {
-  background:#ffffff;
-  box-shadow:0 1px 4px rgba(0,0,0,0.14);
-  transform:translateY(-1px);
-}
-
-.top-toolbar a.active {
-  color:#c00;
-  border-color:#c00;
-  background:#fff0f0;
-}
-
-.top-toolbar a.active:hover {
-  background:#ffe8e8;
 }
 
 #group-trainer-plan #showTrainerPlanButton{
@@ -1325,7 +1208,6 @@ button[style*="var(--color-primary)"],
     <a href="schools.html">Školy</a>
     <a href="trainers.html">Trenéři</a>
     <a href="caretakers.html">Školníci</a>
-    <a href="managers.html">Manažeři</a>
   </div>
 
   <h2 id="pageTitle">ROZVRH</h2>
@@ -1337,6 +1219,7 @@ button[style*="var(--color-primary)"],
   <div class="toolbar-group" id="group-week">
     <div class="toolbar-group-title">Práce s týdnem</div>
     <div class="toolbar-group-body" id="group-week-body">
+      <button id="clearScheduleDataButton" type="button">Vymazat rozvrh</button>
       <label class="toolbar-field" for="dateInput">
         <span id="weekFromHeader"></span>
         <input type="date" id="dateInput">
@@ -1349,6 +1232,7 @@ button[style*="var(--color-primary)"],
       <button onclick="changeWeek(7)">→</button>
       <button id="copyWeekButton" onclick="copyWeek()"></button>
       <button id="todayButton" onclick="goToday()"></button>
+      <button id="applyRecurringWeekButton" type="button">Doplnit ze školního rozvrhu</button>
       <button id="editWeekButton" class="edit-week-button" type="button">Upravit tento týden</button>
     </div>
   </div>
@@ -1422,6 +1306,17 @@ button[style*="var(--color-primary)"],
     </div>
   </div>
 
+  <div class="toolbar-group" id="group-schedule-archive">
+    <div class="toolbar-group-title">Archiv rozvrhů</div>
+    <div class="toolbar-group-body">
+      <button id="saveWeekArchiveButton" type="button">Uložit týden</button>
+      <button id="saveMonthArchiveButton" type="button">Uložit měsíc</button>
+      <select id="scheduleArchiveSelect"></select>
+      <button id="loadArchiveButton" type="button">Načíst archiv</button>
+      <span id="scheduleArchiveStatus"></span>
+    </div>
+  </div>
+
 </div>
 <div id="trainerPlanPreview" style="margin-top:10px;"></div>
 
@@ -1465,6 +1360,19 @@ window.addEventListener("unhandledrejection", (event) => {
   console.error("[UNHANDLED PROMISE]", event.reason);
 });
 
+const clearScheduleParams = new URLSearchParams(window.location.search);
+if(clearScheduleParams.get("clearScheduleData") === "1"){
+  ["plans", "reality", "scheduleArchives"].forEach(key => {
+    localStorage.removeItem(key);
+    localStorage.setItem(key, key === "scheduleArchives" ? "[]" : "{}");
+  });
+  sessionStorage.setItem("scheduleDataCleared", "plans,reality,scheduleArchives");
+  clearScheduleParams.delete("clearScheduleData");
+  const nextQuery = clearScheduleParams.toString();
+  window.location.replace(`${window.location.pathname}${nextQuery ? `?${nextQuery}` : ""}`);
+  throw new Error("Schedule data cleared; reloading.");
+}
+
 const pageTitle = document.getElementById("pageTitle");
 const schoolHeader = document.getElementById("schoolHeader");
 const cityHeader = document.getElementById("cityHeader");
@@ -1480,6 +1388,7 @@ const yearSelect = document.getElementById("yearSelect");
 const dateInput = document.getElementById("dateInput");
 const trainerPeriodDate = document.getElementById("trainerPeriodDate");
 const weekNumber = document.getElementById("weekNumber");
+const clearScheduleDataButton = document.getElementById("clearScheduleDataButton");
 const copyWeekButton = document.getElementById("copyWeekButton");
 const todayButton = document.getElementById("todayButton");
 const managerSelect = document.getElementById("managerSelect");
@@ -1489,6 +1398,12 @@ const trainerPeriodType = document.getElementById("trainerPeriodType");
 const showAllTrainersButton = document.getElementById("showAllTrainersButton");
 const showTrainerPlanButton = document.getElementById("showTrainerPlanButton");
 const trainerPlanPreview = document.getElementById("trainerPlanPreview");
+const saveWeekArchiveButton = document.getElementById("saveWeekArchiveButton");
+const saveMonthArchiveButton = document.getElementById("saveMonthArchiveButton");
+const scheduleArchiveSelect = document.getElementById("scheduleArchiveSelect");
+const loadArchiveButton = document.getElementById("loadArchiveButton");
+const scheduleArchiveStatus = document.getElementById("scheduleArchiveStatus");
+const applyRecurringWeekButton = document.getElementById("applyRecurringWeekButton");
 const trainerPanel = document.getElementById("trainerPanel");
 const scheduleOverlayMessage = document.getElementById("scheduleOverlayMessage");
 const editWeekButton = document.getElementById("editWeekButton");
@@ -1503,6 +1418,18 @@ const LAST_DATE_BY_CARETAKER_KEY = "lastDateByCaretaker";
 const TRAINER_FILTER_TRAINER_ID_KEY = "trainerFilterTrainerId";
 const TRAINER_FILTER_PERIOD_TYPE_KEY = "trainerFilterPeriodType";
 const TRAINER_FILTER_PERIOD_DATE_KEY = "trainerFilterPeriodDate";
+const SCHEDULE_ARCHIVE_KEY = "scheduleArchives";
+const SCHOOL_YEAR_PLAN_KEY = "schoolYearPlan";
+const SCHOOL_YEAR_EXCEPTIONS_KEY = "schoolYearExceptions";
+const SCHEDULE_RESET_VERSION_KEY = "scheduleResetVersion";
+const SCHEDULE_RESET_VERSION = "2026-04-26-new-school-year-plan";
+
+if(localStorage.getItem(SCHEDULE_RESET_VERSION_KEY) !== SCHEDULE_RESET_VERSION){
+  localStorage.setItem("plans", "{}");
+  localStorage.setItem("reality", "{}");
+  localStorage.setItem(SCHEDULE_ARCHIVE_KEY, "[]");
+  localStorage.setItem(SCHEDULE_RESET_VERSION_KEY, SCHEDULE_RESET_VERSION);
+}
 
 function load(key, def){
   try {
@@ -1729,70 +1656,15 @@ function getSchoolsForCurrentRole(allSchools){
 }
 
 function getVisibleTrainersLegacyUnused(){
-  const trainers = loadTrainers();
-  const schools = getSchools();
-
-  if(showAll) return trainers;
-
-  const school = schools.find(s => s.id === schoolId);
-
-  // fallback pouze pokud Ĺˇkola neexistuje
-  if(!school) return trainers;
-
-  const fav = school.favoriteTrainers;
-
-  // pokud nenĂ­ pole â†’ fallback (starĹˇĂ­ data)
-  if(!Array.isArray(fav)) return trainers;
-
-  // pokud je prĂˇzdnĂ© pole â†’ ĹľĂˇdnĂ­ trenĂ©Ĺ™i
-  if(fav.length === 0) return [];
-
-  // vrĂˇtĂ­ pouze vybranĂ© trenĂ©ry
-  const result = trainers.filter(t => fav.includes(t.id));
-
-  console.log("schoolId:", schoolId);
-  console.log("favoriteTrainers:", fav);
-  console.log("result count:", result.length);
-
-  return result;
+  return loadTrainers();
 }
 
 function getVisibleTrainers(schoolId){
-  const trainers = loadTrainers();
-  const schools = getSchools();
-  const school = schools.find(s => String(s.id) === String(schoolId));
-  if(!school) return trainers;
-
-  const fav = Array.isArray(school.favoriteTrainers) ? school.favoriteTrainers.map(String) : null;
-  const temporaryIds = temporarySchoolTrainerIds[String(schoolId)] || [];
-  const mergedIds = fav ? Array.from(new Set([...fav, ...temporaryIds])) : temporaryIds;
-
-  if(!fav) return trainers;
-  if(mergedIds.length === 0) return [];
-
-  return trainers.filter(t => mergedIds.includes(String(t.id)));
+  return loadTrainers();
 }
 
 function splitTrainersBySchoolPreference(items, schoolId){
-  const schools = getSchools();
-  const school = schools.find(s => String(s.id) === String(schoolId));
-  const preferredIds = Array.isArray(school?.favoriteTrainers)
-    ? school.favoriteTrainers.map(String)
-    : [];
-  const preferredIdSet = new Set(preferredIds);
-  const preferred = [];
-  const other = [];
-
-  items.forEach(trainer => {
-    if(preferredIdSet.has(String(trainer.id))){
-      preferred.push(trainer);
-    } else {
-      other.push(trainer);
-    }
-  });
-
-  preferred.sort((a, b) => preferredIds.indexOf(String(a.id)) - preferredIds.indexOf(String(b.id)));
-  return { preferred, other };
+  return { preferred: [], other: items };
 }
 
 function addTemporaryTrainerForSchool(schoolId, trainerId){
@@ -1870,12 +1742,35 @@ function loadTrainerFilterOptions(){
   });
 }
 
+function getTrainerDisplayName(trainer){
+  if(!trainer) return "";
+  return `${trainer.prijmeni || ""} ${trainer.jmeno || ""}`.trim() || trainer.name || "";
+}
+
+function getTrainerDisplayNameById(trainerId){
+  return getTrainerDisplayName(getTrainerById(trainerId)) || TEXTS.common.placeholderDash;
+}
+
+function fillSelect(select, items, selectedValue = ""){
+  if(!select) return;
+  select.replaceChildren();
+  items.forEach(item => {
+    const option = document.createElement("option");
+    option.value = String(item.value);
+    option.textContent = item.label;
+    option.selected = String(item.value) === String(selectedValue);
+    select.appendChild(option);
+  });
+}
+
+
 function initStaticTexts(){
   schoolHeader.textContent = "Škola";
   cityHeader.textContent = "Místo";
   yearHeader.textContent = "Ročník";
   weekFromHeader.textContent = "Týden od";
   weekNumberHeader.textContent = "Týden č.";
+  clearScheduleDataButton.textContent = "Vymazat rozvrh";
   copyWeekButton.textContent = TEXTS.schedule.copyWeek;
   todayButton.textContent = "Dnes";
   trainerSearch.placeholder = TEXTS.schedule.searchTrainer;
@@ -2009,6 +1904,8 @@ function init(){
 
   renderScheduleSafe();
   console.log("[INIT] renderScheduleSafe OK");
+  refreshScheduleArchiveSelect();
+  console.log("[INIT] refreshScheduleArchiveSelect OK");
 
   console.log("[INIT] done");
 }
@@ -2161,6 +2058,24 @@ function confirmLeaveEditMode(onConfirm, onCancel){
 function saveEditedWeek(){
   localStorage.setItem("plans", JSON.stringify(plans));
   localStorage.setItem("reality", JSON.stringify(reality));
+}
+
+function clearScheduleData(){
+  plans = {};
+  reality = {};
+  localStorage.setItem("plans", "{}");
+  localStorage.setItem("reality", "{}");
+  localStorage.setItem("scheduleArchives", "[]");
+  activeCell = null;
+  setEditMode(false);
+  closeMenu();
+  renderScheduleSafe();
+}
+
+function confirmClearScheduleData(){
+  if(!window.confirm("Opravdu vymazat PLÁN, SKUTEČNOST a archiv rozvrhů? Školy, trenéři, školníci, týdenní rozvrhy a výjimky zůstanou.")) return;
+  clearScheduleData();
+  showStatusMessage("Rozvrh byl vymazán.");
 }
 
 function applySchoolChange(){
@@ -2512,6 +2427,23 @@ function openMenu(e, date, cls, h, type, availableOnly = false, promptText = "",
     menu.appendChild(d);
   }
 
+  function addPlannedTrainerAction(){
+    if(type !== "real") return;
+
+    const plannedValue = getStoredValue(plans, date, cls, h);
+    const plannedTrainerId = getStoredTrainerId(plannedValue);
+    if(!plannedTrainerId) return;
+
+    const d = document.createElement("div");
+    d.className = "menu-item menu-item-planned";
+    if(plannedTrainerId === "X") d.classList.add("menu-item-unavailable");
+    d.textContent = plannedTrainerId === "X"
+      ? "Podle plánu: Nelze obsadit"
+      : `Podle plánu: ${getName(plannedValue)}`;
+    d.onclick = () => selectValue(plannedTrainerId);
+    menu.appendChild(d);
+  }
+
   function addAction(label, onClick){
     let d = document.createElement("div");
     d.className = "menu-item";
@@ -2597,6 +2529,7 @@ function openMenu(e, date, cls, h, type, availableOnly = false, promptText = "",
         renderFlatTrainerList(filteredVisibleTrainers);
       }
     } else {
+      addPlannedTrainerAction();
       addAction(TEXTS.schedule.searchTrainer, () => {
         openMenuMode = "search";
         openMenuSearch = "";
@@ -2847,6 +2780,216 @@ function getMonthRange(anchorDate){
   const start = new Date(date.getFullYear(), date.getMonth(), 1);
   const end = new Date(date.getFullYear(), date.getMonth() + 1, 0);
   return { start, end };
+}
+
+function loadSchoolYearPlan(){
+  return load(SCHOOL_YEAR_PLAN_KEY, []);
+}
+
+function saveSchoolYearPlan(items){
+  localStorage.setItem(SCHOOL_YEAR_PLAN_KEY, JSON.stringify(items));
+}
+
+function loadSchoolYearExceptions(){
+  return load(SCHOOL_YEAR_EXCEPTIONS_KEY, []);
+}
+
+function getCurrentSchoolYearRange(anchorDate = currentDate){
+  const date = new Date(anchorDate);
+  const year = date.getMonth() >= 8 ? date.getFullYear() : date.getFullYear() - 1;
+  return {
+    start: new Date(year, 8, 1),
+    end: new Date(year + 1, 5, 30)
+  };
+}
+
+function isDateInCurrentSchoolYear(date){
+  const range = getCurrentSchoolYearRange(date);
+  const value = normalizeDateKey(date);
+  return value >= normalizeDateKey(range.start) && value <= normalizeDateKey(range.end);
+}
+
+function isSchoolExceptionDate(schoolId, date){
+  const dateKey = normalizeDateKey(date);
+  return loadSchoolYearExceptions().some(item =>
+    String(item.schoolId || "") === String(schoolId || "") &&
+    String(item.date || "") === dateKey
+  );
+}
+
+function getRecurringLessonsForCurrentContext(){
+  const schoolId = String(schoolSelect?.value || "");
+  const year = getSelectedYear();
+  return loadSchoolYearPlan()
+    .filter(item => String(item.schoolId || "") === schoolId && String(item.year || "") === year)
+    .sort((a, b) => Number(a.dayIndex) - Number(b.dayIndex) || Number(a.hour) - Number(b.hour) || String(a.className).localeCompare(String(b.className), "cs"));
+}
+
+function applyRecurringPlanToCurrentWeek(){
+  const lessons = getRecurringLessonsForCurrentContext();
+  if(!lessons.length){
+    showStatusMessage("Pro tuto školu a ročník není zadaný stálý plán.", "error");
+    return;
+  }
+
+  let added = 0;
+  const monday = getMonday(currentDate);
+
+  lessons.forEach(lesson => {
+    const date = new Date(monday);
+    date.setDate(date.getDate() + Number(lesson.dayIndex));
+    if(!isDateInCurrentSchoolYear(date)) return;
+    if(isSchoolExceptionDate(lesson.schoolId, date)) return;
+
+    if(getStoredValue(plans, date, lesson.className, lesson.hour)) return;
+
+    plans[getKey(date, lesson.className, lesson.hour)] = createPlanStoredValue(
+      lesson.trainerId,
+      date,
+      lesson.className,
+      lesson.hour
+    );
+    added += 1;
+  });
+
+  localStorage.setItem("plans", JSON.stringify(plans));
+  renderScheduleSafe();
+  showStatusMessage(added ? `Doplněno ${added} hodin ze stálého plánu.` : "Týden už je podle stálého plánu doplněný.");
+}
+
+function getScheduleArchives(){
+  return load(SCHEDULE_ARCHIVE_KEY, []);
+}
+
+function saveScheduleArchives(archives){
+  localStorage.setItem(SCHEDULE_ARCHIVE_KEY, JSON.stringify(archives.slice(0, 80)));
+}
+
+function getScheduleArchiveRange(type){
+  return type === "month" ? getMonthRange(currentDate) : getWeekRange(currentDate);
+}
+
+function getScheduleArchiveLabel(type, range){
+  const startLabel = range.start.toLocaleDateString("cs-CZ");
+  const endLabel = range.end.toLocaleDateString("cs-CZ");
+  const schoolName = getSelectedSchool()?.nazev || "všechny školy";
+  const prefix = type === "month" ? "Měsíc" : "Týden";
+  return `${prefix} ${startLabel} - ${endLabel} | ${schoolName} | ${getSelectedYear()}. ročník`;
+}
+
+function isStoredEntryInRange(key, value, range){
+  const parsed = parseKey(key);
+  if(!parsed?.date) return false;
+  if(!isDateInRange(parsed.date, range.start, range.end)) return false;
+
+  const entryYear = typeof value === "object" ? value?.year : parsed.year;
+  return !entryYear || String(entryYear) === getSelectedYear();
+}
+
+function collectScheduleArchiveStore(store, range){
+  return Object.fromEntries(
+    Object.entries(store).filter(([key, value]) => isStoredEntryInRange(key, value, range))
+  );
+}
+
+function removeArchivedRangeFromStore(store, archive){
+  const range = {
+    start: new Date(archive.startDate),
+    end: new Date(archive.endDate)
+  };
+
+  Object.entries(store).forEach(([key, value]) => {
+    const parsed = parseKey(key);
+    if(!parsed?.date || !isDateInRange(parsed.date, range.start, range.end)) return;
+
+    const entryYear = typeof value === "object" ? value?.year : parsed.year;
+    if(!entryYear || String(entryYear) === String(archive.year)){
+      delete store[key];
+    }
+  });
+}
+
+function setScheduleArchiveStatus(message){
+  if(!scheduleArchiveStatus) return;
+  scheduleArchiveStatus.textContent = message;
+}
+
+function refreshScheduleArchiveSelect(){
+  if(!scheduleArchiveSelect) return;
+  const archives = getScheduleArchives();
+  scheduleArchiveSelect.innerHTML = "";
+
+  if(!archives.length){
+    const option = document.createElement("option");
+    option.value = "";
+    option.textContent = "Žádný uložený archiv";
+    scheduleArchiveSelect.appendChild(option);
+    if(loadArchiveButton) loadArchiveButton.disabled = true;
+    return;
+  }
+
+  archives.forEach((archive) => {
+    const option = document.createElement("option");
+    option.value = archive.id;
+    option.textContent = archive.label;
+    scheduleArchiveSelect.appendChild(option);
+  });
+
+  if(loadArchiveButton) loadArchiveButton.disabled = false;
+}
+
+function saveScheduleArchive(type){
+  const range = getScheduleArchiveRange(type);
+  const archive = {
+    id: `${Date.now()}-${type}`,
+    type,
+    label: getScheduleArchiveLabel(type, range),
+    startDate: formatDate(range.start),
+    endDate: formatDate(range.end),
+    year: getSelectedYear(),
+    schoolId: schoolSelect?.value || "",
+    savedAt: new Date().toISOString(),
+    plans: collectScheduleArchiveStore(plans, range),
+    reality: collectScheduleArchiveStore(reality, range)
+  };
+
+  const archives = [archive, ...getScheduleArchives()];
+  saveScheduleArchives(archives);
+  refreshScheduleArchiveSelect();
+  scheduleArchiveSelect.value = archive.id;
+  setScheduleArchiveStatus("Archiv uložen.");
+}
+
+function loadScheduleArchive(){
+  if(!scheduleArchiveSelect?.value) return;
+  const archive = getScheduleArchives().find(item => item.id === scheduleArchiveSelect.value);
+  if(!archive) return;
+
+  removeArchivedRangeFromStore(plans, archive);
+  removeArchivedRangeFromStore(reality, archive);
+  Object.assign(plans, archive.plans || {});
+  Object.assign(reality, archive.reality || {});
+  localStorage.setItem("plans", JSON.stringify(plans));
+  localStorage.setItem("reality", JSON.stringify(reality));
+
+  if(archive.schoolId && schoolSelect){
+    schoolSelect.value = archive.schoolId;
+    localStorage.setItem("selectedSchool", schoolSelect.value);
+    activeSchoolId = schoolSelect.value;
+    lastSchoolValue = schoolSelect.value;
+    updateSchoolUI();
+  }
+
+  if(archive.year && yearSelect){
+    yearSelect.value = String(archive.year);
+    lastYearValue = yearSelect.value;
+  }
+
+  currentDate = new Date(archive.startDate);
+  updateWeekInfo();
+  lastDateValue = dateInput.value;
+  renderScheduleSafe();
+  setScheduleArchiveStatus("Archiv načten.");
 }
 
 function isDateInRange(dateStr, start, end){
@@ -3500,7 +3643,6 @@ function renderScheduleCore(){
     fragment.appendChild(rowP);
     fragment.appendChild(rowS);
   }
-
   table.replaceChildren(fragment);
 }
 
@@ -3587,10 +3729,26 @@ if(trainerPeriodDate){
 if(showTrainerPlanButton){
   showTrainerPlanButton.addEventListener("click", openTrainerPlanPage);
 }
+if(saveWeekArchiveButton){
+  saveWeekArchiveButton.addEventListener("click", () => saveScheduleArchive("week"));
+}
+if(saveMonthArchiveButton){
+  saveMonthArchiveButton.addEventListener("click", () => saveScheduleArchive("month"));
+}
+if(loadArchiveButton){
+  loadArchiveButton.addEventListener("click", loadScheduleArchive);
+}
+if(clearScheduleDataButton){
+  clearScheduleDataButton.addEventListener("click", confirmClearScheduleData);
+}
+if(applyRecurringWeekButton){
+  applyRecurringWeekButton.addEventListener("click", applyRecurringPlanToCurrentWeek);
+}
 editWeekButton.addEventListener("click", () => {
   editWeekButton.classList.toggle("edit-active");
   setEditMode(!isEditMode);
 });
+window.clearScheduleData = clearScheduleData;
 leaveEditConfirmButton.addEventListener("click", () => {
   const onConfirm = pendingLeaveEditConfirm;
   pendingLeaveEditConfirm = null;

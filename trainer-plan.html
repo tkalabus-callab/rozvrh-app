@@ -3,16 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <title>Plán trenéra</title>
+<link rel="stylesheet" href="styles.css">
 <style>
-  :root {
-    --color-primary: #1bb3c8;
-    --color-primary-dark: #146f80;
-    --color-bg: #eef3f7;
-    --color-border: #d4dde6;
-    --color-header: #2c3e55;
-    --color-surface: #ffffff;
-  }
-
   * {
     box-sizing: border-box;
   }
@@ -27,21 +19,22 @@
   .page-header {
     background: var(--color-header);
     color: #fff;
-    padding: 14px 0 18px;
     margin-bottom: 16px;
   }
 
   .page-header-inner {
-    width: min(960px, calc(100% - 32px));
-    margin: 0 auto;
+    width: 100%;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
   }
 
   .top-toolbar {
     display: flex;
     justify-content: center;
-    padding: 0 20px 14px;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
-    margin-bottom: 12px;
+    order: 2;
+    padding: 14px 20px;
+    margin-bottom: 0;
   }
 
   .top-toolbar-left {
@@ -67,10 +60,18 @@
   }
 
   .page-header h2 {
+    order: 1;
     margin: 0;
+    padding: 16px;
+    background: var(--color-header);
+    border-bottom: 5px solid var(--color-primary);
+    box-shadow: 0 4px 14px rgba(0,0,0,0.18);
     text-align: center;
-    font-size: 24px;
-    letter-spacing: 0.3px;
+    font-size: 30px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.35);
+    text-transform: uppercase;
   }
 
   .page-action-box,

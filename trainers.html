@@ -3,44 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <title>Trenéři</title>
+<link rel="stylesheet" href="styles.css">
 
 <style>
-:root {
-  --color-primary: #1bb3c8;
-  --color-primary-dark: #146f80;
-  --color-bg: #eef3f7;
-  --color-border: #d4dde6;
-  --color-header: #2c3e55;
-  --color-text: #24364b;
-  --content-max-width:960px;
-}
 
 body {
   font-family: Arial;
   padding:20px;
   background:#eef3f7;
   color:var(--color-text);
-}
-
-.page-header {
-  background:var(--color-header);
-  width:100%;
-  box-sizing:border-box;
-}
-
-#pageTitle {
-  background:transparent;
-  color:#fff;
-  padding:10px 16px 16px 16px;
-  margin:0;
-  font-weight:700;
-  letter-spacing:0.3px;
-  text-align:center;
-  text-transform:uppercase;
-  display:block;
-  width:100%;
-  max-width:100%;
-  box-sizing:border-box;
 }
 
 .trainer-detail-panel {
@@ -143,63 +114,6 @@ input { margin:2px; }
 
 .trainer-delete-confirm[hidden] {
   display:none;
-}
-
-.page-action-box {
-  margin:16px auto;
-  padding:16px 18px;
-  max-width:var(--content-max-width);
-  width:100%;
-  border:0;
-  border-radius:12px;
-  background:var(--color-primary);
-  box-sizing:border-box;
-  display:flex;
-  align-items:center;
-  justify-content:flex-start;
-  gap:14px;
-  flex-wrap:wrap;
-}
-
-.view-options {
-  display:flex;
-  align-items:center;
-  gap:8px;
-  flex-wrap:wrap;
-  min-height:32px;
-  border-left:0;
-  padding-left:0;
-}
-
-.view-options-title {
-  color:#000000;
-  font-weight:800;
-  text-transform:uppercase;
-  font-size:14px;
-  line-height:1.2;
-  width:100%;
-  margin-bottom:10px;
-}
-
-.view-option-button {
-  min-height:40px;
-  padding:0 14px;
-  border-radius:8px;
-  border:1px solid var(--color-border);
-  background:#ffffff;
-  color:var(--color-header);
-  font-weight:700;
-  line-height:1;
-  cursor:pointer;
-  transition:background 0.15s ease, border-color 0.15s ease;
-  box-shadow:0 2px 6px rgba(0,0,0,0.18);
-}
-
-.view-option-button.is-active {
-  border-width:2px;
-  border-color:var(--color-primary);
-  background:#eef6fb;
-  box-shadow:0 2px 6px rgba(0,0,0,0.12);
 }
 
 #newTrainerButton {
@@ -355,78 +269,6 @@ tr.trainer-busy:hover { background:#f6dddd; }
   margin:18px auto 8px;
 }
 
-.top-toolbar {
-  z-index:100;
-  display:flex;
-  align-items:stretch;
-  justify-content:center;
-  gap:14px;
-  margin:0;
-  padding:14px 16px;
-  max-width:100%;
-  box-sizing:border-box;
-  background:transparent;
-  border:0;
-  border-bottom:1px solid rgba(255,255,255,0.08);
-  flex-wrap:wrap;
-}
-
-.top-toolbar-left,
-.top-toolbar-actions,
-.top-toolbar-modules {
-  display:flex;
-  align-items:stretch;
-  gap:14px;
-  flex-wrap:wrap;
-}
-
-.top-toolbar a,
-.top-toolbar button {
-  box-sizing:border-box;
-  color:#062b25;
-  text-decoration:none;
-  padding:0 16px;
-  border-radius:6px;
-  font-weight:600;
-  transition:background-color 0.2s ease, box-shadow 0.2s ease;
-  white-space:nowrap;
-  background:var(--color-primary);
-  border:1px solid rgba(0,0,0,0.35);
-  box-shadow:
-    0 2px 4px rgba(0,0,0,0.25),
-    inset 0 1px 0 rgba(255,255,255,0.06);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  min-width:160px;
-  height:46px;
-  line-height:1;
-  text-align:center;
-  overflow:hidden;
-  margin:0;
-}
-
-.top-toolbar a:hover,
-.top-toolbar button:hover {
-  background:var(--color-primary);
-  box-shadow:
-    0 4px 10px rgba(0,0,0,0.35),
-    inset 0 1px 0 rgba(255,255,255,0.10);
-  border-color:#6b84a3;
-  color:#062b25;
-}
-
-.top-toolbar a.active {
-  color:#062b25;
-  border-color:#ffffff;
-  background:var(--color-primary);
-  box-shadow: inset 0 0 0 4px #ffffff;
-}
-
-.top-toolbar a.active:hover {
-  background:var(--color-primary);
-  border-color:#ffffff;
-}
 </style>
 </head>
 
@@ -883,17 +725,9 @@ function render(){
       return a.jmeno.localeCompare(b.jmeno);
     });
   } else if(isSelectionMode){
-    selectionListInfo.textContent = "Volní oblíbení trenéři školy";
-    const schools = JSON.parse(localStorage.getItem("schools") || "[]");
-    const school = schools.find(s => String(s.id) === String(availabilityContext?.schoolId));
-    if(school){
-      const favoriteTrainerIds = Array.isArray(school.favoriteTrainers) ? school.favoriteTrainers.map(String) : [];
-      visibleTrainers = favoriteTrainerIds
-        .map(id => trainers.find(t => String(t.id) === id))
-        .filter(t => t && !isTrainerBusyForAvailabilityContext(t.id));
-      if(!visibleTrainers.length) selectionListInfo.textContent = "Žádný volný oblíbený trenér pro tuto školu.";
-      shouldSortTrainers = false;
-    }
+    selectionListInfo.textContent = "Volní trenéři";
+    visibleTrainers = trainers.filter(t => !isTrainerBusyForAvailabilityContext(t.id));
+    if(!visibleTrainers.length) selectionListInfo.textContent = "Žádný volný trenér pro tento čas.";
   }
 
   const renderedTrainers = shouldSortTrainers ? visibleTrainers.sort((a, b) => {
