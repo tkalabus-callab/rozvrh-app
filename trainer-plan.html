@@ -281,6 +281,7 @@
       <div class="top-toolbar-left">
         <a href="home.html">Domů</a>
         <a href="index.html">Rozvrh</a>
+        <a href="trainers.html">Trenéři</a>
         <a href="schools.html">Školy</a>
       </div>
     </div>
@@ -295,7 +296,7 @@
       <button id="exportTrainerPlanPdfButton" type="button">Export PDF</button>
       <button id="exportTrainerPlanExcelButton" type="button">Export Excel</button>
       <button id="emailTrainerPlanButton" type="button">Poslat e-mailem</button>
-      <button id="backToScheduleButton" type="button">Zpět do rozvrhu</button>
+      <button id="backToScheduleButton" type="button">Zpět na trenéry</button>
     </div>
   </div>
 
@@ -619,7 +620,7 @@ renderTrainerPlanPage();
 exportTrainerPlanExcelButton.addEventListener("click", exportTrainerPlanCsv);
 
 backToScheduleButton.addEventListener("click", () => {
-  window.location.href = "index.html";
+  window.location.href = "trainers.html";
 });
 </script>
 

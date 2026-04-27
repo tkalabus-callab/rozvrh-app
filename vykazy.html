@@ -431,6 +431,39 @@
       text-transform:uppercase;
     }
 
+    .archive-header-actions{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      margin-left:auto;
+    }
+
+    .archive-clear{
+      min-height:34px;
+      padding:0 12px;
+      border:1px solid #ef4444;
+      border-radius:8px;
+      background:#fff1f2;
+      color:#991b1b;
+      font-size:13px;
+      font-weight:900;
+      text-transform:uppercase;
+      cursor:pointer;
+    }
+
+    .archive-close-text{
+      min-height:34px;
+      padding:0 12px;
+      border:1px solid rgba(44,62,85,0.18);
+      border-radius:8px;
+      background:var(--color-primary);
+      color:#062b25;
+      font-size:13px;
+      font-weight:900;
+      text-transform:uppercase;
+      cursor:pointer;
+    }
+
     .archive-close{
       min-width:38px;
       min-height:34px;
@@ -547,6 +580,51 @@
       color:#536273;
       font-size:13px;
       font-weight:700;
+    }
+
+    .archive-status{
+      display:inline-flex;
+      align-items:center;
+      width:max-content;
+      margin-top:8px;
+      padding:4px 8px;
+      border-radius:999px;
+      background:#fff7ed;
+      color:#9a3412;
+      font-size:12px;
+      font-weight:900;
+      text-transform:uppercase;
+    }
+
+    .archive-status.is-done{
+      background:#dcfce7;
+      color:#166534;
+    }
+
+    .archive-item-actions{
+      display:flex;
+      align-items:center;
+      justify-content:flex-end;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+    .archive-process-button{
+      min-height:34px;
+      padding:0 10px;
+      border:1px solid rgba(44,62,85,0.18);
+      border-radius:8px;
+      background:var(--color-primary);
+      color:#062b25;
+      font-size:12px;
+      font-weight:900;
+      text-transform:uppercase;
+      cursor:pointer;
+    }
+
+    .archive-process-button.is-done{
+      background:#e5e7eb;
+      color:var(--color-header);
     }
 
     .archive-empty{
@@ -825,7 +903,11 @@
     <div class="archive-dialog" role="dialog" aria-modal="true" aria-labelledby="reportArchiveTitle">
       <div class="archive-header">
         <h2 id="reportArchiveTitle" class="archive-title">Archiv výkazů</h2>
-        <button id="closeArchiveButton" class="archive-close" type="button" aria-label="Zavřít archiv">×</button>
+        <div class="archive-header-actions">
+          <button id="clearArchiveButton" class="archive-clear" type="button">Smazat archiv</button>
+          <button id="closeArchiveTextButton" class="archive-close-text" type="button">Zavřít archiv</button>
+          <button id="closeArchiveButton" class="archive-close" type="button" aria-label="Zavřít archiv">×</button>
+        </div>
       </div>
       <div class="archive-columns">
         <section class="archive-column" aria-labelledby="schoolArchiveTitle">
@@ -868,12 +950,15 @@
       const archiveReportButton = document.getElementById("archiveReportButton");
       const openArchiveButton = document.getElementById("openArchiveButton");
       const reportArchiveModal = document.getElementById("reportArchiveModal");
+      const clearArchiveButton = document.getElementById("clearArchiveButton");
+      const closeArchiveTextButton = document.getElementById("closeArchiveTextButton");
       const closeArchiveButton = document.getElementById("closeArchiveButton");
       const schoolArchiveList = document.getElementById("schoolArchiveList");
       const trainerArchiveList = document.getElementById("trainerArchiveList");
-      if(!yearSelect || !monthSelect || !reportGroupSelect || !schoolFilterWrap || !trainerFilterWrap || !schoolFilter || !trainerFilter || !reportSummaryTitle || !reportFocusMode || !reportArchiveBadge || !reportFocusSubject || !reportFocusHours || !reportStatusMessage || !summaryPeriod || !summarySchoolHours || !summaryTrainerHours || !summaryHoursCheck || !reportBody || !printReport || !exportExcelButton || !exportPdfButton || !emailReportButton || !archiveReportButton || !openArchiveButton || !reportArchiveModal || !closeArchiveButton || !schoolArchiveList || !trainerArchiveList) return;
+      if(!yearSelect || !monthSelect || !reportGroupSelect || !schoolFilterWrap || !trainerFilterWrap || !schoolFilter || !trainerFilter || !reportSummaryTitle || !reportFocusMode || !reportArchiveBadge || !reportFocusSubject || !reportFocusHours || !reportStatusMessage || !summaryPeriod || !summarySchoolHours || !summaryTrainerHours || !summaryHoursCheck || !reportBody || !printReport || !exportExcelButton || !exportPdfButton || !emailReportButton || !archiveReportButton || !openArchiveButton || !reportArchiveModal || !clearArchiveButton || !closeArchiveTextButton || !closeArchiveButton || !schoolArchiveList || !trainerArchiveList) return;
 
       let loadedArchiveContext = null;
+      const openArchiveMonthKeys = new Set();
 
       const now = new Date();
       const currentYear = now.getFullYear();
@@ -1551,7 +1636,7 @@
           }
         })();
 
-        archive.unshift({
+        const archiveItem = {
           createdAt: new Date().toISOString(),
           format,
           period: context.periodText,
@@ -1575,9 +1660,20 @@
           exportModeText: context.exportModeText,
           exportFilterText: context.exportFilterText,
           titleText: context.titleText
-        });
+        };
 
-        localStorage.setItem("reportsArchive", JSON.stringify(archive.slice(0, 100)));
+        const archiveKey = getArchiveIdentityKey(archiveItem);
+        const existingArchiveItem = archive.find(item => getArchiveIdentityKey(item) === archiveKey);
+        if(existingArchiveItem){
+          const shouldOverwrite = window.confirm(`V archivu už existuje výkaz pro ${context.periodText} / ${context.subjectText}. Chceš ho přepsat novou verzí?`);
+          if(!shouldOverwrite) return false;
+        }
+
+        const nextArchive = archive.filter(item => getArchiveIdentityKey(item) !== archiveKey);
+        nextArchive.unshift(archiveItem);
+
+        localStorage.setItem("reportsArchive", JSON.stringify(nextArchive.slice(0, 100)));
+        return true;
       }
 
       function loadReportArchive(){
@@ -1613,6 +1709,8 @@
           schoolHoursTotal,
           trainerHoursTotal,
           totalsMatch,
+          processedAt: item.processedAt || "",
+          processedStatus: item.processedStatus || "",
           yearValue: item.yearValue || yearSelect.value,
           monthValue: item.monthValue || monthSelect.value,
           periodText: item.period || "",
@@ -1648,8 +1746,48 @@
         });
       }
 
+      function getArchiveIdentityKey(item){
+        const group = item.group || "schools";
+        const monthKey = getArchiveMonthKey(item);
+        const subjectKey = group === "schools"
+          ? (item.schoolFilter || item.schoolLabel || item.subjectText || "")
+          : (item.trainerFilter || item.trainerLabel || item.subjectText || "");
+
+        return [group, monthKey, String(subjectKey)].join("|");
+      }
+
+      function getArchiveTimestamp(item){
+        return item.createdAt ? (Date.parse(item.createdAt) || 0) : 0;
+      }
+
+      function isArchiveProcessed(item){
+        return Boolean(item.processedAt || item.processedStatus);
+      }
+
+      function getArchiveProcessLabel(group){
+        return group === "schools" ? "Vyfakturováno" : "Zkontrolováno";
+      }
+
+      function getArchivePendingLabel(group){
+        return group === "schools" ? "Čeká na fakturaci" : "Čeká na kontrolu";
+      }
+
+      function getUniqueArchiveEntries(archive){
+        const unique = new Map();
+        archive.forEach(({ item, index }) => {
+          const key = getArchiveIdentityKey(item);
+          const existing = unique.get(key);
+          if(!existing || getArchiveTimestamp(item) > getArchiveTimestamp(existing.item)){
+            unique.set(key, { item, index });
+          }
+        });
+
+        return Array.from(unique.values())
+          .sort((a, b) => getArchiveTimestamp(b.item) - getArchiveTimestamp(a.item));
+      }
+
       function renderArchiveList(){
-        const archive = loadReportArchive().map((item, index) => ({ item, index }));
+        const archive = getUniqueArchiveEntries(loadReportArchive().map((item, index) => ({ item, index })));
         renderArchiveColumn(schoolArchiveList, archive, "schools", "Školy");
         renderArchiveColumn(trainerArchiveList, archive, "trainers", "Trenéři");
       }
@@ -1673,7 +1811,9 @@
           .sort(([a], [b]) => b.localeCompare(a))
           .map(([monthKey, items]) => {
             const section = document.createElement("section");
+            const sectionKey = `${group}|${monthKey}`;
             section.className = "archive-month-group";
+            section.classList.toggle("is-open", openArchiveMonthKeys.has(sectionKey));
 
             const heading = document.createElement("button");
             heading.type = "button";
@@ -1696,7 +1836,24 @@
               meta.className = "archive-item-meta";
               const savedAt = item.createdAt ? new Date(item.createdAt).toLocaleString("cs-CZ") : "-";
               meta.textContent = `${context.totalHours} hod | ${context.totalRecords} záznamů | uloženo ${savedAt}`;
-              main.append(title, meta);
+              const status = document.createElement("div");
+              const processed = isArchiveProcessed(item);
+              status.className = `archive-status${processed ? " is-done" : ""}`;
+              status.textContent = processed ? getArchiveProcessLabel(group) : getArchivePendingLabel(group);
+              main.append(title, meta, status);
+
+              const actions = document.createElement("div");
+              actions.className = "archive-item-actions";
+
+              const processButton = document.createElement("button");
+              processButton.type = "button";
+              processButton.className = `archive-process-button${processed ? " is-done" : ""}`;
+              processButton.textContent = processed ? "Zrušit stav" : getArchiveProcessLabel(group);
+              processButton.addEventListener("click", (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                toggleArchiveProcessed(index);
+              });
 
               const loadButton = document.createElement("button");
               loadButton.type = "button";
@@ -1704,12 +1861,18 @@
               loadButton.textContent = "Načíst";
               loadButton.addEventListener("click", () => loadArchivedReport(index));
 
-              row.append(main, loadButton);
+              actions.append(processButton, loadButton);
+              row.append(main, actions);
               return row;
             }));
 
             heading.addEventListener("click", () => {
               section.classList.toggle("is-open");
+              if(section.classList.contains("is-open")){
+                openArchiveMonthKeys.add(sectionKey);
+              } else {
+                openArchiveMonthKeys.delete(sectionKey);
+              }
             });
             section.append(heading, list);
             return section;
@@ -1719,12 +1882,53 @@
       }
 
       function openArchive(){
+        openArchiveMonthKeys.clear();
         renderArchiveList();
         reportArchiveModal.hidden = false;
       }
 
       function closeArchive(){
         reportArchiveModal.hidden = true;
+      }
+
+      function clearReportArchive(){
+        if(!loadReportArchive().length){
+          showStatusMessage("Archiv výkazů je už prázdný.", "live");
+          renderArchiveList();
+          return;
+        }
+
+        const shouldClear = window.confirm("Opravdu smazat celý archiv výkazů? Tuto akci nelze vrátit zpět.");
+        if(!shouldClear) return;
+
+        localStorage.removeItem("reportsArchive");
+        loadedArchiveContext = null;
+        openArchiveMonthKeys.clear();
+        renderArchiveList();
+        updateReportSummaryTitle();
+        updateReportSummaryCards();
+        renderReportTable();
+        showStatusMessage("Archiv výkazů byl smazán.", "success");
+      }
+
+      function toggleArchiveProcessed(index){
+        const archive = loadReportArchive();
+        const item = archive[index];
+        if(!item) return;
+
+        const group = item.group || "schools";
+        if(isArchiveProcessed(item)){
+          delete item.processedAt;
+          delete item.processedStatus;
+          showStatusMessage("Archivní výkaz byl vrácen mezi rozpracované.", "live");
+        } else {
+          item.processedAt = new Date().toISOString();
+          item.processedStatus = group === "schools" ? "invoiced" : "checked";
+          showStatusMessage(`Archivní výkaz označen jako ${getArchiveProcessLabel(group).toLowerCase()}.`, "success");
+        }
+
+        localStorage.setItem("reportsArchive", JSON.stringify(archive));
+        renderArchiveList();
       }
 
       function loadArchivedReport(index){
@@ -1753,6 +1957,7 @@
       function exportReportExcel(options = {}){
         const context = getFreshReportContext();
         const shouldArchive = options?.archive !== false;
+        if(shouldArchive && !saveReportArchive("excel")) return "";
         const blob = buildExcelDocument(context);
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
@@ -1765,15 +1970,14 @@
         link.click();
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
-        if(shouldArchive) saveReportArchive("excel");
         return fileName;
       }
 
       function exportReportPdf(options = {}){
         const shouldArchive = options?.archive !== false;
         const context = getFreshReportContext();
+        if(shouldArchive && !saveReportArchive("pdf")) return;
         printReport.innerHTML = buildReportExportTable(context);
-        if(shouldArchive) saveReportArchive("pdf");
         window.print();
       }
 
@@ -1781,6 +1985,7 @@
         const context = getReportContext();
         const format = "Excel";
         const fileName = exportReportExcel({ archive: true });
+        if(!fileName) return;
 
         const subject = `Výkaz ${context.periodText}`;
         const body = [
@@ -1880,10 +2085,13 @@
       exportPdfButton.addEventListener("click", () => exportReportPdf());
       emailReportButton.addEventListener("click", emailReport);
       archiveReportButton.addEventListener("click", () => {
-        saveReportArchive("archive");
-        showStatusMessage("Výkaz byl uložen do archivu.", "success");
+        if(saveReportArchive("archive")){
+          showStatusMessage("Výkaz byl uložen do archivu jako poslední verze.", "success");
+        }
       });
       openArchiveButton.addEventListener("click", openArchive);
+      clearArchiveButton.addEventListener("click", clearReportArchive);
+      closeArchiveTextButton.addEventListener("click", closeArchive);
       closeArchiveButton.addEventListener("click", closeArchive);
       reportArchiveModal.addEventListener("click", (event) => {
         if(event.target === reportArchiveModal) closeArchive();

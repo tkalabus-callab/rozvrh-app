@@ -598,16 +598,11 @@ th.today-column::before {
 }
 
 /* rozložení:
-   A | C
+   A | A
    B | D
    E | E */
 #group-week{
-  grid-column:1;
-  grid-row:1;
-}
-
-#group-trainer-plan{
-  grid-column:2;
+  grid-column:1 / span 2;
   grid-row:1;
 }
 
@@ -671,30 +666,6 @@ th.today-column::before {
   border-color:var(--color-primary);
 }
 
-/* C = nejdůležitější akce (silný důraz) */
-#group-trainer-plan{
-  background:var(--color-primary);
-  border-color:var(--color-primary);
-  color:#fff;
-}
-
-#group-trainer-plan .toolbar-group-title{
-  color:#fff;
-  font-size:15px;
-}
-
-#group-trainer-plan .toolbar-group-body button{
-  background:#fff;
-  color:var(--color-primary-dark);
-  font-weight:700;
-}
-
-#group-trainer-plan select,
-#group-trainer-plan input{
-  height:32px;
-  min-height:32px;
-}
-
 .toolbar-group-title{
   margin:0;
   font-weight:700;
@@ -716,14 +687,12 @@ th.today-column::before {
 
 #group-week,
 #group-trainers,
-#group-trainer-plan,
 #group-schedule-archive,
 #group-caretaker-mode{
   min-height:100%;
 }
 
 #group-week,
-#group-trainer-plan,
 #group-schedule-archive{
   width:100%;
   box-sizing:border-box;
@@ -731,7 +700,6 @@ th.today-column::before {
 
 #group-week .toolbar-group-body,
 #group-trainers .toolbar-group-body,
-#group-trainer-plan .toolbar-group-body,
 #group-schedule-archive .toolbar-group-body{
   align-items:center;
 }
@@ -746,7 +714,6 @@ th.today-column::before {
 /* všechny tlačítka ve skupinách stejně vysoké a zarovnané */
 #group-week .toolbar-group-body button,
 #group-trainers .toolbar-group-body button,
-#group-trainer-plan .toolbar-group-body button,
 #group-schedule-archive .toolbar-group-body button{
   height:32px;
   min-height:32px;
@@ -762,8 +729,6 @@ th.today-column::before {
 #group-week .toolbar-group-body select,
 #group-trainers .toolbar-group-body input,
 #group-trainers .toolbar-group-body select,
-#group-trainer-plan .toolbar-group-body input,
-#group-trainer-plan .toolbar-group-body select,
 #group-schedule-archive .toolbar-group-body select{
   height:32px;
   min-height:32px;
@@ -772,7 +737,6 @@ th.today-column::before {
 
 #group-week .toolbar-group-body > *,
 #group-trainers .toolbar-group-body > *,
-#group-trainer-plan .toolbar-group-body > *,
 #group-schedule-archive .toolbar-group-body > *{
   margin:0;
 }
@@ -786,10 +750,6 @@ th.today-column::before {
   color:var(--color-header);
   font-size:13px;
   font-weight:700;
-}
-
-#group-trainer-plan .toolbar-group-body{
-  gap:10px;
 }
 
 #group-caretaker-mode-body{
@@ -937,26 +897,27 @@ th.today-column::before {
   color: #b00020;
 }
 
-#trainerSchoolScopeLabel {
-  display: inline-flex;
-  align-items: center;
-  padding: 0 4px;
+#scheduleOverlayMessage.blocking {
+  pointer-events: auto;
+  background: rgba(238, 243, 247, 0.94);
+  color: var(--color-header);
+  flex-direction: column;
+  gap: 14px;
 }
 
-#group-trainer-plan #showTrainerPlanButton{
-  height:40px;
-  min-height:40px;
-  padding:0 18px;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  box-sizing:border-box;
-  font-weight:800;
-  border-radius:6px;
-  border:1px solid rgba(0,0,0,0.2);
-  background:#3a4d63;
-  color:var(--color-primary);
-  box-shadow:0 2px 6px rgba(0,0,0,0.2);
+#scheduleOverlayMessage .overlay-action {
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 14px;
+  border: 1px solid rgba(44,62,85,0.18);
+  border-radius: 8px;
+  background: var(--color-primary);
+  color: #062b25;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 900;
 }
 
 #group-week #editWeekButton{
@@ -977,31 +938,19 @@ th.today-column::before {
   box-shadow:0 2px 6px rgba(0,0,0,0.2);
 }
 
-#group-trainer-plan #showTrainerPlanButton:hover,
-#group-trainer-plan #showTrainerPlanButton:focus,
 #group-week #editWeekButton:hover,
 #group-week #editWeekButton:focus{
   transform:translateY(-2px);
   box-shadow:0 6px 14px rgba(0,0,0,0.28);
 }
 
-#group-trainer-plan #showTrainerPlanButton:active,
 #group-week #editWeekButton:active{
   transform:translateY(0);
   box-shadow:0 2px 4px rgba(0,0,0,0.2);
 }
 
 button[style*="var(--color-primary)"],
-#group-week button,
-#group-trainer-plan button{
-  color:#000000;
-}
-
-#group-trainer-plan .toolbar-group-title{
-  color:#000000;
-}
-
-#trainerSchoolScopeLabel{
+#group-week button{
   color:#000000;
 }
 
@@ -1161,20 +1110,12 @@ button[style*="var(--color-primary)"],
 /* unified keyboard focus for CTA & toggle buttons */
 #group-week button:focus-visible,
 #group-trainers button:focus-visible,
-#group-trainer-plan button:focus-visible,
 #group-caretaker-mode button:focus-visible{
   outline:none;
   box-shadow:
     0 0 0 2px var(--color-primary),
     0 4px 10px rgba(0,0,0,0.24);
   border-radius:6px;
-}
-
-/* ensure focus ring is visible on dark CTA in C */
-#group-trainer-plan #showTrainerPlanButton:focus-visible{
-  box-shadow:
-    0 0 0 2px var(--color-primary),
-    0 6px 14px rgba(0,0,0,0.28);
 }
 
 /* ensure focus ring is visible on primary CTA in A */
@@ -1187,9 +1128,7 @@ button[style*="var(--color-primary)"],
 #group-week input:focus-visible,
 #group-week select:focus-visible,
 #group-trainers input:focus-visible,
-#group-trainers select:focus-visible,
-#group-trainer-plan input:focus-visible,
-#group-trainer-plan select:focus-visible{
+#group-trainers select:focus-visible{
   outline:none;
   box-shadow:
     0 0 0 2px var(--color-primary),
@@ -1252,23 +1191,6 @@ button[style*="var(--color-primary)"],
     </div>
   </div>
 
-  <!-- C: plán trenéra -->
-  <div class="toolbar-group" id="group-trainer-plan">
-    <div class="toolbar-group-title">Plán trenéra</div>
-    <div class="toolbar-group-body" id="group-trainer-plan-body">
-      <div id="trainerToolsContainer">
-        <select id="trainerFilterSelect"></select>
-        <span id="trainerSchoolScopeLabel">Všechny školy</span>
-        <select id="trainerPeriodType">
-          <option value="week">Týden</option>
-          <option value="month">Měsíc</option>
-        </select>
-        <input type="date" id="trainerPeriodDate">
-        <button id="showTrainerPlanButton" type="button">Zobrazit plán</button>
-      </div>
-    </div>
-  </div>
-
   <div class="toolbar-group" id="group-caretaker-mode">
     <div class="toolbar-group-title">REŽIM ŠKOLNÍKA</div>
     <div class="toolbar-group-body" id="group-caretaker-mode-body">
@@ -1318,8 +1240,6 @@ button[style*="var(--color-primary)"],
   </div>
 
 </div>
-<div id="trainerPlanPreview" style="margin-top:10px;"></div>
-
 <div id="managerFilterWrap" style="margin-top:12px; display:none;">
   <label for="managerSelect">Manažer:</label>
   <select id="managerSelect">
@@ -1413,6 +1333,7 @@ const leaveEditDiscardButton = document.getElementById("leaveEditDiscardButton")
 const leaveEditCancelButton = document.getElementById("leaveEditCancelButton");
 const table = document.getElementById("table");
 const CARETAKER_ID_STORAGE_KEY = "caretakerId";
+const MANAGER_SESSION_KEY = "managerModeUnlocked";
 const LAST_SCHOOL_BY_CARETAKER_KEY = "lastSchoolByCaretaker";
 const LAST_DATE_BY_CARETAKER_KEY = "lastDateByCaretaker";
 const TRAINER_FILTER_TRAINER_ID_KEY = "trainerFilterTrainerId";
@@ -1646,9 +1567,25 @@ function isCaretakerRoleMode(){
   return !!getRoleCaretakerId();
 }
 
+function isManagerRoleMode(){
+  return localStorage.getItem(MANAGER_SESSION_KEY) === "1" || sessionStorage.getItem(MANAGER_SESSION_KEY) === "1";
+}
+
+function hasValidCaretakerRole(){
+  return Boolean(getCaretakerById(getRoleCaretakerId()));
+}
+
+function hasScheduleAccess(){
+  return isManagerRoleMode() || hasValidCaretakerRole();
+}
+
 function getSchoolsForCurrentRole(allSchools){
-  if (!isCaretakerRoleMode()) {
+  if (isManagerRoleMode()) {
     return allSchools;
+  }
+
+  if (!hasValidCaretakerRole()) {
+    return [];
   }
 
   const caretakerId = getRoleCaretakerId();
@@ -1698,6 +1635,36 @@ function showStatusMessage(text, type = ""){
     }, 2200);
   } else {
     statusMessageTimeout = null;
+  }
+}
+
+function showScheduleLoginGate(message){
+  if(!scheduleOverlayMessage) return;
+
+  if(statusMessageTimeout){
+    clearTimeout(statusMessageTimeout);
+    statusMessageTimeout = null;
+  }
+
+  scheduleOverlayMessage.replaceChildren();
+
+  const text = document.createElement("div");
+  text.textContent = message || "Nejprve se přihlas jako školník na rozcestníku.";
+
+  const link = document.createElement("a");
+  link.className = "overlay-action";
+  link.href = "home.html";
+  link.textContent = "Přejít na rozcestník";
+
+  scheduleOverlayMessage.append(text, link);
+  scheduleOverlayMessage.className = "visible blocking";
+}
+
+function clearScheduleLoginGate(){
+  if(!scheduleOverlayMessage) return;
+  if(scheduleOverlayMessage.classList.contains("blocking")){
+    scheduleOverlayMessage.replaceChildren();
+    scheduleOverlayMessage.className = "";
   }
 }
 
@@ -1779,6 +1746,33 @@ function initStaticTexts(){
 
 function renderCaretakerRoleInfo(){
   if (!caretakerRoleInfo) return;
+
+  if (isManagerRoleMode()) {
+    caretakerRoleInfo.style.display = "block";
+    caretakerRoleInfo.replaceChildren();
+
+    const row = document.createElement("div");
+    row.className = "caretaker-mode-row";
+
+    const badge = document.createElement("div");
+    badge.className = "caretaker-name-badge";
+    badge.textContent = "Manažer";
+
+    const button = document.createElement("button");
+    button.id = "exitCaretakerModeButton";
+    button.type = "button";
+    button.textContent = "Odhlásit manažera";
+    button.addEventListener("click", () => {
+      localStorage.removeItem(MANAGER_SESSION_KEY);
+      sessionStorage.removeItem(MANAGER_SESSION_KEY);
+      location.href = "home.html";
+    });
+
+    row.appendChild(badge);
+    row.appendChild(button);
+    caretakerRoleInfo.appendChild(row);
+    return;
+  }
 
   const caretakerId = getRoleCaretakerId();
   const caretakerItem = getCaretakerById(caretakerId);
@@ -2019,8 +2013,10 @@ function loadSchools(){
 
   localStorage.setItem("selectedSchool", schoolSelect.value);
   activeSchoolId = schoolSelect.value;
-  schoolSelect.disabled = isCaretakerRoleMode();
-  schoolSelect.title = isCaretakerRoleMode() ? "Režim školníka – nelze měnit školu" : "";
+  schoolSelect.disabled = !hasScheduleAccess() || (!isManagerRoleMode() && schoolItems.length <= 1);
+  schoolSelect.title = !hasScheduleAccess()
+    ? "Nejprve se přihlas jako školník nebo manažer na rozcestníku."
+    : (!isManagerRoleMode() && schoolItems.length <= 1 ? "Přihlášený školník má jen jednu přiřazenou školu." : "");
   updateSchoolUI();
 }
 
@@ -3372,10 +3368,30 @@ function isTrainerBusy(trainerId, date, cls, hour, type){
 
 function renderScheduleCore(){
   loadSchools();
+  if(!hasScheduleAccess()){
+    activeSchoolId = "";
+    table.replaceChildren();
+    renderTrainerPanel();
+    showScheduleLoginGate("Nejprve se přihlas jako školník nebo manažer na rozcestníku.");
+    return;
+  }
+
   const visibleSchools = getSchoolsForCurrentRole(getSchools());
   const allowedSchoolIds = getFilteredSchoolIds().filter(id =>
     visibleSchools.some(s => String(s.id) === String(id))
   );
+
+  if(!allowedSchoolIds.length){
+    activeSchoolId = "";
+    table.replaceChildren();
+    renderTrainerPanel();
+    showScheduleLoginGate(isManagerRoleMode()
+      ? "Zatím nejsou založené žádné školy."
+      : "Přihlášený školník zatím nemá přiřazenou žádnou školu. Přiřazení nastaví manažer.");
+    return;
+  }
+
+  clearScheduleLoginGate();
 
   if(allowedSchoolIds.length){
     if(!allowedSchoolIds.includes(schoolSelect.value)){

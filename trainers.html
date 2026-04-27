@@ -269,6 +269,75 @@ tr.trainer-busy:hover { background:#f6dddd; }
   margin:18px auto 8px;
 }
 
+.trainer-plan-box {
+  width:100%;
+  max-width:var(--content-max-width);
+  margin:0 auto 16px;
+  padding:14px 18px;
+  border:0;
+  border-radius:12px;
+  background:var(--color-primary);
+  box-sizing:border-box;
+  color:#062b25;
+}
+
+.trainer-plan-title {
+  margin:0 0 12px;
+  color:#062b25;
+  font-size:14px;
+  line-height:1.2;
+  font-weight:900;
+  text-transform:uppercase;
+}
+
+.trainer-plan-controls {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.trainer-plan-controls select,
+.trainer-plan-controls input {
+  height:36px;
+  min-height:36px;
+  margin:0;
+  padding:6px 10px;
+  border:1px solid var(--color-border);
+  border-radius:6px;
+  box-sizing:border-box;
+  background:#ffffff;
+  color:var(--color-text);
+  font-weight:700;
+}
+
+#trainerPlanSelect {
+  min-width:190px;
+}
+
+#trainerPlanSchoolScope {
+  font-weight:800;
+  line-height:36px;
+}
+
+#openTrainerPlanButton {
+  height:40px;
+  min-height:40px;
+  padding:0 18px;
+  border:0;
+  border-radius:8px;
+  background:var(--color-header);
+  color:#ffffff;
+  box-shadow:0 4px 10px rgba(0,0,0,0.25);
+  font-weight:800;
+  cursor:pointer;
+}
+
+#openTrainerPlanButton:hover,
+#openTrainerPlanButton:focus {
+  background:var(--color-primary-dark);
+}
+
 </style>
 </head>
 
@@ -291,6 +360,20 @@ tr.trainer-busy:hover { background:#f6dddd; }
   <div class="view-options">
     <button class="view-option-button is-active" type="button" data-view-mode="all">VŠICHNI TRENÉŘI</button>
     <button class="view-option-button" type="button" data-view-mode="compact">KOMPAKTNÍ ZOBRAZENÍ</button>
+  </div>
+</div>
+
+<div class="trainer-plan-box">
+  <div class="trainer-plan-title">Plán trenéra</div>
+  <div class="trainer-plan-controls">
+    <select id="trainerPlanSelect"></select>
+    <span id="trainerPlanSchoolScope">Všechny školy</span>
+    <select id="trainerPlanPeriodType">
+      <option value="week">Týden</option>
+      <option value="month">Měsíc</option>
+    </select>
+    <input type="date" id="trainerPlanPeriodDate">
+    <button id="openTrainerPlanButton" type="button">Zobrazit plán</button>
   </div>
 </div>
 
@@ -390,6 +473,11 @@ const list = document.getElementById("list");
 const compactTrainerList = document.getElementById("compactTrainerList");
 const trainerTable = list.closest("table");
 const viewOptionButtons = document.querySelectorAll(".view-option-button");
+const trainerPlanBox = document.querySelector(".trainer-plan-box");
+const trainerPlanSelect = document.getElementById("trainerPlanSelect");
+const trainerPlanPeriodType = document.getElementById("trainerPlanPeriodType");
+const trainerPlanPeriodDate = document.getElementById("trainerPlanPeriodDate");
+const openTrainerPlanButton = document.getElementById("openTrainerPlanButton");
 const selectionParam = new URLSearchParams(window.location.search).get("selection");
 
 let trainers = JSON.parse(localStorage.getItem("trainers")) || [];
@@ -409,6 +497,85 @@ const hasSelectionContext = !!(
 let editId = null;
 let selectedId = null;
 let currentViewMode = "all";
+const TRAINER_FILTER_TRAINER_ID_KEY = "trainerFilterTrainerId";
+const TRAINER_FILTER_PERIOD_TYPE_KEY = "trainerFilterPeriodType";
+const TRAINER_FILTER_PERIOD_DATE_KEY = "trainerFilterPeriodDate";
+
+function getTodayIso(){
+  return new Date().toISOString().slice(0, 10);
+}
+
+function getTrainerFullName(trainer){
+  return `${trainer.prijmeni || ""} ${trainer.jmeno || ""}`.trim() || trainer.name || "";
+}
+
+function refreshTrainerPlanSelect(){
+  if(!trainerPlanSelect) return;
+
+  const currentValue = trainerPlanSelect.value || localStorage.getItem(TRAINER_FILTER_TRAINER_ID_KEY) || "";
+  const fragment = document.createDocumentFragment();
+
+  const defaultOption = document.createElement("option");
+  defaultOption.value = "";
+  defaultOption.textContent = "-- trenér --";
+  fragment.appendChild(defaultOption);
+
+  const sortedTrainers = [...trainers].sort((a, b) =>
+    getTrainerFullName(a).localeCompare(getTrainerFullName(b), "cs")
+  );
+
+  sortedTrainers.forEach(trainer => {
+    const option = document.createElement("option");
+    option.value = String(trainer.id);
+    option.textContent = getTrainerFullName(trainer);
+    fragment.appendChild(option);
+  });
+
+  trainerPlanSelect.replaceChildren(fragment);
+
+  if(currentValue && [...trainerPlanSelect.options].some(option => option.value === currentValue)){
+    trainerPlanSelect.value = currentValue;
+  }
+}
+
+function loadTrainerPlanControls(){
+  if(!trainerPlanSelect || !trainerPlanPeriodType || !trainerPlanPeriodDate) return;
+
+  refreshTrainerPlanSelect();
+  trainerPlanPeriodType.value = localStorage.getItem(TRAINER_FILTER_PERIOD_TYPE_KEY) || "week";
+  trainerPlanPeriodDate.value = localStorage.getItem(TRAINER_FILTER_PERIOD_DATE_KEY) || getTodayIso();
+}
+
+function saveTrainerPlanControls(){
+  if(trainerPlanSelect){
+    localStorage.setItem(TRAINER_FILTER_TRAINER_ID_KEY, trainerPlanSelect.value || "");
+  }
+  if(trainerPlanPeriodType){
+    localStorage.setItem(TRAINER_FILTER_PERIOD_TYPE_KEY, trainerPlanPeriodType.value || "week");
+  }
+  if(trainerPlanPeriodDate){
+    localStorage.setItem(TRAINER_FILTER_PERIOD_DATE_KEY, trainerPlanPeriodDate.value || "");
+  }
+}
+
+function openTrainerPlan(){
+  if(!trainerPlanSelect) return;
+
+  if(!trainerPlanSelect.value){
+    trainerPlanSelect.focus();
+    return;
+  }
+
+  saveTrainerPlanControls();
+
+  const params = new URLSearchParams({
+    trainerId: trainerPlanSelect.value || "",
+    periodType: trainerPlanPeriodType?.value || "week",
+    periodDate: trainerPlanPeriodDate?.value || ""
+  });
+
+  window.location.href = `trainer-plan.html?${params.toString()}`;
+}
 
 function initStaticTexts(){
   pageTitle.textContent = TEXTS.trainers.title;
@@ -435,6 +602,7 @@ function initStaticTexts(){
   clubHeader.textContent = TEXTS.trainers.club;
   availabilityHeader.textContent = "STAV";
   actionHeader.textContent = "Akce";
+  if(trainerPlanBox) trainerPlanBox.hidden = isSelectionMode;
 }
 
 function add(){
@@ -708,6 +876,8 @@ function renderCompactTrainers(items){
 }
 
 function render(){
+  refreshTrainerPlanSelect();
+
   let listFragment = document.createDocumentFragment();
   const search = isSelectionMode ? trainerSearch.value.trim().toLowerCase() : "";
   let visibleTrainers = trainers;
@@ -833,6 +1003,19 @@ viewOptionButtons.forEach(button => {
     render();
   });
 });
+if(trainerPlanSelect){
+  trainerPlanSelect.addEventListener("change", saveTrainerPlanControls);
+}
+if(trainerPlanPeriodType){
+  trainerPlanPeriodType.addEventListener("change", saveTrainerPlanControls);
+}
+if(trainerPlanPeriodDate){
+  trainerPlanPeriodDate.addEventListener("change", saveTrainerPlanControls);
+}
+if(openTrainerPlanButton){
+  openTrainerPlanButton.addEventListener("click", openTrainerPlan);
+}
+loadTrainerPlanControls();
 render();
 
 </script>
