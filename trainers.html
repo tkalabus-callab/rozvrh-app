@@ -59,12 +59,74 @@ input { margin:2px; }
   line-height:1.45;
 }
 
+.trainer-edit-layout {
+  display:block;
+}
+
+.trainer-edit-main {
+  display:grid;
+  grid-template-columns:minmax(0, 1fr) 224px;
+  gap:0 12px;
+  align-items:start;
+  min-width:0;
+}
+
+.trainer-edit-main .trainer-form-row {
+  grid-column:1;
+}
+
 #jmeno,
 #prijmeni,
 #telefon,
 #email,
 #ico {
   flex-basis:calc((100% - 48px) / 5);
+}
+
+.trainer-settings-grid {
+  grid-column:2;
+  grid-row:1 / span 4;
+  margin:10px 0 0;
+  display:flex;
+  justify-content:flex-start;
+  gap:12px;
+  align-items:start;
+}
+
+.trainer-rate-section {
+  width:224px;
+  min-height:66px;
+  box-sizing:border-box;
+  border:1px solid var(--color-border);
+  border-radius:8px;
+  background:#f8fbfd;
+  padding:10px;
+}
+
+.trainer-rate-title {
+  margin:0 0 8px;
+  color:var(--color-header);
+  font-weight:800;
+  text-transform:uppercase;
+}
+
+.trainer-rate-field {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  color:var(--color-header);
+  font-weight:800;
+}
+
+.trainer-rate-field input {
+  width:108px;
+  min-height:32px;
+  border:1px solid var(--color-border);
+  border-radius:6px;
+  padding:0 10px;
+  box-sizing:border-box;
+  font-weight:800;
 }
 
 #ulice,
@@ -76,6 +138,26 @@ input { margin:2px; }
 #klub,
 #poznamka {
   flex-basis:100%;
+}
+
+@media (max-width: 900px) {
+  .trainer-edit-main {
+    grid-template-columns:1fr;
+  }
+
+  .trainer-edit-main .trainer-form-row,
+  .trainer-settings-grid {
+    grid-column:1;
+    grid-row:auto;
+  }
+
+  .trainer-settings-grid {
+    margin-top:12px;
+  }
+
+  .trainer-rate-section {
+    width:100%;
+  }
 }
 
 .trainer-detail-actions {
@@ -342,6 +424,24 @@ tr.trainer-busy:hover { background:#f6dddd; }
 </head>
 
 <body>
+<script>
+(function(){
+  const managerLoggedIn = sessionStorage.getItem("managerModeUnlocked") === "1";
+  const caretakerId = localStorage.getItem("caretakerId") || "";
+  const sessionCaretakerId = sessionStorage.getItem("caretakerModeUnlocked") || "";
+  let caretakers = [];
+  try { caretakers = JSON.parse(localStorage.getItem("caretakers") || "[]"); } catch {}
+  const caretakerLoggedIn = Boolean(
+    caretakerId &&
+    sessionCaretakerId &&
+    String(caretakerId) === String(sessionCaretakerId) &&
+    caretakers.some(item => String(item.id) === String(caretakerId))
+  );
+  if(!managerLoggedIn && !caretakerLoggedIn){
+    window.location.replace("home.html");
+  }
+})();
+</script>
 
 <div class="page-header">
   <div class="top-toolbar">
@@ -381,12 +481,24 @@ tr.trainer-busy:hover { background:#f6dddd; }
 <h3 id="detailTitle"></h3>
 <div id="detail"></div>
 
+<div class="trainer-edit-layout">
+  <div class="trainer-edit-main">
 <div class="trainer-form-row">
   <input id="jmeno">
   <input id="prijmeni">
   <input id="telefon">
   <input id="email">
   <input id="ico">
+</div>
+
+<div class="trainer-settings-grid">
+  <section class="trainer-rate-section">
+    <h4 class="trainer-rate-title">Sazba trenéra</h4>
+    <label class="trainer-rate-field">
+      <span>Kč / hod</span>
+      <input id="trainerRate" type="number" min="0" step="1" inputmode="decimal">
+    </label>
+  </section>
 </div>
 
 <div class="trainer-form-row">
@@ -401,6 +513,8 @@ tr.trainer-busy:hover { background:#f6dddd; }
 
 <div class="trainer-form-row">
   <input id="poznamka">
+</div>
+  </div>
 </div>
 
 <div class="trainer-detail-actions">
@@ -450,6 +564,7 @@ const prijmeni = document.getElementById("prijmeni");
 const telefon = document.getElementById("telefon");
 const email = document.getElementById("email");
 const ico = document.getElementById("ico");
+const trainerRate = document.getElementById("trainerRate");
 const ulice = document.getElementById("ulice");
 const mesto = document.getElementById("mesto");
 const psc = document.getElementById("psc");
@@ -587,6 +702,7 @@ function initStaticTexts(){
   telefon.placeholder = TEXTS.common.phone;
   email.placeholder = TEXTS.common.email;
   ico.placeholder = TEXTS.common.ico;
+  trainerRate.placeholder = "Sazba Kč / hod";
   ulice.placeholder = "Ulice";
   mesto.placeholder = "Město";
   psc.placeholder = "PSČ";
@@ -615,6 +731,7 @@ function add(){
     telefon: telefon.value,
     email: email.value,
     ico: ico.value,
+    rate: trainerRate.value,
     ulice: ulice.value,
     mesto: mesto.value,
     psc: psc.value,
@@ -642,6 +759,7 @@ function edit(id){
   telefon.value = t.telefon || "";
   email.value = t.email || "";
   ico.value = t.ico || "";
+  trainerRate.value = t.rate || "";
   ulice.value = t.ulice || "";
   mesto.value = t.mesto || "";
   psc.value = t.psc || "";
@@ -687,6 +805,7 @@ function showDetail(id){
 
   appendDetailTextLine(detailFragment, `${TEXTS.trainers.club}: ${t.klub || TEXTS.common.placeholderDash}`);
   appendDetailTextLine(detailFragment, `${TEXTS.common.ico}: ${t.ico || TEXTS.common.placeholderDash}`);
+  appendDetailTextLine(detailFragment, `Sazba trenéra: ${t.rate ? `${t.rate} Kč / hod` : TEXTS.common.placeholderDash}`);
   appendDetailTextLine(detailFragment, `${TEXTS.common.phone}: ${t.telefon || TEXTS.common.placeholderDash}`);
 
   detailFragment.append(`${TEXTS.common.email}: `);
@@ -714,6 +833,7 @@ function clearForm(){
   telefon.value = "";
   email.value = "";
   ico.value = "";
+  trainerRate.value = "";
   ulice.value = "";
   mesto.value = "";
   psc.value = "";

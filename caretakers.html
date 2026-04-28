@@ -516,6 +516,24 @@ tr.active:hover {
 </head>
 
 <body>
+<script>
+(function(){
+  const managerLoggedIn = sessionStorage.getItem("managerModeUnlocked") === "1";
+  const caretakerId = localStorage.getItem("caretakerId") || "";
+  const sessionCaretakerId = sessionStorage.getItem("caretakerModeUnlocked") || "";
+  let caretakers = [];
+  try { caretakers = JSON.parse(localStorage.getItem("caretakers") || "[]"); } catch {}
+  const caretakerLoggedIn = Boolean(
+    caretakerId &&
+    sessionCaretakerId &&
+    String(caretakerId) === String(sessionCaretakerId) &&
+    caretakers.some(item => String(item.id) === String(caretakerId))
+  );
+  if(!managerLoggedIn && !caretakerLoggedIn){
+    window.location.replace("home.html");
+  }
+})();
+</script>
 
 <h2 id="pageTitle">Školníci</h2>
 <div class="top-toolbar">
@@ -555,7 +573,6 @@ tr.active:hover {
   <button id="newCaretakerButton" class="view-option-button" type="button">+ Nový školník</button>
   <button id="allCaretakersViewButton" class="view-option-button is-active" type="button">Všichni školníci</button>
   <button id="expandedCaretakersViewButton" class="view-option-button" type="button">Školníci + přidělené školy</button>
-  <button id="managerViewButton" class="view-option-button" type="button">Manažer</button>
 </div>
 
 <div id="managerModeInfo" class="manager-mode-info" hidden>
@@ -564,19 +581,6 @@ tr.active:hover {
     Přiřazuješ školy školníkům. Změny se projeví na stránce Školy i v rozvrhu.
   </div>
   <button id="exitManagerModeButton" type="button">Ukončit režim manažera</button>
-</div>
-
-<div id="managerAuthModal" class="manager-auth-modal" hidden>
-  <div class="manager-auth-dialog" role="dialog" aria-modal="true" aria-labelledby="managerAuthTitle">
-    <h3 id="managerAuthTitle" class="manager-auth-title">Režim manažer</h3>
-    <p class="manager-auth-text">Zadej heslo pro přiřazování škol školníkům.</p>
-    <input id="managerAuthInput" class="manager-auth-input" type="password" autocomplete="current-password">
-    <div id="managerAuthError" class="manager-auth-error"></div>
-    <div class="manager-auth-actions">
-      <button id="managerAuthCancel" class="manager-auth-cancel" type="button">Zrušit</button>
-      <button id="managerAuthConfirm" class="manager-auth-confirm" type="button">Vstoupit</button>
-    </div>
-  </div>
 </div>
 
 <h3>Seznam</h3>
@@ -598,7 +602,6 @@ tr.active:hover {
 <script>
 const STORAGE_KEY = "caretakers";
 const CARETAKER_ROLE_STORAGE_KEY = "caretakerId";
-const MANAGER_PASSWORD = "1111";
 const MANAGER_SESSION_KEY = "managerModeUnlocked";
 const MANAGER_RETURN_KEY = "managerModeReturnTo";
 
@@ -617,14 +620,8 @@ const newButton = document.getElementById("newButton");
 const newCaretakerButton = document.getElementById("newCaretakerButton");
 const allCaretakersViewButton = document.getElementById("allCaretakersViewButton");
 const expandedCaretakersViewButton = document.getElementById("expandedCaretakersViewButton");
-const managerViewButton = document.getElementById("managerViewButton");
 const managerModeInfo = document.getElementById("managerModeInfo");
 const exitManagerModeButton = document.getElementById("exitManagerModeButton");
-const managerAuthModal = document.getElementById("managerAuthModal");
-const managerAuthInput = document.getElementById("managerAuthInput");
-const managerAuthError = document.getElementById("managerAuthError");
-const managerAuthCancel = document.getElementById("managerAuthCancel");
-const managerAuthConfirm = document.getElementById("managerAuthConfirm");
 const deleteButton = document.getElementById("deleteButton");
 const openSchoolsButton = document.getElementById("openSchoolsButton");
 const clearCaretakerRoleButton = document.getElementById("clearCaretakerRoleButton");
@@ -904,7 +901,6 @@ function isCaretakerExpanded(caretakerId){
 function syncCaretakerViewButtons(){
   allCaretakersViewButton.classList.toggle("is-active", caretakerViewMode === "default");
   expandedCaretakersViewButton.classList.toggle("is-active", caretakerViewMode === "expanded");
-  managerViewButton.classList.toggle("is-active", caretakerViewMode === "manager");
   newCaretakerButton.hidden = caretakerViewMode === "manager";
   managerModeInfo.hidden = caretakerViewMode !== "manager";
   document.body.classList.toggle("manager-mode", caretakerViewMode === "manager");
@@ -1074,62 +1070,9 @@ function renderManagerView(){
   list.replaceChildren(fragment);
 }
 
-function requestManagerPassword(){
-  return new Promise((resolve) => {
-    managerAuthInput.value = "";
-    managerAuthError.textContent = "";
-    managerAuthModal.hidden = false;
-    setTimeout(() => managerAuthInput.focus(), 0);
-
-    const cleanup = () => {
-      managerAuthConfirm.removeEventListener("click", handleConfirm);
-      managerAuthCancel.removeEventListener("click", handleCancel);
-      managerAuthInput.removeEventListener("keydown", handleKeydown);
-      managerAuthModal.removeEventListener("click", handleBackdrop);
-    };
-
-    const close = (result) => {
-      cleanup();
-      managerAuthModal.hidden = true;
-      resolve(result);
-    };
-
-    const handleConfirm = () => {
-      if(managerAuthInput.value === MANAGER_PASSWORD){
-        close(true);
-        return;
-      }
-      managerAuthError.textContent = "Nesprávné heslo.";
-      managerAuthInput.select();
-      managerAuthInput.focus();
-    };
-
-    const handleCancel = () => close(false);
-
-    const handleKeydown = (event) => {
-      if(event.key === "Enter") handleConfirm();
-      if(event.key === "Escape") handleCancel();
-    };
-
-    const handleBackdrop = (event) => {
-      if(event.target === managerAuthModal) handleCancel();
-    };
-
-    managerAuthConfirm.addEventListener("click", handleConfirm);
-    managerAuthCancel.addEventListener("click", handleCancel);
-    managerAuthInput.addEventListener("keydown", handleKeydown);
-    managerAuthModal.addEventListener("click", handleBackdrop);
-  });
-}
-
 async function unlockManagerMode(){
   if(sessionStorage.getItem(MANAGER_SESSION_KEY) === "1" || localStorage.getItem(MANAGER_SESSION_KEY) === "1") {
     sessionStorage.setItem(MANAGER_SESSION_KEY, "1");
-    return true;
-  }
-  if(await requestManagerPassword()){
-    sessionStorage.setItem(MANAGER_SESSION_KEY, "1");
-    localStorage.setItem(MANAGER_SESSION_KEY, "1");
     return true;
   }
   return false;
@@ -1285,17 +1228,8 @@ expandedCaretakersViewButton.addEventListener("click", () => {
   expandedCaretakerId = null;
   render();
 });
-managerViewButton.addEventListener("click", async () => {
-  if(!await unlockManagerMode()) return;
-  caretakerViewMode = "manager";
-  expandedCaretakerId = null;
-  editId = null;
-  selectedId = null;
-  render();
-});
 exitManagerModeButton.addEventListener("click", () => {
   const returnTo = localStorage.getItem(MANAGER_RETURN_KEY);
-  sessionStorage.removeItem(MANAGER_SESSION_KEY);
   localStorage.removeItem(MANAGER_SESSION_KEY);
   localStorage.removeItem(MANAGER_RETURN_KEY);
   if(returnTo === "schools.html"){
@@ -1322,7 +1256,7 @@ editId = null;
 selectedId = null;
 closeCaretakerEditPanel();
 (async function initPage(){
-  if(new URLSearchParams(window.location.search).get("mode") === "manager" && await unlockManagerMode()){
+  if(await unlockManagerMode()){
     caretakerViewMode = "manager";
   }
   render();

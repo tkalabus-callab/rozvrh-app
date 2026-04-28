@@ -152,7 +152,7 @@ select {
   color:var(--color-text);
 }
 
-.hour-cell { width:40px; background:var(--color-header); }
+.hour-cell { width:124px; background:var(--color-header); }
 .label { width:30px; background:#f5f5f5; }
 
 .plan-row td { background:#d0e7ff; }
@@ -238,6 +238,35 @@ th.today-column::before {
 }
 #table tr:first-child th.today-column {
   background:var(--color-primary) !important;
+}
+
+.school-exception-day-header {
+  background:#8a1f1f !important;
+  color:#ffffff !important;
+  box-shadow:inset 0 -4px 0 rgba(0,0,0,0.22);
+}
+
+.school-exception-day-label {
+  display:block;
+  margin-top:4px;
+  font-size:10px;
+  line-height:1.15;
+  font-weight:900;
+  text-transform:uppercase;
+  color:#fff3cd;
+}
+
+.school-exception-day-cell {
+  background:#ffe1e1 !important;
+  background-image:
+    repeating-linear-gradient(
+      -45deg,
+      rgba(138,31,31,0.08) 0,
+      rgba(138,31,31,0.08) 8px,
+      rgba(255,255,255,0.18) 8px,
+      rgba(255,255,255,0.18) 16px
+    ) !important;
+  box-shadow:inset 0 0 0 1px rgba(138,31,31,0.28);
 }
 
 .today-column.unavailable,
@@ -483,6 +512,79 @@ th.today-column::before {
   background:#d7f1f6;
 }
 
+.plan-edit-menu {
+  min-width:300px;
+  padding:10px;
+  border-radius:10px;
+  box-sizing:border-box;
+}
+
+.plan-edit-title {
+  margin:0 0 8px;
+  color:var(--color-header);
+  font-size:14px;
+  font-weight:900;
+  text-transform:uppercase;
+}
+
+.plan-edit-grid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+}
+
+.plan-edit-field {
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  color:var(--color-header);
+  font-size:12px;
+  font-weight:800;
+}
+
+.plan-edit-field select {
+  min-height:32px;
+  border:1px solid var(--color-border);
+  border-radius:6px;
+  padding:0 8px;
+  font-weight:700;
+}
+
+.plan-edit-field-trainer {
+  grid-column:1 / -1;
+}
+
+.plan-edit-actions,
+.plan-edit-existing {
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-top:10px;
+}
+
+.plan-edit-actions button,
+.plan-edit-existing button {
+  min-height:32px;
+  border-radius:6px;
+  padding:0 10px;
+  font-weight:800;
+}
+
+.plan-edit-existing-title {
+  width:100%;
+  margin-top:8px;
+  color:var(--color-header);
+  font-size:12px;
+  font-weight:900;
+  text-transform:uppercase;
+}
+
+.plan-edit-existing button.is-selected {
+  background:var(--color-header);
+  border-color:var(--color-header);
+  color:#ffffff;
+}
+
 .trainer-group-title {
   width:100%;
   font-weight:bold;
@@ -521,6 +623,42 @@ th.today-column::before {
 
 .cell.status-match {
   background:#d4edda;
+}
+
+.schedule-entry {
+  display:block;
+  width:100%;
+  min-height:24px;
+  padding:4px 5px;
+  border:0;
+  border-radius:5px;
+  background:rgba(255,255,255,0.45);
+  color:inherit;
+  font:inherit;
+  font-weight:800;
+  text-align:center;
+  cursor:pointer;
+}
+
+.schedule-entry + .schedule-entry {
+  margin-top:3px;
+}
+
+.schedule-entry.status-plan-missing {
+  background:#f8d7da;
+}
+
+.schedule-entry.status-reality-only {
+  background:#ffe5b4;
+}
+
+.schedule-entry.status-match {
+  background:#d4edda;
+}
+
+.schedule-entry.unavailable {
+  color:#000000;
+  background:#ffef28;
 }
 
 .trainer-search {
@@ -689,9 +827,9 @@ th.today-column::before {
 
 .caretaker-fields-grid{
   display:grid;
-  grid-template-columns:minmax(180px, 0.85fr) minmax(220px, 1.15fr) minmax(88px, 0.35fr) minmax(88px, 0.35fr) minmax(150px, 0.65fr) auto;
+  grid-template-columns:minmax(180px, 0.85fr) minmax(260px, 1.2fr) minmax(160px, 0.65fr) auto;
   grid-template-areas:
-    "caretaker school year class city action";
+    "caretaker school city action";
   gap:8px 12px;
   align-items:end;
 }
@@ -785,10 +923,12 @@ th.today-column::before {
 
 .caretaker-field-year{
   grid-area:year;
+  display:none;
 }
 
 .caretaker-field-class{
   grid-area:class;
+  display:none;
 }
 
 .toolbar-field {
@@ -1045,6 +1185,24 @@ button[style*="var(--color-primary)"],
 </head>
 
 <body>
+<script>
+(function(){
+  const managerLoggedIn = sessionStorage.getItem("managerModeUnlocked") === "1";
+  const caretakerId = localStorage.getItem("caretakerId") || "";
+  const sessionCaretakerId = sessionStorage.getItem("caretakerModeUnlocked") || "";
+  let caretakers = [];
+  try { caretakers = JSON.parse(localStorage.getItem("caretakers") || "[]"); } catch {}
+  const caretakerLoggedIn = Boolean(
+    caretakerId &&
+    sessionCaretakerId &&
+    String(caretakerId) === String(sessionCaretakerId) &&
+    caretakers.some(item => String(item.id) === String(caretakerId))
+  );
+  if(!managerLoggedIn && !caretakerLoggedIn){
+    window.location.replace("home.html");
+  }
+})();
+</script>
 
 <div class="page-header">
   <div class="top-nav">
@@ -1071,6 +1229,7 @@ button[style*="var(--color-primary)"],
           <div class="caretaker-field-label" id="yearHeader"></div>
           <div class="caretaker-field-value">
             <select id="yearSelect" onchange="onYearChange()">
+              <option value="skolka">Školka</option>
               <option>1</option><option>2</option><option>3</option>
               <option>4</option><option>5</option><option>6</option>
               <option>7</option><option>8</option><option>9</option>
@@ -1142,18 +1301,6 @@ button[style*="var(--color-primary)"],
   </div>
 
 </div>
-<div id="managerFilterWrap" style="margin-top:12px; display:none;">
-  <label for="managerSelect">Manažer:</label>
-  <select id="managerSelect">
-    <option value="">Všichni manažeři</option>
-  </select>
-</div>
-
-<div id="caretakerFilterWrap" style="margin-top:12px; display:none;">
-  <label for="trainerSelect">Školníci:</label>
-  <select id="trainerSelect" multiple size="5"></select>
-</div>
-
 <div id="scheduleArea">
   <div id="scheduleOverlayMessage" aria-live="polite"></div>
   <table id="table"></table>
@@ -1172,7 +1319,6 @@ button[style*="var(--color-primary)"],
 
 <script type="module">
 import { TEXTS } from "./texts.js";
-import { loadManagers, createManager, getManagerById } from "./managers.js";
 
 window.onerror = function(msg, url, line, col, error) {
   console.error("[GLOBAL ERROR]", { msg, url, line, col, error });
@@ -1181,19 +1327,6 @@ window.onerror = function(msg, url, line, col, error) {
 window.addEventListener("unhandledrejection", (event) => {
   console.error("[UNHANDLED PROMISE]", event.reason);
 });
-
-const clearScheduleParams = new URLSearchParams(window.location.search);
-if(clearScheduleParams.get("clearScheduleData") === "1"){
-  ["plans", "reality", "scheduleArchives"].forEach(key => {
-    localStorage.removeItem(key);
-    localStorage.setItem(key, key === "scheduleArchives" ? "[]" : "{}");
-  });
-  sessionStorage.setItem("scheduleDataCleared", "plans,reality,scheduleArchives");
-  clearScheduleParams.delete("clearScheduleData");
-  const nextQuery = clearScheduleParams.toString();
-  window.location.replace(`${window.location.pathname}${nextQuery ? `?${nextQuery}` : ""}`);
-  throw new Error("Schedule data cleared; reloading.");
-}
 
 const pageTitle = document.getElementById("pageTitle");
 const schoolHeader = document.getElementById("schoolHeader");
@@ -1212,10 +1345,8 @@ const yearSelect = document.getElementById("yearSelect");
 const classSelect = document.getElementById("classSelect");
 const dateInput = document.getElementById("dateInput");
 const weekNumber = document.getElementById("weekNumber");
-const clearScheduleDataButton = document.getElementById("clearScheduleDataButton");
 const copyWeekButton = document.getElementById("copyWeekButton");
 const todayButton = document.getElementById("todayButton");
-const managerSelect = document.getElementById("managerSelect");
 const saveWeekArchiveButton = document.getElementById("saveWeekArchiveButton");
 const saveMonthArchiveButton = document.getElementById("saveMonthArchiveButton");
 const scheduleArchiveSelect = document.getElementById("scheduleArchiveSelect");
@@ -1239,7 +1370,7 @@ const SCHEDULE_ARCHIVE_KEY = "scheduleArchives";
 const SCHOOL_YEAR_PLAN_KEY = "schoolYearPlan";
 const SCHOOL_YEAR_EXCEPTIONS_KEY = "schoolYearExceptions";
 const SCHEDULE_RESET_VERSION_KEY = "scheduleResetVersion";
-const SCHEDULE_RESET_VERSION = "2026-04-26-new-school-year-plan";
+const SCHEDULE_RESET_VERSION = "2026-04-28-clean-schedule-before-reload";
 
 if(localStorage.getItem(SCHEDULE_RESET_VERSION_KEY) !== SCHEDULE_RESET_VERSION){
   localStorage.setItem("plans", "{}");
@@ -1257,52 +1388,12 @@ function load(key, def){
   }
 }
 
-function ensureAssignedManagerIds(){
-  const schools = JSON.parse(localStorage.getItem('schools') || '[]');
-
-  schools.forEach(s => {
-    if (!('assignedManagerId' in s)) {
-      s.assignedManagerId = '';
-    }
-
-    if (!('assignedCaretakerId' in s)) {
-      s.assignedCaretakerId = s.assignedTrainerId ?? '';
-    }
-  });
-
-  localStorage.setItem('schools', JSON.stringify(schools));
-}
-
-function saveFilters() {
-  localStorage.setItem('filters', JSON.stringify({
-    trainerIds: getSelectedCaretakerIds(),
-    managerId: document.getElementById('managerSelect')?.value || ''
-  }));
-}
-
-function loadFilters() {
-  const filters = JSON.parse(localStorage.getItem('filters') || '{}');
-  const trainerSelect = document.getElementById('trainerSelect');
-  const managerSelect = document.getElementById('managerSelect');
-
-  if (trainerSelect && trainerSelect.options.length) {
-    Array.from(trainerSelect.options).forEach(o => {
-      o.selected = (filters.trainerIds || []).includes(o.value);
-    });
-  }
-
-  if (managerSelect && managerSelect.options.length) {
-    managerSelect.value = filters.managerId || '';
-  }
-}
-
 let trainers = load("trainers", []);
 let plans = load("plans", {});
 let reality = load("reality", {});
 let classes = ["A","B","C","D"];
 let currentDate = new Date();
 let activeSchoolId = "";
-let selectedManagerId = "";
 
 let menu = null;
 let activeCell = null;
@@ -1344,50 +1435,6 @@ function getTrainerById(trainerId){
 
 function loadCaretakers(){
   return load("caretakers", []);
-}
-
-function getSelectedTrainerId(){
-  const trainerSelectEl = document.getElementById("trainerSelect");
-  const selectedTrainerId = trainerSelectEl ? trainerSelectEl.value : "";
-  return selectedTrainerId;
-}
-
-function getSelectedCaretakerIds() {
-  const select = document.getElementById('trainerSelect');
-  if(!select) return [];
-  return Array.from(select.selectedOptions).map(o => o.value);
-}
-
-function enforceTrainerLimit() {
-  const select = document.getElementById('trainerSelect');
-  if(!select) return;
-
-  const selected = Array.from(select.selectedOptions);
-
-  if (selected.length > 5) {
-    selected[selected.length - 1].selected = false;
-    alert('Maximálně 5 školníků');
-  }
-}
-
-function getCaretakerSchoolIds(caretakerIds){
-  const schools = JSON.parse(localStorage.getItem('schools') || '[]');
-
-  if (!caretakerIds || !caretakerIds.length) {
-    return schools.map(s => s.id);
-  }
-
-  return schools
-    .filter(s => caretakerIds.includes(String(s.assignedCaretakerId)))
-    .map(s => s.id);
-}
-
-function getManagerSchoolIds(managerId) {
-  const schools = JSON.parse(localStorage.getItem('schools') || '[]');
-
-  return schools
-    .filter(s => !managerId || String(s.assignedManagerId) === String(managerId))
-    .map(s => s.id);
 }
 
 function getFilteredSchoolIds() {
@@ -1623,10 +1670,6 @@ function highlightConflictAttemptCell(cell){
   }, 2000);
 }
 
-function renderTrainerSelect(){
-  return;
-}
-
 function getTrainerDisplayName(trainer){
   if(!trainer) return "";
   return `${trainer.prijmeni || ""} ${trainer.jmeno || ""}`.trim() || trainer.name || "";
@@ -1656,7 +1699,6 @@ function initStaticTexts(){
   classHeader.textContent = "Třída";
   weekFromHeader.textContent = "Týden od";
   weekNumberHeader.textContent = "Týden č.";
-  if(clearScheduleDataButton) clearScheduleDataButton.textContent = "Vymazat rozvrh";
   copyWeekButton.textContent = TEXTS.schedule.copyWeek;
   todayButton.textContent = "Dnes";
 }
@@ -1731,21 +1773,14 @@ function renderCaretakerRoleInfo(){
 
 function init(){
   console.log("[INIT] start");
-  ensureAssignedManagerIds();
-  console.log("[INIT] ensureAssignedManagerIds OK");
 
   initStaticTexts();
   console.log("[INIT] initStaticTexts OK");
   renderCaretakerRoleInfo();
   console.log("[INIT] renderCaretakerRoleInfo OK");
 
-  initManagers();
-  console.log("[INIT] initManagers OK");
-
   loadSchools();
   console.log("[INIT] loadSchools OK");
-  loadFilters();
-  console.log("[INIT] loadFilters OK");
 
   restoreScheduleReturnContext();
   console.log("[INIT] restoreScheduleReturnContext OK");
@@ -1801,37 +1836,6 @@ function restoreScheduleReturnContext(){
   if(context.date && !Number.isNaN(new Date(context.date).getTime())){
     currentDate = new Date(context.date);
   }
-}
-
-function initManagers(){
-  let managerItems = loadManagers();
-
-  if(managerItems.length === 0){
-    createManager({ name: "Demo školník", schoolIds: [] });
-    managerItems = loadManagers();
-  }
-
-  managerSelect.innerHTML = '<option value="">Všichni manažeři</option>';
-
-  managerItems.forEach(manager => {
-    let option = document.createElement("option");
-    option.value = manager.id;
-    option.textContent = manager.name || "-";
-    managerSelect.appendChild(option);
-  });
-
-  selectedManagerId = managerSelect.value || "";
-  logSelectedManager();
-}
-
-function logSelectedManager(){
-  if(!selectedManagerId){
-    console.log("VybranĂ˝ manaĹľer:", null);
-    return;
-  }
-
-  const selectedManager = getManagerById(selectedManagerId);
-  console.log("VybranĂ˝ manaĹľer:", selectedManager);
 }
 
 function loadSchools(){
@@ -1933,24 +1937,6 @@ function saveEditedWeek(){
   localStorage.setItem("reality", JSON.stringify(reality));
 }
 
-function clearScheduleData(){
-  plans = {};
-  reality = {};
-  localStorage.setItem("plans", "{}");
-  localStorage.setItem("reality", "{}");
-  localStorage.setItem("scheduleArchives", "[]");
-  activeCell = null;
-  setEditMode(false);
-  closeMenu();
-  renderScheduleSafe();
-}
-
-function confirmClearScheduleData(){
-  if(!window.confirm("Opravdu vymazat PLÁN, SKUTEČNOST a archiv rozvrhů? Školy, trenéři, školníci, týdenní rozvrhy a výjimky zůstanou.")) return;
-  clearScheduleData();
-  showStatusMessage("Rozvrh byl vymazán.");
-}
-
 function applySchoolChange(){
   localStorage.setItem("selectedSchool", schoolSelect.value);
   activeSchoolId = schoolSelect.value;
@@ -1960,6 +1946,7 @@ function applySchoolChange(){
   }
   updateSchoolUI();
   renderTrainerPanel();
+  renderScheduleSafe();
 }
 
 schoolSelect.onchange = () => {
@@ -1974,6 +1961,24 @@ schoolSelect.onchange = () => {
 function getSelectedSchool(){
   let schools = getSchoolsForCurrentRole(getSchools());
   return schools.find(s => s.id == schoolSelect.value);
+}
+
+function getStoredLessonTimeForHour(hour){
+  const selectedSchoolId = String(schoolSelect?.value || "");
+  const match = Object.values(plans).find(value =>
+    value &&
+    typeof value === "object" &&
+    String(value.schoolId || "") === selectedSchoolId &&
+    Number(value.hour) === Number(hour) &&
+    value.lessonTime
+  );
+  return match?.lessonTime || "";
+}
+
+function getLessonTimeLabel(hour){
+  const school = getSelectedSchool();
+  const value = Array.isArray(school?.lessonTimes) ? school.lessonTimes[Number(hour) - 1] : "";
+  return value || getStoredLessonTimeForHour(hour) || String(hour);
 }
 
 function getCaretakerNameById(caretakerId){
@@ -2117,6 +2122,250 @@ function assignTrainerToCell(trainerId){
 
   closeMenu();
   renderScheduleSafe();
+}
+
+function createPlanEditorSelect(options, selectedValue = ""){
+  const select = document.createElement("select");
+  options.forEach(optionData => {
+    const option = document.createElement("option");
+    option.value = String(optionData.value);
+    option.textContent = optionData.label;
+    option.selected = String(optionData.value) === String(selectedValue);
+    select.appendChild(option);
+  });
+  return select;
+}
+
+function getScheduleYearOptions(){
+  return Array.from(yearSelect?.options || []).map(option => ({
+    value: option.value || option.textContent,
+    label: option.textContent
+  }));
+}
+
+function getScheduleClassOptions(){
+  return Array.from(classSelect?.options || []).map(option => ({
+    value: option.value || option.textContent,
+    label: option.textContent
+  }));
+}
+
+function getPlanTrainerOptions(selectedValue = ""){
+  const trainerItems = loadTrainers()
+    .map(trainer => ({
+      value: trainer.id,
+      label: `${trainer.prijmeni || ""} ${trainer.jmeno || ""}`.trim() || trainer.name || ""
+    }))
+    .filter(item => item.value && item.label)
+    .sort((a, b) => a.label.localeCompare(b.label, "cs"));
+
+  return [
+    { value: "", label: "Vyber trenéra" },
+    { value: "X", label: "Nelze obsadit" },
+    ...trainerItems
+  ].map(item => ({
+    ...item,
+    selected: String(item.value) === String(selectedValue)
+  }));
+}
+
+function isSamePlanEntry(entry, date, cls, hour, year){
+  return entry &&
+    String(entry.date) === formatDate(date) &&
+    String(entry.className) === String(cls) &&
+    Number(entry.hour) === Number(hour) &&
+    String(entry.year) === String(year);
+}
+
+function canSavePlanEntryInWeek(date, hour, year, className, originalEntry){
+  const classNames = new Set(
+    getStoreEntriesForCell(plans, date, hour)
+      .filter(entry =>
+        String(entry.year) === String(year) &&
+        !isSamePlanEntry(entry, date, originalEntry?.className, hour, originalEntry?.year)
+      )
+      .map(entry => String(entry.className))
+  );
+  classNames.add(String(className));
+
+  if(classNames.size > 2){
+    showStatusMessage("Ve stejném čase lze ve stejném ročníku zadat maximálně dvě třídy.", "error");
+    return false;
+  }
+
+  return true;
+}
+
+function hasTrainerConflictForPlanSave(trainerId, date, hour, year, originalEntry){
+  const normalizedTrainerId = getStoredTrainerId(trainerId);
+  if(!normalizedTrainerId || normalizedTrainerId === "X") return false;
+
+  const targetDate = formatDate(date);
+  return Object.entries(plans).some(([key, value]) => {
+    if(getStoredTrainerId(value) !== normalizedTrainerId) return false;
+    const parsed = parseKey(key);
+    if(!parsed) return false;
+    if(parsed.date !== targetDate || Number(parsed.hour) !== Number(hour)) return false;
+    if(parsed.year && String(parsed.year) !== String(year)) return false;
+    if(originalEntry && isSamePlanEntry(originalEntry, date, parsed.cls, parsed.hour, parsed.year || year)) return false;
+    return true;
+  });
+}
+
+function openPlanEditor(e, date, hour, selectedEntry = null, anchorOptions = null){
+  closeMenu();
+  e?.stopPropagation?.();
+  if(!isEditMode) return;
+  if(isSchoolExceptionDate(schoolSelect.value, date)){
+    showStatusMessage("V den výjimky není výuka. Nejdřív uprav výjimku u školy.", "error");
+    return;
+  }
+
+  const anchorCell = anchorOptions?.cell || e?.currentTarget;
+  if(!anchorCell) return;
+  setActiveCell(anchorCell);
+  activeCell.dataset.date = formatDate(date);
+  activeCell.dataset.hour = String(hour);
+  activeCell.dataset.type = "plan";
+
+  let selectedPlanEntry = selectedEntry || null;
+  const entries = getStoreEntriesForCell(plans, date, hour);
+
+  menu = document.createElement("div");
+  menu.className = "menu plan-edit-menu";
+  menu.addEventListener("click", event => event.stopPropagation());
+  const anchorLeft = anchorOptions?.left ?? e?.pageX ?? anchorCell.getBoundingClientRect().left + window.scrollX;
+  const anchorTop = anchorOptions?.top ?? e?.pageY ?? anchorCell.getBoundingClientRect().bottom + window.scrollY;
+  menu.style.left = anchorLeft + "px";
+  menu.style.top = anchorTop + "px";
+
+  const title = document.createElement("div");
+  title.className = "plan-edit-title";
+  title.textContent = `Plán | ${date.toLocaleDateString("cs-CZ")} | ${getLessonTimeLabel(hour)}`;
+
+  const grid = document.createElement("div");
+  grid.className = "plan-edit-grid";
+
+  const yearField = document.createElement("label");
+  yearField.className = "plan-edit-field";
+  yearField.append("Ročník");
+  const yearEditorSelect = createPlanEditorSelect(getScheduleYearOptions(), selectedPlanEntry?.year || getSelectedYear());
+  yearField.appendChild(yearEditorSelect);
+
+  const classField = document.createElement("label");
+  classField.className = "plan-edit-field";
+  classField.append("Třída");
+  const classEditorSelect = createPlanEditorSelect(getScheduleClassOptions(), selectedPlanEntry?.className || getSelectedClass());
+  classField.appendChild(classEditorSelect);
+
+  const trainerField = document.createElement("label");
+  trainerField.className = "plan-edit-field plan-edit-field-trainer";
+  trainerField.append("Trenér");
+  const trainerEditorSelect = createPlanEditorSelect(getPlanTrainerOptions(), getStoredTrainerId(selectedPlanEntry?.value) || "");
+  trainerField.appendChild(trainerEditorSelect);
+
+  grid.append(yearField, classField, trainerField);
+
+  const actions = document.createElement("div");
+  actions.className = "plan-edit-actions";
+
+  const saveButton = document.createElement("button");
+  saveButton.type = "button";
+  saveButton.textContent = selectedPlanEntry ? "Uložit změnu" : "Přidat do plánu";
+  saveButton.addEventListener("click", () => {
+    const selectedYear = yearEditorSelect.value;
+    const selectedClass = classEditorSelect.value;
+    const selectedTrainer = trainerEditorSelect.value;
+
+    if(!selectedTrainer){
+      showStatusMessage("Vyber trenéra nebo možnost Nelze obsadit.", "error");
+      return;
+    }
+
+    if(!canSavePlanEntryInWeek(date, hour, selectedYear, selectedClass, selectedPlanEntry)) return;
+
+    const targetEntry = getStoreEntriesForCell(plans, date, hour)
+      .find(entry => isSamePlanEntry(entry, date, selectedClass, hour, selectedYear));
+    const overwritesDifferentEntry = targetEntry &&
+      !isSamePlanEntry(targetEntry, date, selectedPlanEntry?.className, hour, selectedPlanEntry?.year);
+    if(overwritesDifferentEntry && !confirm("Pro tento ročník a třídu už v této hodině existuje plán. Přepsat ho?")){
+      return;
+    }
+
+    if(hasTrainerConflictForPlanSave(selectedTrainer, date, hour, selectedYear, selectedPlanEntry)){
+      showStatusMessage("Tento trenér už je ve stejný čas naplánovaný jinde.", "error");
+      highlightConflictAttemptCell(activeCell);
+      return;
+    }
+
+    if(selectedPlanEntry){
+      deleteStoredValue(plans, date, selectedPlanEntry.className, hour, selectedPlanEntry.year);
+    }
+
+    plans[getKey(date, selectedClass, hour, selectedYear)] = createPlanStoredValue(
+      selectedTrainer,
+      date,
+      selectedClass,
+      hour,
+      selectedYear,
+      getLessonTimeLabel(hour)
+    );
+    localStorage.setItem("plans", JSON.stringify(plans));
+    closeMenu();
+    renderScheduleSafe();
+  });
+  actions.appendChild(saveButton);
+
+  if(selectedPlanEntry){
+    const deleteButton = document.createElement("button");
+    deleteButton.type = "button";
+    deleteButton.textContent = "Smazat plán";
+    deleteButton.addEventListener("click", () => {
+      deleteStoredValue(plans, date, selectedPlanEntry.className, hour, selectedPlanEntry.year);
+      localStorage.setItem("plans", JSON.stringify(plans));
+      closeMenu();
+      renderScheduleSafe();
+    });
+    actions.appendChild(deleteButton);
+  }
+
+  const closeButton = document.createElement("button");
+  closeButton.type = "button";
+  closeButton.textContent = "Zavřít";
+  closeButton.addEventListener("click", closeMenu);
+  actions.appendChild(closeButton);
+
+  menu.append(title, grid, actions);
+
+  if(entries.length){
+    const existing = document.createElement("div");
+    existing.className = "plan-edit-existing";
+    const existingTitle = document.createElement("div");
+    existingTitle.className = "plan-edit-existing-title";
+    existingTitle.textContent = "Záznamy v této hodině";
+    existing.appendChild(existingTitle);
+
+    entries.forEach(entry => {
+      const entryButton = document.createElement("button");
+      entryButton.type = "button";
+      entryButton.textContent = getScheduleEntryText(entry);
+      if(isSamePlanEntry(entry, date, selectedPlanEntry?.className, hour, selectedPlanEntry?.year)){
+        entryButton.classList.add("is-selected");
+      }
+      entryButton.addEventListener("click", () => {
+        closeMenu();
+        openPlanEditor(null, date, hour, entry, {
+          cell: anchorCell,
+          left: anchorLeft,
+          top: anchorTop
+        });
+      });
+      existing.appendChild(entryButton);
+    });
+    menu.appendChild(existing);
+  }
+
+  document.body.appendChild(menu);
 }
 
 function openMenu(e, date, cls, h, type, availableOnly = false, promptText = "", anchorOptions = null){
@@ -2300,11 +2549,11 @@ function openMenu(e, date, cls, h, type, availableOnly = false, promptText = "",
           type,
           schoolId: activeSchoolId,
           cls,
-          year: getSelectedYear()
+          year: getActiveCellYear()
         }));
         sessionStorage.setItem("scheduleReturnContext", JSON.stringify({
           schoolId: activeSchoolId,
-          year: getSelectedYear(),
+          year: getActiveCellYear(),
           date: dateInput.value || formatDate(date),
           cls,
           hour: h,
@@ -2538,11 +2787,12 @@ function updateWeekInfo(){
 
 function formatDate(d){ return d.toISOString().split("T")[0]; }
 function normalizeDateKey(date){ return formatDate(new Date(date)); }
-function getSelectedYear(){ return String(yearSelect.value); }
+function getSelectedYear(){ return String(yearSelect?.value || "1"); }
 function getSelectedClass(){ return String(classSelect?.value || classes[0] || "A"); }
 function getVisibleClasses(){ return [getSelectedClass()]; }
 function getLegacyKey(d, c, h){ return formatDate(d) + "_" + c + "_" + h; }
-function getKey(d, c, h){ return formatDate(d) + "_" + getSelectedYear() + "_" + c + "_" + h; }
+function getActiveCellYear(){ return String(activeCell?.dataset?.year || getSelectedYear()); }
+function getKey(d, c, h, year = getActiveCellYear()){ return formatDate(d) + "_" + year + "_" + c + "_" + h; }
 
 function getWeekRange(anchorDate){
   const start = getMonday(new Date(anchorDate));
@@ -2570,9 +2820,28 @@ function loadSchoolYearExceptions(){
   return load(SCHOOL_YEAR_EXCEPTIONS_KEY, []);
 }
 
+function getSchoolYearStartYearForDate(date = new Date()){
+  const value = new Date(date);
+  const year = value.getFullYear();
+  return value.getMonth() >= 8 ? year : year - 1;
+}
+
+function getSchoolYearValueForDate(date = currentDate){
+  return String(getSchoolYearStartYearForDate(date));
+}
+
+function getPlanItemSchoolYear(item, fallbackDate = currentDate){
+  return String(item?.schoolYear || getSchoolYearValueForDate(fallbackDate));
+}
+
+function getExceptionSchoolYear(item, fallbackDate = currentDate){
+  if(item?.schoolYear) return String(item.schoolYear);
+  if(item?.date) return getSchoolYearValueForDate(item.date);
+  return getSchoolYearValueForDate(fallbackDate);
+}
+
 function getCurrentSchoolYearRange(anchorDate = currentDate){
-  const date = new Date(anchorDate);
-  const year = date.getMonth() >= 8 ? date.getFullYear() : date.getFullYear() - 1;
+  const year = getSchoolYearStartYearForDate(anchorDate);
   return {
     start: new Date(year, 8, 1),
     end: new Date(year + 1, 5, 30)
@@ -2586,30 +2855,60 @@ function isDateInCurrentSchoolYear(date){
 }
 
 function isSchoolExceptionDate(schoolId, date){
+  return Boolean(getSchoolExceptionForDate(schoolId, date));
+}
+
+function getSchoolExceptionForDate(schoolId, date){
   const dateKey = normalizeDateKey(date);
-  return loadSchoolYearExceptions().some(item =>
+  const schoolYear = getSchoolYearValueForDate(date);
+  return loadSchoolYearExceptions().find(item =>
     String(item.schoolId || "") === String(schoolId || "") &&
-    String(item.date || "") === dateKey
+    String(item.date || "") === dateKey &&
+    getExceptionSchoolYear(item, date) === schoolYear
   );
 }
 
 function getRecurringLessonsForCurrentContext(){
   const schoolId = String(schoolSelect?.value || "");
-  const year = getSelectedYear();
+  const schoolYear = getSchoolYearValueForDate(currentDate);
   return loadSchoolYearPlan()
-    .filter(item => String(item.schoolId || "") === schoolId && String(item.year || "") === year)
-    .sort((a, b) => Number(a.dayIndex) - Number(b.dayIndex) || Number(a.hour) - Number(b.hour) || String(a.className).localeCompare(String(b.className), "cs"));
+    .filter(item =>
+      String(item.schoolId || "") === schoolId &&
+      getPlanItemSchoolYear(item, currentDate) === schoolYear
+    )
+    .sort((a, b) =>
+      Number(a.dayIndex) - Number(b.dayIndex) ||
+      Number(a.hour) - Number(b.hour) ||
+      getYearSortValue(a.year) - getYearSortValue(b.year) ||
+      String(a.className).localeCompare(String(b.className), "cs")
+    );
+}
+
+function isPlanEntryForSelectedSchoolInWeek(key, value, weekStart){
+  const parsed = parseKey(key);
+  if(!parsed?.date) return false;
+
+  const weekEnd = new Date(weekStart);
+  weekEnd.setDate(weekEnd.getDate() + 4);
+  if(parsed.date < formatDate(weekStart) || parsed.date > formatDate(weekEnd)) return false;
+
+  const selectedSchoolId = String(schoolSelect?.value || "");
+  const entrySchoolId = typeof value === "object" ? String(value?.schoolId || "") : selectedSchoolId;
+  return !selectedSchoolId || entrySchoolId === selectedSchoolId;
 }
 
 function applyRecurringPlanToCurrentWeek(){
   const lessons = getRecurringLessonsForCurrentContext();
   if(!lessons.length){
-    showStatusMessage("Pro tuto školu a ročník není zadaný stálý plán.", "error");
+    showStatusMessage("Pro tuto školu není zadaný stálý plán.", "error");
     return;
   }
 
   let added = 0;
   const monday = getMonday(currentDate);
+  plans = Object.fromEntries(
+    Object.entries(plans).filter(([key, value]) => !isPlanEntryForSelectedSchoolInWeek(key, value, monday))
+  );
 
   lessons.forEach(lesson => {
     const date = new Date(monday);
@@ -2617,13 +2916,14 @@ function applyRecurringPlanToCurrentWeek(){
     if(!isDateInCurrentSchoolYear(date)) return;
     if(isSchoolExceptionDate(lesson.schoolId, date)) return;
 
-    if(getStoredValue(plans, date, lesson.className, lesson.hour)) return;
-
-    plans[getKey(date, lesson.className, lesson.hour)] = createPlanStoredValue(
+    const lessonTime = getLessonTimeLabel(lesson.hour);
+    plans[getKey(date, lesson.className, lesson.hour, lesson.year)] = createPlanStoredValue(
       lesson.trainerId,
       date,
       lesson.className,
-      lesson.hour
+      lesson.hour,
+      lesson.year,
+      lessonTime
     );
     added += 1;
   });
@@ -2650,7 +2950,7 @@ function getScheduleArchiveLabel(type, range){
   const endLabel = range.end.toLocaleDateString("cs-CZ");
   const schoolName = getSelectedSchool()?.nazev || "všechny školy";
   const prefix = type === "month" ? "Měsíc" : "Týden";
-  return `${prefix} ${startLabel} - ${endLabel} | ${schoolName} | ${getSelectedYear()}. ročník`;
+  return `${prefix} ${startLabel} - ${endLabel} | ${schoolName}`;
 }
 
 function isStoredEntryInRange(key, value, range){
@@ -2658,8 +2958,9 @@ function isStoredEntryInRange(key, value, range){
   if(!parsed?.date) return false;
   if(!isDateInRange(parsed.date, range.start, range.end)) return false;
 
-  const entryYear = typeof value === "object" ? value?.year : parsed.year;
-  return !entryYear || String(entryYear) === getSelectedYear();
+  const selectedSchoolId = String(schoolSelect?.value || "");
+  const entrySchoolId = typeof value === "object" ? String(value?.schoolId || "") : "";
+  return !entrySchoolId || !selectedSchoolId || entrySchoolId === selectedSchoolId;
 }
 
 function collectScheduleArchiveStore(store, range){
@@ -2812,8 +3113,16 @@ function parseKey(key){
   return { date, year: null, cls, hour: Number(hour) };
 }
 
-function getStoredValue(store, d, c, h){
-  let key = getKey(d, c, h);
+function getYearSortValue(value){
+  return String(value) === "skolka" ? 0 : Number(value) || 99;
+}
+
+function getYearLabel(value){
+  return String(value) === "skolka" ? "Školka" : String(value || "-");
+}
+
+function getStoredValue(store, d, c, h, year = getActiveCellYear()){
+  let key = getKey(d, c, h, year);
   if(key in store) return store[key];
 
   let legacyKey = getLegacyKey(d, c, h);
@@ -2824,34 +3133,36 @@ function getStoredTrainerId(value){
   return typeof value === "object" ? value?.trainerId : value;
 }
 
-function createPlanStoredValue(trainerId, date, cls, hour){
-  if(!trainerId || trainerId === "X") return trainerId;
+function createPlanStoredValue(trainerId, date, cls, hour, year = getActiveCellYear(), lessonTime = ""){
+  if(!trainerId) return trainerId;
 
   return {
     trainerId,
     schoolId: schoolSelect?.value || "",
     date: formatDate(date),
-    year: getSelectedYear(),
+    schoolYear: getSchoolYearValueForDate(date),
+    year,
     className: cls,
-    hour: Number(hour)
+    hour: Number(hour),
+    lessonTime
   };
 }
 
-function createRealityStoredValue(trainerId, date, cls, hour){
-  if(!trainerId || trainerId === "X") return trainerId;
+function createRealityStoredValue(trainerId, date, cls, hour, year = getActiveCellYear()){
+  if(!trainerId) return trainerId;
 
   return {
     trainerId,
     schoolId: schoolSelect?.value || "",
     date: formatDate(date),
-    year: getSelectedYear(),
+    year,
     className: cls,
     hour: Number(hour)
   };
 }
 
-function deleteStoredValue(store, d, c, h){
-  delete store[getKey(d, c, h)];
+function deleteStoredValue(store, d, c, h, year = getActiveCellYear()){
+  delete store[getKey(d, c, h, year)];
   delete store[getLegacyKey(d, c, h)];
 }
 
@@ -2861,6 +3172,13 @@ function getName(id){
 
   let t = trainers.find(t => t.id == id);
   return t ? `${t.prijmeni} (${t.klub || TEXTS.common.placeholderDash})` : "";
+}
+
+function getTrainerShortName(value){
+  const id = getStoredTrainerId(value);
+  if(id === "X") return "Nelze obsadit";
+  const trainer = trainers.find(item => String(item.id) === String(id));
+  return trainer?.prijmeni || trainer?.name || getName(value) || "-";
 }
 
 function formatTrainerPlanSubject(trainer, periodType, anchorDate){
@@ -2990,8 +3308,8 @@ function buildCellTitle(baseTooltip, conflictTooltip){
   return [baseTooltip, conflictTooltip].filter(Boolean).join("\n");
 }
 
-function hasConflict(trainerId, date, cls, hour, type){
-  return isTrainerBusy(getStoredTrainerId(trainerId), date, cls, hour, type);
+function hasConflict(trainerId, date, cls, hour, type, year = getActiveCellYear()){
+  return isTrainerBusy(getStoredTrainerId(trainerId), date, cls, hour, type, year);
 }
 
 function getAvailableTrainersForCell(date, cls, hour, type){
@@ -3010,8 +3328,9 @@ function isTrainerBusyGlobal(trainerId, date, hour, type){
     const d = new Date(activeCell.dataset.date);
     const cls = activeCell.dataset.cls;
     const hour = Number(activeCell.dataset.hour);
+    const year = activeCell.dataset.year || getSelectedYear();
 
-    activeKey = getKey(d, cls, hour);
+    activeKey = getKey(d, cls, hour, year);
     activeLegacyKey = getLegacyKey(d, cls, hour);
   }
 
@@ -3032,11 +3351,11 @@ function isTrainerBusyGlobal(trainerId, date, hour, type){
   });
 }
 
-function isTrainerBusy(trainerId, date, cls, hour, type){
+function isTrainerBusy(trainerId, date, cls, hour, type, year = getActiveCellYear()){
   trainerId = getStoredTrainerId(trainerId);
   let targetDate = formatDate(date);
-  let targetYear = getSelectedYear();
-  let currentKey = getKey(date, cls, hour);
+  let targetYear = String(year);
+  let currentKey = getKey(date, cls, hour, targetYear);
   let legacyKey = getLegacyKey(date, cls, hour);
   let store = type === "plan" ? plans : reality;
 
@@ -3055,6 +3374,107 @@ function isTrainerBusy(trainerId, date, cls, hour, type){
   }
 
   return false;
+}
+
+function getStoreEntriesForCell(store, dayDate, hour){
+  const dateKey = formatDate(dayDate);
+  const selectedSchoolId = String(schoolSelect?.value || "");
+  const seen = new Set();
+
+  return Object.entries(store)
+    .map(([key, value]) => {
+      const parsed = parseKey(key);
+      if(!parsed || parsed.date !== dateKey || Number(parsed.hour) !== Number(hour)) return null;
+
+      const entrySchoolId = typeof value === "object" ? String(value?.schoolId || "") : "";
+      if(entrySchoolId && selectedSchoolId && entrySchoolId !== selectedSchoolId) return null;
+
+      const year = typeof value === "object" && value?.year ? String(value.year) : String(parsed.year || getSelectedYear());
+      const className = typeof value === "object" && value?.className ? String(value.className) : String(parsed.cls || "");
+      const uniqueKey = `${dateKey}_${year}_${className}_${hour}`;
+      if(seen.has(uniqueKey)) return null;
+      seen.add(uniqueKey);
+
+      return {
+        key: uniqueKey,
+        date: dateKey,
+        year,
+        className,
+        hour: Number(hour),
+        value
+      };
+    })
+    .filter(Boolean)
+    .sort((a, b) =>
+      getYearSortValue(a.year) - getYearSortValue(b.year) ||
+      a.className.localeCompare(b.className, "cs")
+    );
+}
+
+function getRealityEntriesForCell(dayDate, hour){
+  const realEntries = getStoreEntriesForCell(reality, dayDate, hour);
+  const realKeys = new Set(realEntries.map(entry => entry.key));
+  const planPlaceholders = getStoreEntriesForCell(plans, dayDate, hour)
+    .filter(entry => !realKeys.has(entry.key))
+    .map(entry => ({ ...entry, value: "", planValue: entry.value }));
+
+  return [...realEntries, ...planPlaceholders].sort((a, b) =>
+    getYearSortValue(a.year) - getYearSortValue(b.year) ||
+    a.className.localeCompare(b.className, "cs")
+  );
+}
+
+function getScheduleEntryText(entry){
+  if(getStoredTrainerId(entry.value) === "X"){
+    return `${getYearLabel(entry.year)} ${entry.className || "-"} Nelze obsadit`.trim();
+  }
+  const trainerName = getTrainerShortName(entry.value);
+  return `${getYearLabel(entry.year)} ${entry.className || "-"} ${trainerName || "-"}`.trim();
+}
+
+function createScheduleEntryElement(entry, dayDate, type){
+  const planValue = type === "plan"
+    ? entry.value
+    : getStoredValue(plans, dayDate, entry.className, entry.hour, entry.year);
+  const realityValue = type === "real" ? entry.value : getStoredValue(reality, dayDate, entry.className, entry.hour, entry.year);
+  const status = getPlanRealityStatus(planValue, realityValue);
+  const trainerId = getStoredTrainerId(entry.value);
+  const conflict = trainerId && trainerId !== "X" && isTrainerBusy(trainerId, dayDate, entry.className, entry.hour, type, entry.year);
+  const globalConflict = trainerId && trainerId !== "X" && hasConflict(trainerId, dayDate, entry.className, entry.hour, type, entry.year);
+  const entryButton = document.createElement("button");
+
+  entryButton.type = "button";
+  entryButton.className = [
+    "schedule-entry",
+    status.className,
+    trainerId === "X" ? "unavailable" : "",
+    globalConflict ? "conflict-global" : "",
+    conflict ? "conflict" : ""
+  ].filter(Boolean).join(" ");
+  entryButton.dataset.schoolId = schoolSelect.value;
+  entryButton.dataset.date = formatDate(dayDate);
+  entryButton.dataset.year = entry.year;
+  entryButton.dataset.cls = entry.className;
+  entryButton.dataset.hour = String(entry.hour);
+  entryButton.dataset.type = type;
+  entryButton.textContent = getScheduleEntryText(entry);
+  entryButton.title = buildCellTitle(
+    trainerId === "X" ? "Nelze obsadit" : status.tooltip,
+    conflict ? "Konflikt – trenér už je jinde" : ""
+  );
+  entryButton.addEventListener("click", (event) => {
+    if(!isEditMode) return;
+    event.stopPropagation();
+    activeSchoolId = event.currentTarget.dataset.schoolId || schoolSelect.value;
+    renderTrainerPanel();
+    if(type === "plan"){
+      openPlanEditor(event, new Date(dayDate), entry.hour, entry, { cell: entryButton });
+    } else {
+      openMenu(event, new Date(dayDate), entry.className, entry.hour, type, false, "", { cell: entryButton });
+    }
+  });
+
+  return entryButton;
 }
 
 function renderScheduleCore(){
@@ -3102,44 +3522,39 @@ function renderScheduleCore(){
 
   let mondayDate = getMonday(currentDate);
   const todayDayIndex = getTodayDayIndexInDisplayedWeek(mondayDate);
-  const visibleClasses = getVisibleClasses();
   let fragment = document.createDocumentFragment();
 
   let headerRow1 = document.createElement("tr");
   let hourHeader = document.createElement("th");
-  hourHeader.rowSpan = 2;
   hourHeader.className = "hour-cell";
   hourHeader.textContent = TEXTS.schedule.hourShort;
   headerRow1.appendChild(hourHeader);
 
   let labelHeader = document.createElement("th");
-  labelHeader.rowSpan = 2;
   headerRow1.appendChild(labelHeader);
 
   for(let dayIndex = 0; dayIndex < 5; dayIndex++){
     let dayDate = new Date(mondayDate);
     dayDate.setDate(dayDate.getDate() + dayIndex);
+    const schoolException = getSchoolExceptionForDate(schoolSelect.value, dayDate);
 
     let dayHeader = document.createElement("th");
-    dayHeader.colSpan = visibleClasses.length;
     if(dayIndex === todayDayIndex) dayHeader.classList.add("today-column");
+    if(schoolException){
+      dayHeader.classList.add("school-exception-day-header");
+      dayHeader.title = `Bez výuky: ${schoolException.reason || "Výjimka"}`;
+    }
     dayHeader.append(TEXTS.schedule.days[dayIndex], document.createElement("br"), dayDate.toLocaleDateString());
+    if(schoolException){
+      const exceptionLabel = document.createElement("span");
+      exceptionLabel.className = "school-exception-day-label";
+      exceptionLabel.textContent = schoolException.reason || "Bez výuky";
+      dayHeader.append(exceptionLabel);
+    }
     headerRow1.appendChild(dayHeader);
   }
 
-  let headerRow2 = document.createElement("tr");
-  for(let dayIndex = 0; dayIndex < 5; dayIndex++){
-    visibleClasses.forEach(c => {
-      let classHeader = document.createElement("th");
-      classHeader.className = "class-header";
-      if(dayIndex === todayDayIndex) classHeader.classList.add("today-column");
-      classHeader.textContent = c;
-      headerRow2.appendChild(classHeader);
-    });
-  }
-
   fragment.appendChild(headerRow1);
-  fragment.appendChild(headerRow2);
 
   for(let hour = 1; hour <= 8; hour++){
     let rowP = document.createElement("tr");
@@ -3147,7 +3562,8 @@ function renderScheduleCore(){
 
     let hourCell = document.createElement("td");
     hourCell.rowSpan = 2;
-    hourCell.textContent = hour;
+    hourCell.textContent = getLessonTimeLabel(hour);
+    hourCell.title = `${hour}. hodina`;
     rowP.appendChild(hourCell);
 
     let planLabel = document.createElement("td");
@@ -3164,188 +3580,47 @@ function renderScheduleCore(){
     for(let dayIndex = 0; dayIndex < 5; dayIndex++){
       let dayDate = new Date(mondayDate);
       dayDate.setDate(dayDate.getDate() + dayIndex);
+      const schoolException = getSchoolExceptionForDate(schoolSelect.value, dayDate);
+      const planEntries = getStoreEntriesForCell(plans, dayDate, hour);
+      const realityEntries = getRealityEntriesForCell(dayDate, hour);
 
-      visibleClasses.forEach((cls, classIndex) => {
-        let border = classIndex === 0 ? "day-border" : "";
-        let planValue = getStoredValue(plans, dayDate, cls, hour);
-        let realityValue = getStoredValue(reality, dayDate, cls, hour);
-        let planTrainerId = getStoredTrainerId(planValue);
-        let comparisonStatus = getPlanRealityStatus(planValue, realityValue);
-        let planConflict = planTrainerId && planTrainerId !== "X" && isTrainerBusy(planTrainerId, dayDate, cls, hour, "plan");
-        let realityConflict = realityValue && realityValue !== "X" && isTrainerBusy(realityValue, dayDate, cls, hour, "real");
-        let planGlobalConflict = planTrainerId && planTrainerId !== "X" && hasConflict(planTrainerId, dayDate, cls, hour, "plan");
-        let realityGlobalConflict = realityValue && realityValue !== "X" && hasConflict(realityValue, dayDate, cls, hour, "real");
-        let planClass = ["active-cell", border, comparisonStatus.className, planTrainerId === "X" ? "unavailable" : "", planGlobalConflict ? "conflict-global" : "", planConflict ? "conflict" : "", planConflict ? "conflict-plan" : ""].filter(Boolean).join(" ");
-        let realityClass = [border, comparisonStatus.className, realityValue === "X" ? "unavailable" : "", realityGlobalConflict ? "conflict-global" : "", realityConflict ? "conflict" : "", realityConflict ? "conflict-real" : ""].filter(Boolean).join(" ");
-
-        let planCell = document.createElement("td");
-        planCell.className = ["cell", planClass].filter(Boolean).join(" ");
-        if(dayIndex === todayDayIndex) planCell.classList.add("today-column");
-        planCell.dataset.schoolId = schoolSelect.value;
-        planCell.dataset.date = formatDate(dayDate);
-        planCell.dataset.cls = cls;
-        planCell.dataset.hour = String(hour);
-        planCell.dataset.type = "plan";
-        if(planTrainerId === "X"){
-          planCell.innerHTML = '<div class="cell-unavailable"><div class="cell-unavailable-icon">🚫</div><div class="cell-unavailable-text"><div>Nelze</div><div>obsadit</div></div></div>';
-        } else {
-          planCell.textContent = getName(planValue);
-        }
-        planCell.title = buildCellTitle(
-          planTrainerId === "X" ? "Nelze obsadit" : comparisonStatus.tooltip,
-          planConflict ? "Konflikt – trenér už je jinde" : ""
-        );
-        planCell.addEventListener("click", (event) => {
-          if(!isEditMode) return;
-          try {
-            activeSchoolId = event.currentTarget.dataset.schoolId || schoolSelect.value;
-            renderTrainerPanel();
-            openMenu(event, new Date(dayDate), cls, hour, "plan");
-          } catch (e) {
-            console.error("Cell click error:", e);
-          }
-        });
-        planCell.addEventListener("dragover", (event) => {
-          event.preventDefault();
-        });
-        planCell.addEventListener("dragenter", () => {
-          planCell.classList.add("drag-over");
-        });
-        planCell.addEventListener("dragleave", () => {
-          planCell.classList.remove("drag-over");
-        });
-        planCell.addEventListener("drop", (event) => {
-          event.preventDefault();
-          planCell.classList.remove("drag-over");
-
-          let trainerId = event.dataTransfer.getData("text/plain");
-          if(!trainerId) return;
-
-          if(hasConflict(trainerId, dayDate, cls, hour, "plan")){
-            showStatusMessage("Tento trenér už je ve stejný čas naplánovaný jinde.", "error");
-            highlightConflictAttemptCell(planCell);
-            reopenAvailableOnlyContext = {
-              cell: planCell,
-              date: new Date(dayDate),
-              cls,
-              h: hour,
-              type: "plan",
-              promptText: "Vyberte jiného volného trenéra.",
-            };
-            suppressMenuAutoCloseUntil = Date.now() + 300;
-            setTimeout(() => {
-              if(!reopenAvailableOnlyContext) return;
-              const context = reopenAvailableOnlyContext;
-              reopenAvailableOnlyContext = null;
-              const rect = context.cell?.getBoundingClientRect();
-              openMenu(
-                null,
-                context.date,
-                context.cls,
-                context.h,
-                context.type,
-                true,
-                context.promptText,
-                {
-                  cell: context.cell,
-                  left: (rect?.left ?? 0) + window.scrollX,
-                  top: (rect?.bottom ?? 0) + window.scrollY,
-                }
-              );
-            }, 50);
-            return;
-          }
-
-          plans[getKey(dayDate, cls, hour)] = createPlanStoredValue(trainerId, dayDate, cls, hour);
-          localStorage.setItem("plans", JSON.stringify(plans));
-          renderScheduleSafe();
-        });
+      let planCell = document.createElement("td");
+      planCell.className = "cell active-cell day-border";
+      if(dayIndex === todayDayIndex) planCell.classList.add("today-column");
+      if(schoolException){
+        planCell.classList.add("school-exception-day-cell");
+        planCell.title = `Bez výuky: ${schoolException.reason || "Výjimka"}`;
+      }
+      planCell.dataset.schoolId = schoolSelect.value;
+      planCell.dataset.date = formatDate(dayDate);
+      planCell.dataset.hour = String(hour);
+      planCell.dataset.type = "plan";
+      planCell.addEventListener("click", (event) => {
+        if(!isEditMode || event.target !== planCell) return;
+        activeSchoolId = event.currentTarget.dataset.schoolId || schoolSelect.value;
+        renderTrainerPanel();
+        openPlanEditor(event, new Date(dayDate), hour, null, { cell: planCell });
+      });
+      if(planEntries.length){
+        planCell.replaceChildren(...planEntries.map(entry => createScheduleEntryElement(entry, dayDate, "plan")));
+      }
         rowP.appendChild(planCell);
 
-        let realCell = document.createElement("td");
-        realCell.className = ["cell", realityClass].filter(Boolean).join(" ");
-        if(dayIndex === todayDayIndex) realCell.classList.add("today-column");
-        realCell.dataset.schoolId = schoolSelect.value;
-        realCell.dataset.date = formatDate(dayDate);
-        realCell.dataset.cls = cls;
-        realCell.dataset.hour = String(hour);
-        realCell.dataset.type = "real";
-        if(realityValue === "X"){
-          realCell.innerHTML = '<div class="cell-unavailable"><div class="cell-unavailable-icon">🚫</div><div class="cell-unavailable-text"><div>Nelze</div><div>obsadit</div></div></div>';
-        } else {
-          realCell.textContent = getName(realityValue);
-        }
-        realCell.title = buildCellTitle(
-          realityValue === "X" ? "Nelze obsadit" : comparisonStatus.tooltip,
-          realityConflict ? "Konflikt – trenér už je jinde" : ""
-        );
-        realCell.addEventListener("click", (event) => {
-          if(!isEditMode) return;
-          try {
-            activeSchoolId = event.currentTarget.dataset.schoolId || schoolSelect.value;
-            renderTrainerPanel();
-            openMenu(event, new Date(dayDate), cls, hour, "real");
-          } catch (e) {
-            console.error("Cell click error:", e);
-          }
-        });
-        realCell.addEventListener("dragover", (event) => {
-          event.preventDefault();
-        });
-        realCell.addEventListener("dragenter", () => {
-          realCell.classList.add("drag-over");
-        });
-        realCell.addEventListener("dragleave", () => {
-          realCell.classList.remove("drag-over");
-        });
-        realCell.addEventListener("drop", (event) => {
-          event.preventDefault();
-          realCell.classList.remove("drag-over");
-
-          let trainerId = event.dataTransfer.getData("text/plain");
-          if(!trainerId) return;
-
-          if(hasConflict(trainerId, dayDate, cls, hour, "real")){
-            showStatusMessage("Tento trenér už je ve stejný čas naplánovaný jinde.", "error");
-            highlightConflictAttemptCell(realCell);
-            reopenAvailableOnlyContext = {
-              cell: realCell,
-              date: new Date(dayDate),
-              cls,
-              h: hour,
-              type: "real",
-              promptText: "Vyberte jiného volného trenéra.",
-            };
-            suppressMenuAutoCloseUntil = Date.now() + 300;
-            setTimeout(() => {
-              if(!reopenAvailableOnlyContext) return;
-              const context = reopenAvailableOnlyContext;
-              reopenAvailableOnlyContext = null;
-              const rect = context.cell?.getBoundingClientRect();
-              openMenu(
-                null,
-                context.date,
-                context.cls,
-                context.h,
-                context.type,
-                true,
-                context.promptText,
-                {
-                  cell: context.cell,
-                  left: (rect?.left ?? 0) + window.scrollX,
-                  top: (rect?.bottom ?? 0) + window.scrollY,
-                }
-              );
-            }, 50);
-            return;
-          }
-
-          reality[getKey(dayDate, cls, hour)] = createRealityStoredValue(trainerId, dayDate, cls, hour);
-          localStorage.setItem("reality", JSON.stringify(reality));
-          renderScheduleSafe();
-        });
+      let realCell = document.createElement("td");
+      realCell.className = "cell day-border";
+      if(dayIndex === todayDayIndex) realCell.classList.add("today-column");
+      if(schoolException){
+        realCell.classList.add("school-exception-day-cell");
+        realCell.title = `Bez výuky: ${schoolException.reason || "Výjimka"}`;
+      }
+      realCell.dataset.schoolId = schoolSelect.value;
+      realCell.dataset.date = formatDate(dayDate);
+      realCell.dataset.hour = String(hour);
+      realCell.dataset.type = "real";
+      if(realityEntries.length){
+        realCell.replaceChildren(...realityEntries.map(entry => createScheduleEntryElement(entry, dayDate, "real")));
+      }
         rowS.appendChild(realCell);
-      });
     }
 
     fragment.appendChild(rowP);
@@ -3386,6 +3661,7 @@ function renderScheduleSafe(){
 
 function copyWeek(){
   let monday = getMonday(currentDate);
+  const selectedSchoolId = String(schoolSelect?.value || "");
 
   for(let d = 0; d < 5; d++){
     let date = new Date(monday);
@@ -3394,13 +3670,18 @@ function copyWeek(){
     let next = new Date(date);
     next.setDate(next.getDate() + 7);
 
-    for(let h = 1; h <= 8; h++){
-      classes.forEach(cls => {
-        let from = getStoredValue(plans, date, cls, h);
-        let to = getKey(next, cls, h);
-        if(from) plans[to] = createPlanStoredValue(getStoredTrainerId(from), next, cls, h);
-      });
-    }
+    Object.entries(plans).forEach(([key, value]) => {
+      const parsed = parseKey(key);
+      if(!parsed || parsed.date !== formatDate(date)) return;
+      const entrySchoolId = typeof value === "object" ? String(value?.schoolId || "") : "";
+      if(entrySchoolId && selectedSchoolId && entrySchoolId !== selectedSchoolId) return;
+      const year = typeof value === "object" && value?.year ? String(value.year) : String(parsed.year || getSelectedYear());
+      const cls = typeof value === "object" && value?.className ? String(value.className) : String(parsed.cls || "");
+      if(!cls || !parsed.hour) return;
+      const trainerId = getStoredTrainerId(value);
+      if(!trainerId) return;
+      plans[getKey(next, cls, parsed.hour, year)] = createPlanStoredValue(trainerId, next, cls, parsed.hour, year);
+    });
   }
 
   localStorage.setItem("plans", JSON.stringify(plans));
@@ -3429,9 +3710,6 @@ if(loadArchiveButton){
 if(classSelect){
   classSelect.addEventListener("change", onClassChange);
 }
-if(clearScheduleDataButton){
-  clearScheduleDataButton.addEventListener("click", confirmClearScheduleData);
-}
 if(applyRecurringWeekButton){
   applyRecurringWeekButton.addEventListener("click", applyRecurringPlanToCurrentWeek);
 }
@@ -3439,7 +3717,6 @@ editWeekButton.addEventListener("click", () => {
   editWeekButton.classList.toggle("edit-active");
   setEditMode(!isEditMode);
 });
-window.clearScheduleData = clearScheduleData;
 leaveEditConfirmButton.addEventListener("click", () => {
   const onConfirm = pendingLeaveEditConfirm;
   pendingLeaveEditConfirm = null;

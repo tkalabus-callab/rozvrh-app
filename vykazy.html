@@ -179,6 +179,125 @@
       font-weight:900;
     }
 
+    .evaluation-box{
+      background:#ffffff;
+      border-top:5px solid var(--color-primary);
+      color:var(--color-header);
+    }
+
+    .evaluation-summary{
+      margin-top:12px;
+      display:grid;
+      grid-template-columns:repeat(4, minmax(0, 1fr));
+      gap:10px;
+    }
+
+    .evaluation-card{
+      min-height:76px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      gap:6px;
+      padding:10px 12px;
+      border-radius:8px;
+      background:var(--color-header);
+      color:#ffffff;
+      box-sizing:border-box;
+      text-align:center;
+    }
+
+    .evaluation-card-label{
+      font-size:12px;
+      font-weight:900;
+      text-transform:uppercase;
+    }
+
+    .evaluation-card-value{
+      font-size:22px;
+      font-weight:900;
+      line-height:1.1;
+    }
+
+    .evaluation-table-wrap{
+      margin-top:12px;
+    }
+
+    .evaluation-tools{
+      margin-top:12px;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+    .evaluation-view-button{
+      border:1px solid var(--color-border);
+      border-radius:8px;
+      padding:8px 12px;
+      background:#ffffff;
+      color:var(--color-header);
+      font-weight:900;
+      cursor:pointer;
+    }
+
+    .evaluation-view-button.is-active{
+      background:var(--color-header);
+      color:#ffffff;
+      border-color:var(--color-header);
+    }
+
+    .evaluation-search{
+      margin-left:auto;
+      min-width:220px;
+      min-height:34px;
+      border:1px solid var(--color-border);
+      border-radius:8px;
+      padding:0 10px;
+      font-weight:700;
+      color:var(--color-header);
+    }
+
+    .school-year-archive-list{
+      margin-top:12px;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+
+    .school-year-archive-list[hidden]{
+      display:none;
+    }
+
+    .school-year-archive-item{
+      display:grid;
+      grid-template-columns:1fr auto;
+      gap:10px;
+      align-items:center;
+      padding:10px 12px;
+      border:1px solid var(--color-border);
+      border-radius:8px;
+      background:#f8fbfd;
+    }
+
+    .school-year-archive-title{
+      font-weight:900;
+      color:var(--color-header);
+    }
+
+    .school-year-archive-meta{
+      margin-top:3px;
+      color:#526173;
+      font-size:12px;
+      font-weight:700;
+    }
+
+    .evaluation-section-row td{
+      background:var(--color-header);
+      color:#ffffff;
+      font-weight:900;
+      text-transform:uppercase;
+    }
+
     .filter-item{
       display:grid;
       grid-template-columns:120px minmax(0, 1fr);
@@ -772,6 +891,10 @@
         display:none !important;
       }
 
+      .evaluation-box{
+        display:none !important;
+      }
+
       .print-report{
         display:block !important;
       }
@@ -779,6 +902,24 @@
   </style>
 </head>
 <body>
+<script>
+(function(){
+  const managerLoggedIn = sessionStorage.getItem("managerModeUnlocked") === "1";
+  const caretakerId = localStorage.getItem("caretakerId") || "";
+  const sessionCaretakerId = sessionStorage.getItem("caretakerModeUnlocked") || "";
+  let caretakers = [];
+  try { caretakers = JSON.parse(localStorage.getItem("caretakers") || "[]"); } catch {}
+  const caretakerLoggedIn = Boolean(
+    caretakerId &&
+    sessionCaretakerId &&
+    String(caretakerId) === String(sessionCaretakerId) &&
+    caretakers.some(item => String(item.id) === String(caretakerId))
+  );
+  if(!managerLoggedIn && !caretakerLoggedIn){
+    window.location.replace("home.html");
+  }
+})();
+</script>
 
   <div class="page-header">
     <div class="page-header-inner">
@@ -869,6 +1010,50 @@
       </div>
     </div>
     <div id="reportStatusMessage" class="status-message" hidden></div>
+    <div class="box evaluation-box">
+      <div class="box-title">VYHODNOCENÍ OBDOBÍ</div>
+      <div class="filters-period">
+        <div class="filter-item">
+          <label for="evaluationPeriod">Období:</label>
+          <select id="evaluationPeriod">
+            <option value="month">Měsíc</option>
+            <option value="calendar-year">Kalendářní rok</option>
+            <option value="school-year">Školní rok</option>
+          </select>
+        </div>
+        <button id="saveSchoolYearArchiveButton" class="action-button action-button-primary" type="button">Uložit školní rok do archivu</button>
+        <button id="toggleSchoolYearArchiveButton" class="action-button" type="button">Archiv školních roků</button>
+      </div>
+      <div id="evaluationSummary" class="evaluation-summary"></div>
+      <div id="schoolYearArchiveList" class="school-year-archive-list" hidden></div>
+      <div class="evaluation-tools">
+        <button class="evaluation-view-button is-active" type="button" data-evaluation-view="summary">Souhrn</button>
+        <button class="evaluation-view-button" type="button" data-evaluation-view="schools">Školy</button>
+        <button class="evaluation-view-button" type="button" data-evaluation-view="trainers">Trenéři</button>
+        <button class="evaluation-view-button" type="button" data-evaluation-view="control">Kontrola</button>
+        <input id="evaluationSearch" class="evaluation-search" type="search" placeholder="Hledat školu nebo trenéra">
+      </div>
+      <div class="table-wrap evaluation-table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Typ</th>
+              <th>Název</th>
+              <th>Hodiny</th>
+              <th>Sazba</th>
+              <th>Fakturace</th>
+              <th>Náklady</th>
+              <th>Rozdíl</th>
+            </tr>
+          </thead>
+          <tbody id="evaluationBody">
+            <tr>
+              <td colspan="7">Zatím bez dat</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
     <div class="actions-box">
       <div class="actions-label">Akce</div>
       <button id="exportExcelButton" class="action-button" type="button">Export Excel</button>
@@ -942,6 +1127,14 @@
       const summarySchoolHours = document.getElementById("summarySchoolHours");
       const summaryTrainerHours = document.getElementById("summaryTrainerHours");
       const summaryHoursCheck = document.getElementById("summaryHoursCheck");
+      const evaluationPeriod = document.getElementById("evaluationPeriod");
+      const saveSchoolYearArchiveButton = document.getElementById("saveSchoolYearArchiveButton");
+      const toggleSchoolYearArchiveButton = document.getElementById("toggleSchoolYearArchiveButton");
+      const schoolYearArchiveList = document.getElementById("schoolYearArchiveList");
+      const evaluationSummary = document.getElementById("evaluationSummary");
+      const evaluationBody = document.getElementById("evaluationBody");
+      const evaluationSearch = document.getElementById("evaluationSearch");
+      const evaluationViewButtons = Array.from(document.querySelectorAll("[data-evaluation-view]"));
       const reportBody = document.getElementById("reportBody");
       const printReport = document.getElementById("printReport");
       const exportExcelButton = document.getElementById("exportExcelButton");
@@ -955,10 +1148,11 @@
       const closeArchiveButton = document.getElementById("closeArchiveButton");
       const schoolArchiveList = document.getElementById("schoolArchiveList");
       const trainerArchiveList = document.getElementById("trainerArchiveList");
-      if(!yearSelect || !monthSelect || !reportGroupSelect || !schoolFilterWrap || !trainerFilterWrap || !schoolFilter || !trainerFilter || !reportSummaryTitle || !reportFocusMode || !reportArchiveBadge || !reportFocusSubject || !reportFocusHours || !reportStatusMessage || !summaryPeriod || !summarySchoolHours || !summaryTrainerHours || !summaryHoursCheck || !reportBody || !printReport || !exportExcelButton || !exportPdfButton || !emailReportButton || !archiveReportButton || !openArchiveButton || !reportArchiveModal || !clearArchiveButton || !closeArchiveTextButton || !closeArchiveButton || !schoolArchiveList || !trainerArchiveList) return;
+      if(!yearSelect || !monthSelect || !reportGroupSelect || !schoolFilterWrap || !trainerFilterWrap || !schoolFilter || !trainerFilter || !reportSummaryTitle || !reportFocusMode || !reportArchiveBadge || !reportFocusSubject || !reportFocusHours || !reportStatusMessage || !summaryPeriod || !summarySchoolHours || !summaryTrainerHours || !summaryHoursCheck || !evaluationPeriod || !saveSchoolYearArchiveButton || !toggleSchoolYearArchiveButton || !schoolYearArchiveList || !evaluationSummary || !evaluationBody || !evaluationSearch || !evaluationViewButtons.length || !reportBody || !printReport || !exportExcelButton || !exportPdfButton || !emailReportButton || !archiveReportButton || !openArchiveButton || !reportArchiveModal || !clearArchiveButton || !closeArchiveTextButton || !closeArchiveButton || !schoolArchiveList || !trainerArchiveList) return;
 
       let loadedArchiveContext = null;
       const openArchiveMonthKeys = new Set();
+      let evaluationView = "summary";
 
       const now = new Date();
       const currentYear = now.getFullYear();
@@ -1095,6 +1289,10 @@
         return item.mesto || item.city || "-";
       }
 
+      function getYearLabel(value){
+        return String(value) === "skolka" ? "Školka" : (value || "-");
+      }
+
       function aggregateEntriesByHours(entries){
         const groups = new Map();
 
@@ -1136,6 +1334,14 @@
       function getMonthEntriesBase(){
         const year = Number(yearSelect.value);
         const month = Number(monthSelect.value);
+        const start = `${year}-${String(month).padStart(2, "0")}-01`;
+        const endDate = new Date(year, month, 0);
+        const end = `${year}-${String(month).padStart(2, "0")}-${String(endDate.getDate()).padStart(2, "0")}`;
+
+        return getEntriesBaseForRange(start, end);
+      }
+
+      function getEntriesBaseForRange(startDate, endDate){
         const plansByKey = Object.fromEntries(
           Object.entries(loadPlans()).map(([key, value]) => [key, normalizePlanEntry(key, value)])
         );
@@ -1148,8 +1354,7 @@
 
             const date = new Date(entry.date);
             if(Number.isNaN(date.getTime())) return false;
-            if(date.getFullYear() !== year) return false;
-            if(date.getMonth() + 1 !== month) return false;
+            if(String(entry.date) < startDate || String(entry.date) > endDate) return false;
 
             return true;
           })
@@ -1161,9 +1366,284 @@
               ...entry,
               schoolName: getSchoolLabel(school),
               trainerName: getTrainerLabel(trainer),
-              place: getSchoolPlace(school)
+              place: getSchoolPlace(school),
+              schoolRate: Number(String(school?.rate || "0").replace(",", ".")) || 0,
+              trainerRate: Number(String(trainer?.rate || "0").replace(",", ".")) || 0
             };
           });
+      }
+
+      function getEvaluationRange(){
+        const year = Number(yearSelect.value);
+        const month = Number(monthSelect.value);
+
+        if(evaluationPeriod.value === "calendar-year"){
+          return {
+            label: `Kalendářní rok ${year}`,
+            start: `${year}-01-01`,
+            end: `${year}-12-31`
+          };
+        }
+
+        if(evaluationPeriod.value === "school-year"){
+          return {
+            label: `Školní rok ${year - 1}/${year}`,
+            start: `${year - 1}-09-01`,
+            end: `${year}-06-30`
+          };
+        }
+
+        const endDate = new Date(year, month, 0);
+        return {
+          label: `${getSelectedOptionText(monthSelect)} ${year}`.trim(),
+          start: `${year}-${String(month).padStart(2, "0")}-01`,
+          end: `${year}-${String(month).padStart(2, "0")}-${String(endDate.getDate()).padStart(2, "0")}`
+        };
+      }
+
+      function formatMoney(value){
+        return `${Math.round(Number(value || 0)).toLocaleString("cs-CZ")} Kč`;
+      }
+
+      function getEvaluationFilteredRows(rows){
+        const query = evaluationSearch.value.trim().toLowerCase();
+        if(!query) return rows;
+        return rows.filter(row => String(row.name || "").toLowerCase().includes(query));
+      }
+
+      function renderEvaluationViewButtons(){
+        evaluationViewButtons.forEach(button => {
+          button.classList.toggle("is-active", button.dataset.evaluationView === evaluationView);
+        });
+        evaluationSearch.hidden = evaluationView === "summary" || evaluationView === "control";
+      }
+
+      function renderEvaluationRows(snapshot){
+        const schools = snapshot.schools.slice().sort((a, b) => a.name.localeCompare(b.name, "cs"));
+        const trainers = snapshot.trainers.slice().sort((a, b) => a.name.localeCompare(b.name, "cs"));
+
+        renderEvaluationViewButtons();
+
+        if(evaluationView === "summary"){
+          evaluationBody.innerHTML = `
+            <tr><td>Celkem</td><td>Odučené hodiny</td><td>${snapshot.totalHours}</td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
+            <tr><td>Celkem</td><td>Fakturace školám</td><td>-</td><td>-</td><td>${formatMoney(snapshot.totalInvoice)}</td><td>-</td><td>-</td></tr>
+            <tr><td>Celkem</td><td>Náklady na trenéry</td><td>-</td><td>-</td><td>-</td><td>${formatMoney(snapshot.totalCosts)}</td><td>-</td></tr>
+            <tr><td>Celkem</td><td>Rozdíl</td><td>-</td><td>-</td><td>-</td><td>-</td><td>${formatMoney(snapshot.totalProfit)}</td></tr>
+          `;
+          return;
+        }
+
+        if(evaluationView === "schools"){
+          const rows = getEvaluationFilteredRows(schools);
+          evaluationBody.innerHTML = rows.length ? rows.map(row => `
+            <tr>
+              <td>Škola</td>
+              <td>${escapeHtml(row.name)}</td>
+              <td>${row.hours}</td>
+              <td>${formatMoney(row.rate)}</td>
+              <td>${formatMoney(row.invoice)}</td>
+              <td>${formatMoney(row.cost)}</td>
+              <td>${formatMoney(row.invoice - row.cost)}</td>
+            </tr>
+          `).join("") : '<tr><td colspan="7">Nic neodpovídá vyhledávání.</td></tr>';
+          return;
+        }
+
+        if(evaluationView === "trainers"){
+          const rows = getEvaluationFilteredRows(trainers);
+          evaluationBody.innerHTML = rows.length ? rows.map(row => `
+            <tr>
+              <td>Trenér</td>
+              <td>${escapeHtml(row.name)}</td>
+              <td>${row.hours}</td>
+              <td>${formatMoney(row.rate)}</td>
+              <td>-</td>
+              <td>${formatMoney(row.cost)}</td>
+              <td>-</td>
+            </tr>
+          `).join("") : '<tr><td colspan="7">Nic neodpovídá vyhledávání.</td></tr>';
+          return;
+        }
+
+        const missingSchoolRates = schools.filter(row => row.hours && !Number(row.rate));
+        const missingTrainerRates = trainers.filter(row => row.hours && !Number(row.rate));
+        const controlRows = [
+          ...missingSchoolRates.map(row => ({
+            type: "Chybí sazba školy",
+            name: row.name,
+            hours: row.hours
+          })),
+          ...missingTrainerRates.map(row => ({
+            type: "Chybí sazba trenéra",
+            name: row.name,
+            hours: row.hours
+          }))
+        ];
+
+        evaluationBody.innerHTML = controlRows.length ? controlRows.map(row => `
+          <tr>
+            <td>${escapeHtml(row.type)}</td>
+            <td>${escapeHtml(row.name)}</td>
+            <td>${row.hours}</td>
+            <td>0 Kč</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+          </tr>
+        `).join("") : '<tr><td colspan="7">Kontrola sazeb je v pořádku.</td></tr>';
+      }
+
+      function renderEvaluation(){
+        const range = getEvaluationRange();
+        const entries = aggregateEntriesByHours(getEntriesBaseForRange(range.start, range.end));
+        const schools = new Map();
+        const trainers = new Map();
+
+        entries.forEach(entry => {
+          const hours = Number(entry.taughtHours || 0);
+          const schoolKey = String(entry.schoolId || "");
+          const trainerKey = String(entry.trainerId || "");
+          const invoice = hours * Number(entry.schoolRate || 0);
+          const cost = hours * Number(entry.trainerRate || 0);
+
+          if(!schools.has(schoolKey)){
+            schools.set(schoolKey, {
+              name: entry.schoolName || "-",
+              hours: 0,
+              rate: Number(entry.schoolRate || 0),
+              invoice: 0,
+              cost: 0
+            });
+          }
+          const schoolRow = schools.get(schoolKey);
+          schoolRow.hours += hours;
+          schoolRow.invoice += invoice;
+          schoolRow.cost += cost;
+
+          if(!trainers.has(trainerKey)){
+            trainers.set(trainerKey, {
+              name: entry.trainerName || "-",
+              hours: 0,
+              rate: Number(entry.trainerRate || 0),
+              cost: 0
+            });
+          }
+          const trainerRow = trainers.get(trainerKey);
+          trainerRow.hours += hours;
+          trainerRow.cost += cost;
+        });
+
+        const totalHours = entries.reduce((sum, entry) => sum + Number(entry.taughtHours || 0), 0);
+        const totalInvoice = Array.from(schools.values()).reduce((sum, row) => sum + row.invoice, 0);
+        const totalCosts = Array.from(trainers.values()).reduce((sum, row) => sum + row.cost, 0);
+        const totalProfit = totalInvoice - totalCosts;
+        const snapshot = {
+          range,
+          totalHours,
+          totalInvoice,
+          totalCosts,
+          totalProfit,
+          schools: Array.from(schools.values()),
+          trainers: Array.from(trainers.values())
+        };
+
+        evaluationSummary.innerHTML = [
+          ["Období", range.label],
+          ["Hodiny", totalHours],
+          ["Fakturace", formatMoney(totalInvoice)],
+          ["Náklady", formatMoney(totalCosts)]
+        ].map(([label, value]) => `
+          <div class="evaluation-card">
+            <div class="evaluation-card-label">${escapeHtml(label)}</div>
+            <div class="evaluation-card-value">${escapeHtml(value)}</div>
+          </div>
+        `).join("");
+
+        if(!entries.length){
+          evaluationBody.innerHTML = '<tr><td colspan="7">Pro vybrané období nejsou ve skutečnosti žádná data.</td></tr>';
+          renderEvaluationViewButtons();
+          return snapshot;
+        }
+
+        renderEvaluationRows(snapshot);
+        return snapshot;
+      }
+
+      function loadSchoolYearArchive(){
+        try{
+          return JSON.parse(localStorage.getItem("schoolYearReportArchive") || "[]");
+        }catch(e){
+          return [];
+        }
+      }
+
+      function saveSchoolYearArchive(items){
+        localStorage.setItem("schoolYearReportArchive", JSON.stringify(items));
+      }
+
+      function saveCurrentSchoolYearArchive(){
+        const previousPeriod = evaluationPeriod.value;
+        evaluationPeriod.value = "school-year";
+        const snapshot = renderEvaluation();
+        evaluationPeriod.value = previousPeriod;
+        renderEvaluation();
+
+        if(!snapshot) return;
+
+        const yearValue = String(yearSelect.value);
+        const archive = loadSchoolYearArchive().filter(item => String(item.yearValue) !== yearValue);
+        archive.unshift({
+          yearValue,
+          label: snapshot.range.label,
+          createdAt: new Date().toISOString(),
+          totalHours: snapshot.totalHours,
+          totalInvoice: snapshot.totalInvoice,
+          totalCosts: snapshot.totalCosts,
+          totalProfit: snapshot.totalProfit,
+          schools: snapshot.schools,
+          trainers: snapshot.trainers
+        });
+        saveSchoolYearArchive(archive);
+        renderSchoolYearArchiveList();
+        showStatusMessage(`Školní rok ${snapshot.range.label} byl uložen do archivu.`, "success");
+      }
+
+      function renderSchoolYearArchiveList(){
+        const archive = loadSchoolYearArchive();
+        if(!archive.length){
+          schoolYearArchiveList.innerHTML = '<div class="archive-empty">Zatím není uložený žádný školní rok.</div>';
+          return;
+        }
+
+        schoolYearArchiveList.replaceChildren(...archive.map(item => {
+          const row = document.createElement("div");
+          row.className = "school-year-archive-item";
+
+          const main = document.createElement("div");
+          const title = document.createElement("div");
+          title.className = "school-year-archive-title";
+          title.textContent = item.label || `Školní rok ${item.yearValue || "-"}`;
+          const meta = document.createElement("div");
+          meta.className = "school-year-archive-meta";
+          const savedAt = item.createdAt ? new Date(item.createdAt).toLocaleString("cs-CZ") : "-";
+          meta.textContent = `${item.totalHours || 0} hod | fakturace ${formatMoney(item.totalInvoice)} | náklady ${formatMoney(item.totalCosts)} | uloženo ${savedAt}`;
+          main.append(title, meta);
+
+          const loadButton = document.createElement("button");
+          loadButton.type = "button";
+          loadButton.className = "action-button";
+          loadButton.textContent = "Načíst";
+          loadButton.addEventListener("click", () => {
+            if(item.yearValue) yearSelect.value = item.yearValue;
+            evaluationPeriod.value = "school-year";
+            refreshCurrentReport();
+            showStatusMessage(`Načten školní rok: ${item.label || item.yearValue}`, "archive");
+          });
+
+          row.append(main, loadButton);
+          return row;
+        }));
       }
 
       function sumGroupedHours(entries, groupFields){
@@ -1267,6 +1747,7 @@
         updateReportSummaryTitle();
         updateReportSummaryCards();
         renderReportTable();
+        renderEvaluation();
       }
 
       function getSelectedOptionText(select){
@@ -1316,7 +1797,7 @@
             entry.schoolName || "-",
             entry.place || "-",
             entry.trainerName || "-",
-            entry.year || "-",
+            getYearLabel(entry.year),
             entry.className || "-",
             `${entry.taughtHours || "-"} hod`
           ])
@@ -2056,7 +2537,7 @@
             <td class="align-right">${entry.schoolName || "-"}</td>
             <td class="align-right">${entry.place || "-"}</td>
             <td class="align-right">${entry.trainerName || "-"}</td>
-            <td class="align-center">${entry.year || "-"}</td>
+            <td class="align-center">${getYearLabel(entry.year)}</td>
             <td class="align-center">${entry.className || "-"}</td>
             <td class="align-center">${entry.taughtHours} hod</td>
           </tr>
@@ -2081,6 +2562,20 @@
       trainerFilter.addEventListener("change", refreshCurrentReport);
       yearSelect.addEventListener("change", refreshCurrentReport);
       monthSelect.addEventListener("change", refreshCurrentReport);
+      evaluationPeriod.addEventListener("change", renderEvaluation);
+      evaluationSearch.addEventListener("input", renderEvaluation);
+      evaluationViewButtons.forEach(button => {
+        button.addEventListener("click", () => {
+          evaluationView = button.dataset.evaluationView || "summary";
+          renderEvaluation();
+        });
+      });
+      saveSchoolYearArchiveButton.addEventListener("click", saveCurrentSchoolYearArchive);
+      toggleSchoolYearArchiveButton.addEventListener("click", () => {
+        schoolYearArchiveList.hidden = !schoolYearArchiveList.hidden;
+        toggleSchoolYearArchiveButton.textContent = schoolYearArchiveList.hidden ? "Archiv školních roků" : "Skrýt archiv školních roků";
+        renderSchoolYearArchiveList();
+      });
       exportExcelButton.addEventListener("click", () => exportReportExcel());
       exportPdfButton.addEventListener("click", () => exportReportPdf());
       emailReportButton.addEventListener("click", emailReport);
@@ -2103,6 +2598,8 @@
       updateReportSummaryTitle();
       updateReportSummaryCards();
       renderReportTable();
+      renderEvaluation();
+      renderSchoolYearArchiveList();
     })();
   </script>
 
