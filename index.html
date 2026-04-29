@@ -821,6 +821,12 @@ th.today-column::before {
   font-weight:700;
 }
 
+#scheduleArchiveStatus.archive-status-strong{
+  color:#b00020;
+  font-size:18px;
+  font-weight:900;
+}
+
 #group-caretaker-mode-body{
   display:block;
 }
@@ -972,6 +978,15 @@ th.today-column::before {
 
 #scheduleOverlayMessage.error {
   color: #b00020;
+}
+
+#scheduleOverlayMessage.success {
+  background: rgba(22, 163, 74, 0.16);
+  color: #166534;
+  font-size: 32px;
+  font-weight: 900;
+  letter-spacing: 0;
+  text-shadow: 0 2px 0 rgba(255,255,255,0.85);
 }
 
 #scheduleOverlayMessage.blocking {
@@ -1290,7 +1305,7 @@ button[style*="var(--color-primary)"],
       <section class="schedule-control-column" id="group-schedule-archive">
         <h3 class="schedule-control-title">Archiv rozvrhů</h3>
         <div class="schedule-control-body">
-          <button id="saveWeekArchiveButton" type="button">Uložit týden</button>
+          <button id="saveWeekArchiveButton" type="button">Uzavřít týden</button>
           <button id="saveMonthArchiveButton" type="button">Uložit měsíc</button>
           <select id="scheduleArchiveSelect"></select>
           <button id="loadArchiveButton" type="button">Načíst archiv</button>
@@ -2201,6 +2216,7 @@ function hasTrainerConflictForPlanSave(trainerId, date, hour, year, originalEntr
   if(!normalizedTrainerId || normalizedTrainerId === "X") return false;
 
   const targetDate = formatDate(date);
+  const targetSchoolId = String(schoolSelect?.value || "");
   return Object.entries(plans).some(([key, value]) => {
     if(getStoredTrainerId(value) !== normalizedTrainerId) return false;
     const parsed = parseKey(key);
@@ -2208,6 +2224,8 @@ function hasTrainerConflictForPlanSave(trainerId, date, hour, year, originalEntr
     if(parsed.date !== targetDate || Number(parsed.hour) !== Number(hour)) return false;
     if(parsed.year && String(parsed.year) !== String(year)) return false;
     if(originalEntry && isSamePlanEntry(originalEntry, date, parsed.cls, parsed.hour, parsed.year || year)) return false;
+    const entrySchoolId = getScheduleEntrySchoolId(value);
+    if(entrySchoolId && targetSchoolId && entrySchoolId === targetSchoolId) return false;
     return true;
   });
 }
@@ -2435,18 +2453,25 @@ function openMenu(e, date, cls, h, type, availableOnly = false, promptText = "",
   function addPlannedTrainerAction(){
     if(type !== "real") return;
 
-    const plannedValue = getStoredValue(plans, date, cls, h);
-    const plannedTrainerId = getStoredTrainerId(plannedValue);
-    if(!plannedTrainerId) return;
+    const plannedEntries = getStoreEntriesForCell(plans, date, h)
+      .filter(entry => !getStoredTrainerId(getStoredValue(reality, date, entry.className, h, entry.year)));
+    const visiblePlannedEntries = plannedEntries.length
+      ? plannedEntries
+      : getStoreEntriesForCell(plans, date, h).filter(entry => entry.className === cls);
 
-    const d = document.createElement("div");
-    d.className = "menu-item menu-item-planned";
-    if(plannedTrainerId === "X") d.classList.add("menu-item-unavailable");
-    d.textContent = plannedTrainerId === "X"
-      ? "Podle plánu: Nelze obsadit"
-      : `Podle plánu: ${getName(plannedValue)}`;
-    d.onclick = () => selectValue(plannedTrainerId);
-    menu.appendChild(d);
+    visiblePlannedEntries.forEach(entry => {
+      const plannedTrainerId = getStoredTrainerId(entry.value);
+      if(!plannedTrainerId) return;
+
+      const d = document.createElement("div");
+      d.className = "menu-item menu-item-planned";
+      if(plannedTrainerId === "X") d.classList.add("menu-item-unavailable");
+      d.textContent = plannedTrainerId === "X"
+        ? `Podle plánu: ${getYearLabel(entry.year)} ${entry.className || "-"} Nelze obsadit`
+        : `Podle plánu: ${getYearLabel(entry.year)} ${entry.className || "-"} ${getName(entry.value)}`;
+      d.onclick = () => selectPlannedRealityEntry(entry, plannedTrainerId);
+      menu.appendChild(d);
+    });
   }
 
   function addAction(label, onClick){
@@ -2582,6 +2607,7 @@ function openMenu(e, date, cls, h, type, availableOnly = false, promptText = "",
       sendMail(date, cls, h);
       return;
     }
+    let readyArchiveCheck = null;
 
     if(
       val &&
@@ -2641,6 +2667,13 @@ function openMenu(e, date, cls, h, type, availableOnly = false, promptText = "",
       localStorage.setItem("plans", JSON.stringify(plans));
     } else {
       if(val){
+        const range = getScheduleArchiveRange("week");
+        readyArchiveCheck = {
+          range,
+          missingBefore: getWeekClosureMissingReality(range).length
+        };
+      }
+      if(val){
         reality[getKey(date, cls, h)] = createRealityStoredValue(val, date, cls, h);
       } else {
         deleteStoredValue(reality, date, cls, h);
@@ -2650,6 +2683,28 @@ function openMenu(e, date, cls, h, type, availableOnly = false, promptText = "",
 
     closeMenu();
     renderScheduleSafe();
+    if(readyArchiveCheck){
+      maybeShowWeekReadyForArchive(readyArchiveCheck.missingBefore, readyArchiveCheck.range);
+    }
+  }
+
+  function selectPlannedRealityEntry(entry, trainerId){
+    if(!entry || !trainerId) return;
+
+    const range = getScheduleArchiveRange("week");
+    const missingBefore = getWeekClosureMissingReality(range).length;
+    const targetDate = new Date(entry.date || date);
+    reality[getKey(targetDate, entry.className, entry.hour, entry.year)] = createRealityStoredValue(
+      trainerId,
+      targetDate,
+      entry.className,
+      entry.hour,
+      entry.year
+    );
+    localStorage.setItem("reality", JSON.stringify(reality));
+    closeMenu();
+    renderScheduleSafe();
+    maybeShowWeekReadyForArchive(missingBefore, range);
   }
 
   renderMenuTrainerOptions(availableOnly, promptText);
@@ -2969,6 +3024,88 @@ function collectScheduleArchiveStore(store, range){
   );
 }
 
+function getScheduleEntrySchoolId(value){
+  return typeof value === "object" ? String(value?.schoolId || "") : "";
+}
+
+function getScheduleEntryYear(parsed, value){
+  return typeof value === "object" && value?.year ? String(value.year) : String(parsed?.year || getSelectedYear());
+}
+
+function getScheduleEntryClass(parsed, value){
+  return typeof value === "object" && value?.className ? String(value.className) : String(parsed?.cls || "");
+}
+
+function getScheduleEntryHour(parsed, value){
+  return Number(typeof value === "object" && value?.hour ? value.hour : parsed?.hour);
+}
+
+function getWeekClosureMissingReality(range){
+  const selectedSchoolId = String(schoolSelect?.value || "");
+  const missing = [];
+
+  Object.entries(plans).forEach(([key, value]) => {
+    if(!isStoredEntryInRange(key, value, range)) return;
+    if(!getStoredTrainerId(value)) return;
+
+    const parsed = parseKey(key);
+    const date = typeof value === "object" && value?.date ? value.date : parsed?.date;
+    const year = getScheduleEntryYear(parsed, value);
+    const className = getScheduleEntryClass(parsed, value);
+    const hour = getScheduleEntryHour(parsed, value);
+    const planSchoolId = getScheduleEntrySchoolId(value) || selectedSchoolId;
+    const matchingReality = Object.entries(reality).some(([realityKey, realityValue]) => {
+      if(!getStoredTrainerId(realityValue)) return false;
+      const realityParsed = parseKey(realityKey);
+      const realityDate = typeof realityValue === "object" && realityValue?.date ? realityValue.date : realityParsed?.date;
+      if(realityDate !== date) return false;
+      if(getScheduleEntryYear(realityParsed, realityValue) !== year) return false;
+      if(getScheduleEntryClass(realityParsed, realityValue) !== className) return false;
+      if(getScheduleEntryHour(realityParsed, realityValue) !== hour) return false;
+      const realitySchoolId = getScheduleEntrySchoolId(realityValue) || selectedSchoolId;
+      return !planSchoolId || !realitySchoolId || planSchoolId === realitySchoolId;
+    });
+
+    if(!matchingReality){
+      missing.push({ date, year, className, hour });
+    }
+  });
+
+  return missing.sort((a, b) =>
+    String(a.date).localeCompare(String(b.date)) ||
+    Number(a.hour) - Number(b.hour) ||
+    getYearSortValue(a.year) - getYearSortValue(b.year) ||
+    String(a.className).localeCompare(String(b.className), "cs")
+  );
+}
+
+function formatMissingRealityItem(item){
+  const dateLabel = item.date ? new Date(item.date).toLocaleDateString("cs-CZ", { weekday:"short", day:"numeric", month:"numeric" }) : "-";
+  return `${dateLabel}, ${item.hour}. hodina, ${getYearLabel(item.year)} ${item.className || "-"}`;
+}
+
+function maybeShowWeekReadyForArchive(missingBefore, range){
+  if(!missingBefore) return;
+  if(getWeekClosureMissingReality(range).length) return;
+
+  showStatusMessage("TÝDEN PŘIPRAVEN K ARCHIVACI", "success");
+}
+
+function closeCurrentWeekArchive(){
+  const range = getScheduleArchiveRange("week");
+  const missing = getWeekClosureMissingReality(range);
+
+  if(missing.length){
+    const preview = missing.slice(0, 6).map(formatMissingRealityItem).join("; ");
+    const more = missing.length > 6 ? ` a další ${missing.length - 6}` : "";
+    setScheduleArchiveStatus(`Týden nelze uzavřít. Chybí skutečnost: ${preview}${more}.`);
+    return;
+  }
+
+  saveScheduleArchive("week", { closed: true });
+  setScheduleArchiveStatus("Týden uzavřen do archivu.", "archive-status-strong");
+}
+
 function removeArchivedRangeFromStore(store, archive){
   const range = {
     start: new Date(archive.startDate),
@@ -2986,9 +3123,10 @@ function removeArchivedRangeFromStore(store, archive){
   });
 }
 
-function setScheduleArchiveStatus(message){
+function setScheduleArchiveStatus(message, className = ""){
   if(!scheduleArchiveStatus) return;
   scheduleArchiveStatus.textContent = message;
+  scheduleArchiveStatus.className = className;
 }
 
 function refreshScheduleArchiveSelect(){
@@ -3015,7 +3153,7 @@ function refreshScheduleArchiveSelect(){
   if(loadArchiveButton) loadArchiveButton.disabled = false;
 }
 
-function saveScheduleArchive(type){
+function saveScheduleArchive(type, options = {}){
   const range = getScheduleArchiveRange(type);
   const archive = {
     id: `${Date.now()}-${type}`,
@@ -3026,6 +3164,7 @@ function saveScheduleArchive(type){
     year: getSelectedYear(),
     schoolId: schoolSelect?.value || "",
     savedAt: new Date().toISOString(),
+    closed: Boolean(options.closed),
     plans: collectScheduleArchiveStore(plans, range),
     reality: collectScheduleArchiveStore(reality, range)
   };
@@ -3162,8 +3301,39 @@ function createRealityStoredValue(trainerId, date, cls, hour, year = getActiveCe
 }
 
 function deleteStoredValue(store, d, c, h, year = getActiveCellYear()){
-  delete store[getKey(d, c, h, year)];
-  delete store[getLegacyKey(d, c, h)];
+  const targetDate = formatDate(d);
+  const targetYear = String(year || "");
+  const targetClass = String(c || "");
+  const targetHour = Number(h);
+  const targetSchoolId = String(activeCell?.dataset?.schoolId || schoolSelect?.value || "");
+  let removed = false;
+
+  [getKey(d, c, h, year), getLegacyKey(d, c, h)].forEach(key => {
+    if(key in store){
+      delete store[key];
+      removed = true;
+    }
+  });
+
+  Object.entries(store).forEach(([key, value]) => {
+    const parsed = parseKey(key);
+    if(!parsed || parsed.date !== targetDate) return;
+    if(Number(parsed.hour) !== targetHour) return;
+
+    const entryYear = typeof value === "object" && value?.year ? String(value.year) : String(parsed.year || "");
+    if(targetYear && entryYear && entryYear !== targetYear) return;
+
+    const entryClass = typeof value === "object" && value?.className ? String(value.className) : String(parsed.cls || "");
+    if(entryClass !== targetClass) return;
+
+    const entrySchoolId = getScheduleEntrySchoolId(value);
+    if(entrySchoolId && targetSchoolId && entrySchoolId !== targetSchoolId) return;
+
+    delete store[key];
+    removed = true;
+  });
+
+  return removed;
 }
 
 function getName(id){
@@ -3358,17 +3528,21 @@ function isTrainerBusy(trainerId, date, cls, hour, type, year = getActiveCellYea
   let currentKey = getKey(date, cls, hour, targetYear);
   let legacyKey = getLegacyKey(date, cls, hour);
   let store = type === "plan" ? plans : reality;
+  let targetSchoolId = String(activeCell?.dataset?.schoolId || schoolSelect?.value || "");
 
   for(let key in store){
     let item = parseKey(key);
+    let value = store[key];
     if(
       key !== currentKey &&
       key !== legacyKey &&
       item.date === targetDate &&
       item.hour === hour &&
       (item.year ? item.year === targetYear : true) &&
-      getStoredTrainerId(store[key]) === trainerId
+      getStoredTrainerId(value) === trainerId
     ){
+      const entrySchoolId = getScheduleEntrySchoolId(value);
+      if(entrySchoolId && targetSchoolId && entrySchoolId === targetSchoolId) continue;
       return true;
     }
   }
@@ -3699,7 +3873,7 @@ window.openCaretakers = openCaretakers;
 window.render = renderScheduleSafe;
 
 if(saveWeekArchiveButton){
-  saveWeekArchiveButton.addEventListener("click", () => saveScheduleArchive("week"));
+  saveWeekArchiveButton.addEventListener("click", closeCurrentWeekArchive);
 }
 if(saveMonthArchiveButton){
   saveMonthArchiveButton.addEventListener("click", () => saveScheduleArchive("month"));

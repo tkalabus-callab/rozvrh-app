@@ -73,6 +73,34 @@
       padding:0 12px;
     }
 
+    .report-mode-box{
+      display:grid;
+      grid-template-columns:repeat(4, minmax(0, 1fr));
+      gap:10px;
+      margin-bottom:16px;
+    }
+
+    .report-mode-button{
+      min-height:48px;
+      border:2px solid transparent;
+      border-radius:8px;
+      background:#ffffff;
+      color:var(--color-header);
+      font-weight:900;
+      cursor:pointer;
+      box-shadow:0 3px 8px rgba(0,0,0,0.12);
+    }
+
+    .report-mode-button.is-active{
+      background:var(--color-header);
+      color:#ffffff;
+      border-color:var(--color-primary);
+    }
+
+    .report-mode-button.is-archive{
+      margin-left:auto;
+    }
+
     .box{
       background:var(--color-primary);
       border-radius:12px;
@@ -93,8 +121,8 @@
 
     .filters-layout{
       display:grid;
-      grid-template-columns:minmax(250px, 1fr) minmax(320px, 1.2fr) minmax(250px, 1fr);
-      gap:22px;
+      grid-template-columns:minmax(220px, 0.9fr) minmax(280px, 1.1fr) minmax(240px, 0.9fr);
+      gap:18px;
       align-items:start;
     }
 
@@ -137,6 +165,10 @@
       display:grid;
       grid-template-columns:1fr;
       gap:8px;
+    }
+
+    .filter-item.report-group-control{
+      display:none !important;
     }
 
     .filters-control-summary{
@@ -220,6 +252,13 @@
 
     .evaluation-table-wrap{
       margin-top:12px;
+    }
+
+    .evaluation-period-controls{
+      display:grid;
+      grid-template-columns:minmax(180px, 1fr) minmax(120px, 0.55fr) minmax(160px, 0.7fr);
+      gap:10px;
+      align-items:center;
     }
 
     .evaluation-tools{
@@ -344,6 +383,14 @@
     .report-focus-panel.is-archive{
       border-top-color:#f59e0b;
       background:#fff8eb;
+    }
+
+    #filtersBox[hidden],
+    #reportSummaryTitle[hidden],
+    #evaluationPanel[hidden],
+    #actionsBox[hidden],
+    #reportTableWrap[hidden]{
+      display:none !important;
     }
 
     .report-focus-main{
@@ -501,10 +548,6 @@
       background:#3a5675;
     }
 
-    #openArchiveButton{
-      margin-left:auto;
-    }
-
     .archive-modal{
       position:fixed;
       inset:0;
@@ -517,6 +560,86 @@
     }
 
     .archive-modal[hidden]{
+      display:none;
+    }
+
+    .confirm-modal{
+      position:fixed;
+      inset:0;
+      z-index:1200;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:20px;
+      background:rgba(10,18,30,0.58);
+    }
+
+    .confirm-modal[hidden]{
+      display:none;
+    }
+
+    .confirm-dialog{
+      width:min(520px, 100%);
+      border-radius:12px;
+      background:#ffffff;
+      border:1px solid var(--color-border);
+      border-top:6px solid var(--color-primary);
+      box-shadow:0 18px 40px rgba(0,0,0,0.28);
+      overflow:hidden;
+    }
+
+    .confirm-header{
+      padding:16px 18px 10px;
+      background:var(--color-header);
+      color:#ffffff;
+    }
+
+    .confirm-title{
+      margin:0;
+      font-size:20px;
+      font-weight:900;
+      text-transform:uppercase;
+      text-shadow:0 2px 3px rgba(0,0,0,0.25);
+    }
+
+    .confirm-body{
+      padding:18px;
+      color:var(--color-header);
+      font-size:16px;
+      font-weight:800;
+      line-height:1.45;
+    }
+
+    .confirm-actions{
+      display:flex;
+      justify-content:flex-end;
+      gap:10px;
+      padding:0 18px 18px;
+    }
+
+    .confirm-cancel,
+    .confirm-submit{
+      min-height:38px;
+      padding:0 16px;
+      border-radius:8px;
+      font-weight:900;
+      cursor:pointer;
+    }
+
+    .confirm-cancel{
+      border:1px solid var(--color-border);
+      background:#ffffff;
+      color:var(--color-header);
+    }
+
+    .confirm-submit{
+      border:1px solid rgba(0,0,0,0.08);
+      background:var(--color-primary);
+      color:#062b25;
+      box-shadow:0 2px 8px rgba(0,0,0,0.15);
+    }
+
+    .confirm-modal.is-info .confirm-cancel{
       display:none;
     }
 
@@ -837,6 +960,10 @@
         grid-template-columns:1fr;
       }
 
+      .evaluation-period-controls{
+        grid-template-columns:1fr;
+      }
+
       .filter-section{
         align-items:flex-start;
       }
@@ -864,6 +991,12 @@
 
       .report-focus-subject{
         font-size:24px;
+      }
+    }
+
+    @media (max-width: 720px){
+      .report-mode-box{
+        grid-template-columns:1fr 1fr;
       }
     }
 
@@ -931,21 +1064,28 @@
     </div>
   </div>
 
-  <div class="container">
+  <div id="reportsContainer" class="container">
 
-    <div class="box">
-      <div class="box-title">FILTRY</div>
+    <div class="report-mode-box" aria-label="Režim výkazů">
+      <button class="report-mode-button is-active" type="button" data-report-view="schools">Fakturace škol</button>
+      <button class="report-mode-button" type="button" data-report-view="trainers">Kontrola trenéra</button>
+      <button class="report-mode-button" type="button" data-report-view="evaluation">Vyhodnocení období</button>
+      <button id="openArchiveModeButton" class="report-mode-button" type="button" data-report-view="archive">Archiv</button>
+    </div>
+
+    <div id="filtersBox" class="box">
+      <div id="filtersBoxTitle" class="box-title">FILTRY</div>
       <div class="filters-layout">
         <div class="filters-column">
           <div class="filter-section filter-control-card">
             <div class="filter-section-title">Období:</div>
             <div class="filters-period">
-              <div class="filter-item">
+              <div id="yearFilterItem" class="filter-item">
                 <label for="year">Rok:</label>
                 <select id="year"></select>
               </div>
 
-              <div class="filter-item">
+              <div id="monthFilterItem" class="filter-item">
                 <label for="month">Měsíc:</label>
                 <select id="month"></select>
               </div>
@@ -956,7 +1096,7 @@
         <div class="filters-column">
           <div class="filter-section filter-section-inline filter-control-card">
             <div class="filters-display">
-              <div class="filter-item">
+              <div class="filter-item report-group-control" hidden>
                 <label for="reportGroup">Zobrazit podle:</label>
                 <select id="reportGroup">
                   <option value="schools">Fakturace školy</option>
@@ -977,7 +1117,7 @@
           </div>
         </div>
 
-        <div class="filters-control-summary">
+        <div id="filtersControlSummary" class="filters-control-summary">
           <div class="filter-summary-card">
             <div class="filter-summary-label">Součet škol</div>
             <div id="summarySchoolHours" class="filter-summary-value">0</div>
@@ -1010,9 +1150,9 @@
       </div>
     </div>
     <div id="reportStatusMessage" class="status-message" hidden></div>
-    <div class="box evaluation-box">
+    <div id="evaluationPanel" class="box evaluation-box" hidden>
       <div class="box-title">VYHODNOCENÍ OBDOBÍ</div>
-      <div class="filters-period">
+      <div class="evaluation-period-controls">
         <div class="filter-item">
           <label for="evaluationPeriod">Období:</label>
           <select id="evaluationPeriod">
@@ -1021,11 +1161,16 @@
             <option value="school-year">Školní rok</option>
           </select>
         </div>
-        <button id="saveSchoolYearArchiveButton" class="action-button action-button-primary" type="button">Uložit školní rok do archivu</button>
-        <button id="toggleSchoolYearArchiveButton" class="action-button" type="button">Archiv školních roků</button>
+        <div class="filter-item">
+          <label for="evaluationYear">Rok:</label>
+          <select id="evaluationYear"></select>
+        </div>
+        <div id="evaluationMonthWrap" class="filter-item">
+          <label for="evaluationMonth">Měsíc:</label>
+          <select id="evaluationMonth"></select>
+        </div>
       </div>
       <div id="evaluationSummary" class="evaluation-summary"></div>
-      <div id="schoolYearArchiveList" class="school-year-archive-list" hidden></div>
       <div class="evaluation-tools">
         <button class="evaluation-view-button is-active" type="button" data-evaluation-view="summary">Souhrn</button>
         <button class="evaluation-view-button" type="button" data-evaluation-view="schools">Školy</button>
@@ -1054,15 +1199,14 @@
         </table>
       </div>
     </div>
-    <div class="actions-box">
+    <div id="actionsBox" class="actions-box">
       <div class="actions-label">Akce</div>
       <button id="exportExcelButton" class="action-button" type="button">Export Excel</button>
       <button id="exportPdfButton" class="action-button" type="button">Export PDF</button>
       <button id="emailReportButton" class="action-button" type="button">Poslat e-mailem</button>
       <button id="archiveReportButton" class="action-button action-button-primary" type="button">Uložit do archivu</button>
-      <button id="openArchiveButton" class="action-button" type="button">Archiv</button>
     </div>
-    <div class="table-wrap">
+    <div id="reportTableWrap" class="table-wrap">
       <table>
         <thead>
           <tr>
@@ -1084,16 +1228,19 @@
     </div>
 
   </div>
-  <div id="reportArchiveModal" class="archive-modal" hidden>
+    <div id="reportArchiveModal" class="archive-modal" hidden>
     <div class="archive-dialog" role="dialog" aria-modal="true" aria-labelledby="reportArchiveTitle">
       <div class="archive-header">
         <h2 id="reportArchiveTitle" class="archive-title">Archiv výkazů</h2>
         <div class="archive-header-actions">
           <button id="clearArchiveButton" class="archive-clear" type="button" hidden>Smazat archiv</button>
+          <button id="saveSchoolYearArchiveButton" class="archive-close-text" type="button">Uložit školní rok</button>
+          <button id="toggleSchoolYearArchiveButton" class="archive-close-text" type="button">Archiv školních roků</button>
           <button id="closeArchiveTextButton" class="archive-close-text" type="button">Zavřít archiv</button>
           <button id="closeArchiveButton" class="archive-close" type="button" aria-label="Zavřít archiv">×</button>
         </div>
       </div>
+      <div id="schoolYearArchiveList" class="school-year-archive-list" hidden></div>
       <div class="archive-columns">
         <section class="archive-column" aria-labelledby="schoolArchiveTitle">
           <h3 id="schoolArchiveTitle" class="archive-column-title">Školy</h3>
@@ -1106,12 +1253,34 @@
       </div>
     </div>
   </div>
+  <div id="reportConfirmModal" class="confirm-modal" hidden>
+    <div class="confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="reportConfirmTitle">
+      <div class="confirm-header">
+        <h2 id="reportConfirmTitle" class="confirm-title">Potvrzení</h2>
+      </div>
+      <div id="reportConfirmMessage" class="confirm-body"></div>
+      <div class="confirm-actions">
+        <button id="reportConfirmCancelButton" class="confirm-cancel" type="button">Zrušit</button>
+        <button id="reportConfirmSubmitButton" class="confirm-submit" type="button">Potvrdit</button>
+      </div>
+    </div>
+  </div>
   <div id="printReport" class="print-report"></div>
 
   <script>
     (function(){
       const yearSelect = document.getElementById("year");
       const monthSelect = document.getElementById("month");
+      const filtersBox = document.getElementById("filtersBox");
+      const filtersBoxTitle = document.getElementById("filtersBoxTitle");
+      const yearFilterItem = document.getElementById("yearFilterItem");
+      const monthFilterItem = document.getElementById("monthFilterItem");
+      const filtersControlSummary = document.getElementById("filtersControlSummary");
+      const reportModeButtons = Array.from(document.querySelectorAll("[data-report-view]"));
+      const evaluationPanel = document.getElementById("evaluationPanel");
+      const actionsBox = document.getElementById("actionsBox");
+      const reportTableWrap = document.getElementById("reportTableWrap");
+      const openArchiveModeButton = document.getElementById("openArchiveModeButton");
       const reportGroupSelect = document.getElementById("reportGroup");
       const schoolFilterWrap = document.getElementById("schoolFilterWrap");
       const trainerFilterWrap = document.getElementById("trainerFilterWrap");
@@ -1128,6 +1297,9 @@
       const summaryTrainerHours = document.getElementById("summaryTrainerHours");
       const summaryHoursCheck = document.getElementById("summaryHoursCheck");
       const evaluationPeriod = document.getElementById("evaluationPeriod");
+      const evaluationYear = document.getElementById("evaluationYear");
+      const evaluationMonth = document.getElementById("evaluationMonth");
+      const evaluationMonthWrap = document.getElementById("evaluationMonthWrap");
       const saveSchoolYearArchiveButton = document.getElementById("saveSchoolYearArchiveButton");
       const toggleSchoolYearArchiveButton = document.getElementById("toggleSchoolYearArchiveButton");
       const schoolYearArchiveList = document.getElementById("schoolYearArchiveList");
@@ -1141,25 +1313,30 @@
       const exportPdfButton = document.getElementById("exportPdfButton");
       const emailReportButton = document.getElementById("emailReportButton");
       const archiveReportButton = document.getElementById("archiveReportButton");
-      const openArchiveButton = document.getElementById("openArchiveButton");
       const reportArchiveModal = document.getElementById("reportArchiveModal");
       const clearArchiveButton = document.getElementById("clearArchiveButton");
       const closeArchiveTextButton = document.getElementById("closeArchiveTextButton");
       const closeArchiveButton = document.getElementById("closeArchiveButton");
       const schoolArchiveList = document.getElementById("schoolArchiveList");
       const trainerArchiveList = document.getElementById("trainerArchiveList");
-      if(!yearSelect || !monthSelect || !reportGroupSelect || !schoolFilterWrap || !trainerFilterWrap || !schoolFilter || !trainerFilter || !reportSummaryTitle || !reportFocusMode || !reportArchiveBadge || !reportFocusSubject || !reportFocusHours || !reportStatusMessage || !summaryPeriod || !summarySchoolHours || !summaryTrainerHours || !summaryHoursCheck || !evaluationPeriod || !saveSchoolYearArchiveButton || !toggleSchoolYearArchiveButton || !schoolYearArchiveList || !evaluationSummary || !evaluationBody || !evaluationSearch || !evaluationViewButtons.length || !reportBody || !printReport || !exportExcelButton || !exportPdfButton || !emailReportButton || !archiveReportButton || !openArchiveButton || !reportArchiveModal || !clearArchiveButton || !closeArchiveTextButton || !closeArchiveButton || !schoolArchiveList || !trainerArchiveList) return;
+      const reportConfirmModal = document.getElementById("reportConfirmModal");
+      const reportConfirmTitle = document.getElementById("reportConfirmTitle");
+      const reportConfirmMessage = document.getElementById("reportConfirmMessage");
+      const reportConfirmCancelButton = document.getElementById("reportConfirmCancelButton");
+      const reportConfirmSubmitButton = document.getElementById("reportConfirmSubmitButton");
+      if(!yearSelect || !monthSelect || !filtersBox || !filtersBoxTitle || !yearFilterItem || !monthFilterItem || !filtersControlSummary || !reportModeButtons.length || !evaluationPanel || !actionsBox || !reportTableWrap || !openArchiveModeButton || !reportGroupSelect || !schoolFilterWrap || !trainerFilterWrap || !schoolFilter || !trainerFilter || !reportSummaryTitle || !reportFocusMode || !reportArchiveBadge || !reportFocusSubject || !reportFocusHours || !reportStatusMessage || !summaryPeriod || !summarySchoolHours || !summaryTrainerHours || !summaryHoursCheck || !evaluationPeriod || !evaluationYear || !evaluationMonth || !evaluationMonthWrap || !saveSchoolYearArchiveButton || !toggleSchoolYearArchiveButton || !schoolYearArchiveList || !evaluationSummary || !evaluationBody || !evaluationSearch || !evaluationViewButtons.length || !reportBody || !printReport || !exportExcelButton || !exportPdfButton || !emailReportButton || !archiveReportButton || !reportArchiveModal || !clearArchiveButton || !closeArchiveTextButton || !closeArchiveButton || !schoolArchiveList || !trainerArchiveList || !reportConfirmModal || !reportConfirmTitle || !reportConfirmMessage || !reportConfirmCancelButton || !reportConfirmSubmitButton) return;
 
       let loadedArchiveContext = null;
       const openArchiveMonthKeys = new Set();
       let evaluationView = "summary";
+      let activeReportView = "schools";
 
       const now = new Date();
       const currentYear = now.getFullYear();
       const currentMonth = now.getMonth() + 1;
 
-      // roky (rozsah ±3 roky)
-      for(let y = currentYear - 3; y <= currentYear + 1; y++){
+      // roky od spuštění evidence dál
+      for(let y = 2026; y <= currentYear + 5; y++){
         const opt = document.createElement("option");
         opt.value = y;
         opt.textContent = y;
@@ -1180,6 +1357,25 @@
         if(m === currentMonth) opt.selected = true;
         monthSelect.appendChild(opt);
       });
+
+      function syncEvaluationDateControlsFromMain(){
+        evaluationYear.innerHTML = yearSelect.innerHTML;
+        evaluationMonth.innerHTML = monthSelect.innerHTML;
+        evaluationYear.value = yearSelect.value;
+        evaluationMonth.value = monthSelect.value;
+      }
+
+      function syncMainDateControlsFromEvaluation(){
+        yearSelect.value = evaluationYear.value;
+        monthSelect.value = evaluationMonth.value;
+      }
+
+      function updateEvaluationDateControlsVisibility(){
+        evaluationMonthWrap.hidden = evaluationPeriod.value !== "month";
+      }
+
+      syncEvaluationDateControlsFromMain();
+      updateEvaluationDateControlsVisibility();
 
       function loadSchools(){
         try{
@@ -1585,8 +1781,10 @@
       function saveCurrentSchoolYearArchive(){
         const previousPeriod = evaluationPeriod.value;
         evaluationPeriod.value = "school-year";
+        updateEvaluationDateControlsVisibility();
         const snapshot = renderEvaluation();
         evaluationPeriod.value = previousPeriod;
+        updateEvaluationDateControlsVisibility();
         renderEvaluation();
 
         if(!snapshot) return;
@@ -1637,6 +1835,8 @@
           loadButton.addEventListener("click", () => {
             if(item.yearValue) yearSelect.value = item.yearValue;
             evaluationPeriod.value = "school-year";
+            syncEvaluationDateControlsFromMain();
+            updateEvaluationDateControlsVisibility();
             refreshCurrentReport();
             showStatusMessage(`Načten školní rok: ${item.label || item.yearValue}`, "archive");
           });
@@ -1659,11 +1859,27 @@
       }
 
       function getMonthControlTotals(){
-        const entries = getMonthEntriesBase();
+        const reportMode = reportGroupSelect.value;
+        const selectedSchoolId = schoolFilter.value;
+        const selectedTrainerId = trainerFilter.value;
+
+        if(reportMode === "schools" && !selectedSchoolId){
+          return { schoolHours: 0, trainerHours: 0, hasSelection: false };
+        }
+
+        if(reportMode === "trainers" && !selectedTrainerId){
+          return { schoolHours: 0, trainerHours: 0, hasSelection: false };
+        }
+
+        const entries = getMonthEntriesBase().filter(entry => {
+          if(reportMode === "schools") return String(entry.schoolId) === String(selectedSchoolId);
+          return String(entry.trainerId) === String(selectedTrainerId);
+        });
 
         return {
           schoolHours: sumGroupedHours(entries, ["schoolId", "trainerId", "year", "className"]),
-          trainerHours: sumGroupedHours(entries, ["trainerId", "schoolId", "year", "className"])
+          trainerHours: sumGroupedHours(entries, ["trainerId", "schoolId", "year", "className"]),
+          hasSelection: true
         };
       }
 
@@ -1731,13 +1947,76 @@
       }
 
       function updateSpecificFiltersVisibility(){
+        if(activeReportView === "evaluation"){
+          schoolFilterWrap.style.display = "none";
+          trainerFilterWrap.style.display = "none";
+          filtersControlSummary.hidden = true;
+          yearFilterItem.hidden = false;
+          monthFilterItem.hidden = evaluationPeriod.value !== "month";
+          updateEvaluationDateControlsVisibility();
+          return;
+        }
+
+        filtersControlSummary.hidden = false;
+        yearFilterItem.hidden = false;
+        monthFilterItem.hidden = false;
         const invoiceMode = reportGroupSelect.value === "schools";
         schoolFilterWrap.style.display = invoiceMode ? "" : "none";
         trainerFilterWrap.style.display = invoiceMode ? "none" : "";
       }
 
+      function updateReportViewControls(){
+        reportModeButtons.forEach(button => {
+          const view = button.dataset.reportView || "";
+          button.classList.toggle("is-active", view === activeReportView);
+        });
+
+        const evaluationMode = activeReportView === "evaluation";
+        filtersBox.hidden = evaluationMode;
+        filtersBoxTitle.textContent = evaluationMode
+          ? "OBDOBÍ VYHODNOCENÍ"
+          : (activeReportView === "trainers" ? "FILTRY KONTROLY TRENÉRA" : "FILTRY FAKTURACE ŠKOLY");
+        evaluationPanel.hidden = !evaluationMode;
+        reportSummaryTitle.hidden = evaluationMode;
+        actionsBox.hidden = evaluationMode;
+        reportTableWrap.hidden = evaluationMode;
+      }
+
+      function setReportView(view){
+        if(view === "archive"){
+          openArchive();
+          updateReportViewControls();
+          return;
+        }
+
+        activeReportView = view === "evaluation" ? "evaluation" : (view === "trainers" ? "trainers" : "schools");
+
+        if(activeReportView === "schools" || activeReportView === "trainers"){
+          updateArchiveActionButton();
+          if(reportGroupSelect.value !== activeReportView){
+            reportGroupSelect.value = activeReportView;
+            handleReportModeChange();
+          } else {
+            updateReportSummaryTitle();
+            updateReportSummaryCards();
+            renderReportTable();
+          }
+        }
+
+        if(activeReportView === "evaluation"){
+          clearStatusMessage();
+          syncEvaluationDateControlsFromMain();
+          updateEvaluationDateControlsVisibility();
+          renderEvaluation();
+        }
+
+        updateSpecificFiltersVisibility();
+        updateReportViewControls();
+      }
+
       function handleReportModeChange(){
         loadedArchiveContext = null;
+        activeReportView = reportGroupSelect.value === "trainers" ? "trainers" : "schools";
         if(reportGroupSelect.value === "schools"){
           trainerFilter.value = "";
         } else {
@@ -1748,6 +2027,8 @@
         updateReportSummaryCards();
         renderReportTable();
         renderEvaluation();
+        updateArchiveActionButton();
+        updateReportViewControls();
       }
 
       function getSelectedOptionText(select){
@@ -2064,6 +2345,38 @@
         reportStatusMessage.className = "status-message";
       }
 
+      function showAppConfirm({ title, message, confirmText = "Potvrdit", cancelText = "Zrušit", onConfirm }){
+        reportConfirmTitle.textContent = title;
+        reportConfirmMessage.textContent = message;
+        reportConfirmSubmitButton.textContent = confirmText;
+        reportConfirmCancelButton.textContent = cancelText;
+        reportConfirmModal.classList.remove("is-info");
+        reportConfirmModal.hidden = false;
+
+        const close = () => {
+          reportConfirmModal.hidden = true;
+          reportConfirmSubmitButton.onclick = null;
+          reportConfirmCancelButton.onclick = null;
+        };
+
+        reportConfirmCancelButton.onclick = close;
+        reportConfirmSubmitButton.onclick = () => {
+          close();
+          if(typeof onConfirm === "function") onConfirm();
+        };
+      }
+
+      function showAppInfo({ title, message, confirmText = "OK" }){
+        showAppConfirm({
+          title,
+          message,
+          confirmText,
+          cancelText: "",
+          onConfirm: null
+        });
+        reportConfirmModal.classList.add("is-info");
+      }
+
       function getReportContext(){
         if(loadedArchiveContext) return loadedArchiveContext;
 
@@ -2078,7 +2391,7 @@
         const totalTrainers = new Set(entries.map(entry => String(entry.trainerId || ""))).size;
         const totalSchools = new Set(entries.map(entry => String(entry.schoolId || ""))).size;
         const controlTotals = getMonthControlTotals();
-        const totalsMatch = controlTotals.schoolHours === controlTotals.trainerHours;
+        const totalsMatch = controlTotals.hasSelection && controlTotals.schoolHours === controlTotals.trainerHours;
 
         return {
           entries,
@@ -2091,6 +2404,7 @@
           totalSchools,
           schoolHoursTotal: controlTotals.schoolHours,
           trainerHoursTotal: controlTotals.trainerHours,
+          hasControlSelection: controlTotals.hasSelection,
           totalsMatch,
           yearValue: yearSelect.value,
           monthValue: monthSelect.value,
@@ -2107,7 +2421,7 @@
         };
       }
 
-      function saveReportArchive(format){
+      function saveReportArchive(format, options = {}){
         const context = getFreshReportContext();
         const archive = (() => {
           try{
@@ -2143,12 +2457,14 @@
           titleText: context.titleText
         };
 
+        if(options.processed){
+          archiveItem.processedAt = new Date().toISOString();
+          archiveItem.processedStatus = context.group === "schools" ? "invoiced" : "checked";
+        }
+
         const archiveKey = getArchiveIdentityKey(archiveItem);
         const existingArchiveItem = archive.find(item => getArchiveIdentityKey(item) === archiveKey);
-        if(existingArchiveItem){
-          const shouldOverwrite = window.confirm(`V archivu už existuje výkaz pro ${context.periodText} / ${context.subjectText}. Chceš ho přepsat novou verzí?`);
-          if(!shouldOverwrite) return false;
-        }
+        if(existingArchiveItem && !options.overwrite) return "exists";
 
         const nextArchive = archive.filter(item => getArchiveIdentityKey(item) !== archiveKey);
         nextArchive.unshift(archiveItem);
@@ -2189,6 +2505,7 @@
           totalSchools,
           schoolHoursTotal,
           trainerHoursTotal,
+          hasControlSelection: true,
           totalsMatch,
           processedAt: item.processedAt || "",
           processedStatus: item.processedStatus || "",
@@ -2364,6 +2681,8 @@
 
       function openArchive(){
         openArchiveMonthKeys.clear();
+        schoolYearArchiveList.hidden = true;
+        toggleSchoolYearArchiveButton.textContent = "Archiv školních roků";
         renderArchiveList();
         reportArchiveModal.hidden = false;
       }
@@ -2437,7 +2756,7 @@
 
       function exportReportExcel(options = {}){
         const context = getFreshReportContext();
-        const shouldArchive = options?.archive !== false;
+        const shouldArchive = options?.archive === true;
         if(shouldArchive && !saveReportArchive("excel")) return "";
         const blob = buildExcelDocument(context);
         const url = URL.createObjectURL(blob);
@@ -2455,7 +2774,7 @@
       }
 
       function exportReportPdf(options = {}){
-        const shouldArchive = options?.archive !== false;
+        const shouldArchive = options?.archive === true;
         const context = getFreshReportContext();
         if(shouldArchive && !saveReportArchive("pdf")) return;
         printReport.innerHTML = buildReportExportTable(context);
@@ -2465,7 +2784,7 @@
       function emailReport(){
         const context = getReportContext();
         const format = "Excel";
-        const fileName = exportReportExcel({ archive: true });
+        const fileName = exportReportExcel({ archive: false });
         if(!fileName) return;
 
         const subject = `Výkaz ${context.periodText}`;
@@ -2488,17 +2807,21 @@
         ].join("\n");
 
         window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-        alert(`Soubor ${fileName} byl připraven. Přiložte ho prosím ručně do otevřeného e-mailu.`);
+        showAppInfo({
+          title: "E-mail připraven",
+          message: `Soubor ${fileName} byl připraven. Přiložte ho prosím ručně do otevřeného e-mailu.`,
+          confirmText: "Rozumím"
+        });
       }
 
       function updateReportSummaryCards(){
         const context = getReportContext();
 
         summaryPeriod.textContent = context.periodText;
-        summarySchoolHours.textContent = String(context.schoolHoursTotal);
-        summaryTrainerHours.textContent = String(context.trainerHoursTotal);
-        summaryHoursCheck.textContent = context.totalsMatch ? "Sedí" : "Nesedí";
-        summaryHoursCheck.style.color = context.totalsMatch ? "#166534" : "#b91c1c";
+        summarySchoolHours.textContent = context.hasControlSelection ? String(context.schoolHoursTotal) : "-";
+        summaryTrainerHours.textContent = context.hasControlSelection ? String(context.trainerHoursTotal) : "-";
+        summaryHoursCheck.textContent = context.hasControlSelection ? (context.totalsMatch ? "Sedí" : "Nesedí") : "-";
+        summaryHoursCheck.style.color = !context.hasControlSelection ? "var(--color-header)" : (context.totalsMatch ? "#166534" : "#b91c1c");
       }
 
       function updateReportSummaryTitle(){
@@ -2508,6 +2831,54 @@
         reportSummaryTitle.classList.toggle("is-archive", Boolean(loadedArchiveContext));
         reportFocusSubject.textContent = context.subjectText;
         reportFocusHours.textContent = String(context.totalHours);
+      }
+
+      function updateArchiveActionButton(){
+        archiveReportButton.textContent = reportGroupSelect.value === "schools" ? "Vyfakturováno" : "Zkontrolováno";
+      }
+
+      function markCurrentReportProcessed(){
+        const context = getFreshReportContext();
+        const missingSelection = context.group === "schools" ? !schoolFilter.value : !trainerFilter.value;
+        const actionLabel = context.group === "schools" ? "vyfakturováno" : "zkontrolováno";
+
+        if(missingSelection){
+          showStatusMessage(context.group === "schools" ? "Nejdřív vyber školu pro fakturaci." : "Nejdřív vyber trenéra pro kontrolu.", "live");
+          return;
+        }
+
+        if(!context.entries.length){
+          showStatusMessage("Výkaz zatím nemá žádná data ze skutečnosti, takže ho nelze uzavřít do archivu.", "live");
+          return;
+        }
+
+        showAppConfirm({
+          title: context.group === "schools" ? "Vyfakturováno" : "Zkontrolováno",
+          message: `Označit výkaz ${context.periodText} / ${context.subjectText} jako ${actionLabel} a uložit ho do archivu?`,
+          confirmText: context.group === "schools" ? "Vyfakturovat" : "Zkontrolovat",
+          cancelText: "Zrušit",
+          onConfirm: () => {
+            const result = saveReportArchive("processed", { processed: true });
+            if(result === "exists"){
+              showAppConfirm({
+                title: "Přepsat archiv",
+                message: `V archivu už existuje výkaz pro ${context.periodText} / ${context.subjectText}. Přepsat ho novou verzí?`,
+                confirmText: "Přepsat",
+                cancelText: "Zrušit",
+                onConfirm: () => {
+                  if(saveReportArchive("processed", { processed: true, overwrite: true })){
+                    showStatusMessage(`Výkaz byl označen jako ${actionLabel} a přepsán v archivu.`, "success");
+                  }
+                }
+              });
+              return;
+            }
+
+            if(result){
+              showStatusMessage(`Výkaz byl označen jako ${actionLabel} a uložen do archivu.`, "success");
+            }
+          }
+        });
       }
 
       function renderReportTable(){
@@ -2555,14 +2926,35 @@
         updateReportSummaryTitle();
         updateReportSummaryCards();
         renderReportTable();
+        if(activeReportView === "evaluation") renderEvaluation();
       }
 
+      reportModeButtons.forEach(button => {
+        button.addEventListener("click", () => setReportView(button.dataset.reportView || "schools"));
+      });
       reportGroupSelect.addEventListener("change", handleReportModeChange);
       schoolFilter.addEventListener("change", refreshCurrentReport);
       trainerFilter.addEventListener("change", refreshCurrentReport);
-      yearSelect.addEventListener("change", refreshCurrentReport);
-      monthSelect.addEventListener("change", refreshCurrentReport);
-      evaluationPeriod.addEventListener("change", renderEvaluation);
+      yearSelect.addEventListener("change", () => {
+        syncEvaluationDateControlsFromMain();
+        refreshCurrentReport();
+      });
+      monthSelect.addEventListener("change", () => {
+        syncEvaluationDateControlsFromMain();
+        refreshCurrentReport();
+      });
+      evaluationPeriod.addEventListener("change", () => {
+        updateSpecificFiltersVisibility();
+        renderEvaluation();
+      });
+      evaluationYear.addEventListener("change", () => {
+        syncMainDateControlsFromEvaluation();
+        renderEvaluation();
+      });
+      evaluationMonth.addEventListener("change", () => {
+        syncMainDateControlsFromEvaluation();
+        renderEvaluation();
+      });
       evaluationSearch.addEventListener("input", renderEvaluation);
       evaluationViewButtons.forEach(button => {
         button.addEventListener("click", () => {
@@ -2579,17 +2971,15 @@
       exportExcelButton.addEventListener("click", () => exportReportExcel());
       exportPdfButton.addEventListener("click", () => exportReportPdf());
       emailReportButton.addEventListener("click", emailReport);
-      archiveReportButton.addEventListener("click", () => {
-        if(saveReportArchive("archive")){
-          showStatusMessage("Výkaz byl uložen do archivu jako poslední verze.", "success");
-        }
-      });
-      openArchiveButton.addEventListener("click", openArchive);
+      archiveReportButton.addEventListener("click", markCurrentReportProcessed);
       clearArchiveButton.addEventListener("click", clearReportArchive);
       closeArchiveTextButton.addEventListener("click", closeArchive);
       closeArchiveButton.addEventListener("click", closeArchive);
       reportArchiveModal.addEventListener("click", (event) => {
         if(event.target === reportArchiveModal) closeArchive();
+      });
+      reportConfirmModal.addEventListener("click", (event) => {
+        if(event.target === reportConfirmModal) reportConfirmCancelButton.click();
       });
 
       fillSchoolFilter();
@@ -2600,6 +2990,8 @@
       renderReportTable();
       renderEvaluation();
       renderSchoolYearArchiveList();
+      updateArchiveActionButton();
+      setReportView(reportGroupSelect.value === "trainers" ? "trainers" : "schools");
     })();
   </script>
 
