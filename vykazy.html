@@ -851,24 +851,6 @@
       flex-wrap:wrap;
     }
 
-    .archive-process-button{
-      min-height:34px;
-      padding:0 10px;
-      border:1px solid rgba(44,62,85,0.18);
-      border-radius:8px;
-      background:var(--color-primary);
-      color:#062b25;
-      font-size:12px;
-      font-weight:900;
-      text-transform:uppercase;
-      cursor:pointer;
-    }
-
-    .archive-process-button.is-done{
-      background:#e5e7eb;
-      color:var(--color-header);
-    }
-
     .archive-empty{
       padding:18px;
       border:1px dashed var(--color-border);
@@ -1535,6 +1517,74 @@
         const end = `${year}-${String(month).padStart(2, "0")}-${String(endDate.getDate()).padStart(2, "0")}`;
 
         return getEntriesBaseForRange(start, end);
+      }
+
+      function getCurrentMonthRange(){
+        const year = Number(yearSelect.value);
+        const month = Number(monthSelect.value);
+        const start = `${year}-${String(month).padStart(2, "0")}-01`;
+        const endDate = new Date(year, month, 0);
+        const end = `${year}-${String(month).padStart(2, "0")}-${String(endDate.getDate()).padStart(2, "0")}`;
+        return { start, end };
+      }
+
+      function isUsableTrainerId(trainerId){
+        return Boolean(trainerId && trainerId !== "X");
+      }
+
+      function isEntryInRange(entry, range){
+        return Boolean(entry?.date && String(entry.date) >= range.start && String(entry.date) <= range.end);
+      }
+
+      function isSameLessonSlot(a, b){
+        return String(a?.date || "") === String(b?.date || "") &&
+          String(a?.year || "") === String(b?.year || "") &&
+          String(a?.className || "") === String(b?.className || "") &&
+          Number(a?.hour) === Number(b?.hour);
+      }
+
+      function getMissingRealityForSchoolMonth(schoolId, yearValue, monthValue){
+        const selectedSchoolId = String(schoolId || "");
+        if(!selectedSchoolId) return [];
+
+        const previousYear = yearSelect.value;
+        const previousMonth = monthSelect.value;
+        yearSelect.value = String(yearValue || previousYear);
+        monthSelect.value = String(monthValue || previousMonth);
+        const range = getCurrentMonthRange();
+        yearSelect.value = previousYear;
+        monthSelect.value = previousMonth;
+
+        const plansByKey = Object.fromEntries(
+          Object.entries(loadPlans()).map(([key, value]) => [key, normalizePlanEntry(key, value)])
+        );
+        const realityEntries = Object.entries(loadReality())
+          .map(([key, value]) => normalizeRealityEntry(key, value, plansByKey[key]))
+          .filter(entry =>
+            isEntryInRange(entry, range) &&
+            isUsableTrainerId(entry.trainerId) &&
+            String(entry.schoolId || "") === selectedSchoolId
+          );
+
+        return Object.entries(loadPlans())
+          .map(([key, value]) => normalizePlanEntry(key, value))
+          .filter(entry =>
+            isEntryInRange(entry, range) &&
+            isUsableTrainerId(entry.trainerId) &&
+            String(entry.schoolId || "") === selectedSchoolId
+          )
+          .filter(planEntry => !realityEntries.some(realityEntry => isSameLessonSlot(planEntry, realityEntry)));
+      }
+
+      function getMissingRealityForSelectedSchool(){
+        return getMissingRealityForSchoolMonth(schoolFilter.value, yearSelect.value, monthSelect.value);
+      }
+
+      function formatMissingRealityInfo(entries){
+        return entries.slice(0, 4).map(entry => {
+          const dateText = new Date(entry.date).toLocaleDateString("cs-CZ");
+          return `${dateText}, ${getYearLabel(entry.year)} ${entry.className || "-"}, ${entry.hour}. hodina`;
+        }).join("; ");
       }
 
       function getEntriesBaseForRange(startDate, endDate){
@@ -2643,23 +2693,13 @@
               const actions = document.createElement("div");
               actions.className = "archive-item-actions";
 
-              const processButton = document.createElement("button");
-              processButton.type = "button";
-              processButton.className = `archive-process-button${processed ? " is-done" : ""}`;
-              processButton.textContent = processed ? "Zrušit stav" : getArchiveProcessLabel(group);
-              processButton.addEventListener("click", (event) => {
-                event.preventDefault();
-                event.stopPropagation();
-                toggleArchiveProcessed(index);
-              });
-
               const loadButton = document.createElement("button");
               loadButton.type = "button";
               loadButton.className = "action-button";
               loadButton.textContent = "Načíst";
               loadButton.addEventListener("click", () => loadArchivedReport(index));
 
-              actions.append(processButton, loadButton);
+              actions.append(loadButton);
               row.append(main, actions);
               return row;
             }));
@@ -2709,26 +2749,6 @@
         updateReportSummaryCards();
         renderReportTable();
         showStatusMessage("Archiv výkazů byl smazán.", "success");
-      }
-
-      function toggleArchiveProcessed(index){
-        const archive = loadReportArchive();
-        const item = archive[index];
-        if(!item) return;
-
-        const group = item.group || "schools";
-        if(isArchiveProcessed(item)){
-          delete item.processedAt;
-          delete item.processedStatus;
-          showStatusMessage("Archivní výkaz byl vrácen mezi rozpracované.", "live");
-        } else {
-          item.processedAt = new Date().toISOString();
-          item.processedStatus = group === "schools" ? "invoiced" : "checked";
-          showStatusMessage(`Archivní výkaz označen jako ${getArchiveProcessLabel(group).toLowerCase()}.`, "success");
-        }
-
-        localStorage.setItem("reportsArchive", JSON.stringify(archive));
-        renderArchiveList();
       }
 
       function loadArchivedReport(index){
@@ -2850,6 +2870,21 @@
         if(!context.entries.length){
           showStatusMessage("Výkaz zatím nemá žádná data ze skutečnosti, takže ho nelze uzavřít do archivu.", "live");
           return;
+        }
+
+        if(context.group === "schools"){
+          const missingReality = getMissingRealityForSelectedSchool();
+          if(missingReality.length){
+            const preview = formatMissingRealityInfo(missingReality);
+            const more = missingReality.length > 4 ? ` a dalších ${missingReality.length - 4}` : "";
+            const message = `Výkaz nelze označit jako vyfakturováno. Ve škole jsou naplánované hodiny bez doplněné skutečnosti: ${preview}${more}. Nejdřív doplň skutečnost v rozvrhu.`;
+            showStatusMessage(message, "live");
+            showAppInfo({
+              title: "Chybí skutečnost",
+              message
+            });
+            return;
+          }
         }
 
         showAppConfirm({

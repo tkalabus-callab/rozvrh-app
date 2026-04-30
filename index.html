@@ -459,6 +459,29 @@ th.today-column::before {
   box-shadow:0 2px 4px rgba(0,0,0,0.18);
 }
 
+.week-warning-dialog {
+  width:min(560px, calc(100vw - 48px));
+  padding:22px 24px;
+  white-space:normal;
+  border-top:6px solid #ef4444;
+}
+
+.week-warning-title {
+  margin:0 0 10px;
+  color:#b00020;
+  font-size:24px;
+  font-weight:900;
+  text-transform:uppercase;
+}
+
+.week-warning-message {
+  margin:0 0 18px;
+  color:var(--color-header);
+  font-size:16px;
+  font-weight:800;
+  line-height:1.45;
+}
+
 .day-border {
   border-left:1px solid #000 !important;
 }
@@ -670,9 +693,9 @@ th.today-column::before {
 }
 
 .schedule-toolbar {
-  display:flex;
-  flex-direction:column;
-  gap:12px;
+  display:grid;
+  grid-template-columns:minmax(520px, 1.05fr) minmax(520px, 0.95fr);
+  gap:10px;
   align-items:stretch;
 }
 
@@ -685,16 +708,16 @@ th.today-column::before {
 }
 
 .grouped-toolbar{
-  margin-top:12px;
+  margin-top:8px;
 }
 
 .toolbar-group{
   display:flex;
   flex-direction:column;
-  gap:8px;
-  padding:10px 12px;
+  gap:6px;
+  padding:8px 12px;
   border:1px solid var(--color-border);
-  border-radius:10px;
+  border-radius:8px;
   background:#fff;
   min-width:220px;
   align-self:stretch;
@@ -714,7 +737,7 @@ th.today-column::before {
 
 .schedule-controls-grid{
   display:grid;
-  grid-template-columns:minmax(0, 1.45fr) minmax(360px, 1fr);
+  grid-template-columns:1fr;
   gap:0;
   align-items:stretch;
   width:100%;
@@ -723,62 +746,88 @@ th.today-column::before {
 .schedule-control-column{
   display:flex;
   flex-direction:column;
-  gap:8px;
+  gap:6px;
   min-width:0;
-  padding:0 16px;
+  padding:0;
 }
 
 .schedule-control-column:first-child{
   padding-left:0;
-  border-right:2px solid rgba(44,62,85,0.22);
 }
 
 .schedule-control-column:last-child{
   padding-right:0;
 }
 
+.schedule-control-column + .schedule-control-column{
+  border-left:2px solid rgba(44,62,85,0.22);
+}
+
 .schedule-control-title{
   margin:0;
   color:var(--color-header);
-  font-size:14px;
+  font-size:13px;
   font-weight:900;
   line-height:1.2;
   text-transform:uppercase;
 }
 
 .schedule-control-body{
-  min-height:36px;
+  min-height:34px;
   display:flex;
   flex-wrap:wrap;
   align-items:center;
-  gap:8px;
+  gap:7px;
 }
 
 .schedule-control-body-primary{
-  margin-bottom:8px;
+  margin-bottom:2px;
+  display:grid;
+  grid-template-columns:242px 92px 46px 46px 128px;
+  align-items:center;
+  justify-content:start;
+  flex-wrap:nowrap;
 }
 
 .schedule-control-body-secondary{
   padding-top:0;
+  display:grid;
+  grid-template-columns:242px 92px 46px 46px 128px;
+  align-items:center;
+  justify-content:start;
+  flex-wrap:nowrap;
+}
+
+#applyRecurringWeekButton{
+  grid-column:1;
+  width:100%;
+}
+
+#editWeekButton{
+  grid-column:2 / 5;
+  width:100%;
+}
+
+#todayButton{
+  grid-column:5;
 }
 
 .toolbar-group-title{
   margin:0;
-  font-weight:700;
   color:var(--color-header);
-  font-size:14px;
+  font-size:13px;
+  font-weight:900;
   line-height:1.2;
-  min-height:17px;
   text-transform:uppercase;
 }
 
 .toolbar-group-body{
   display:flex;
-  gap:8px;
+  gap:6px;
   flex-wrap:wrap;
   align-items:center;
   flex:1;
-  padding-bottom:2px;
+  padding-bottom:0;
 }
 
 #group-caretaker-mode{
@@ -786,39 +835,81 @@ th.today-column::before {
 }
 
 #group-schedule-controls button{
-  height:34px;
-  min-height:34px;
+  height:36px;
+  min-height:36px;
   padding:0 12px;
   display:inline-flex;
   align-items:center;
   justify-content:center;
   box-sizing:border-box;
-  font-size:13px;
+  border-radius:8px;
+  border:1px solid rgba(0,0,0,0.22);
+  background:var(--color-primary);
+  color:#062b25;
+  font-family:Arial, sans-serif;
+  font-size:14px;
   font-weight:800;
+  line-height:1;
+  white-space:nowrap;
+  box-shadow:0 2px 6px rgba(0,0,0,0.18);
 }
 
 #group-schedule-controls input,
 #group-schedule-controls select{
-  height:34px;
-  min-height:34px;
+  height:36px;
+  min-height:36px;
   box-sizing:border-box;
-  font-size:13px;
-  font-weight:700;
+  padding:0 12px;
+  border:1px solid var(--color-border);
+  border-radius:8px;
+  background:#ffffff;
+  color:var(--color-header);
+  font-family:Arial, sans-serif;
+  font-size:14px;
+  font-weight:800;
+  line-height:1;
+  box-shadow:none;
 }
 
 #group-schedule-controls .schedule-control-body > *{
   margin:0;
 }
 
-#scheduleArchiveSelect{
-  min-width:280px;
-  max-width:100%;
+.week-control-layout{
+  display:grid;
+  grid-template-columns:minmax(0, 1fr) minmax(172px, 172px);
+  gap:10px;
+  align-items:stretch;
+}
+
+.week-control-main{
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+
+.week-control-status-slot{
+  min-width:0;
+  display:flex;
+  justify-content:flex-end;
+  align-items:stretch;
+}
+
+#todayButton,
+#saveWeekArchiveButton{
+  grid-column:5;
+  width:128px;
+  min-width:128px;
 }
 
 #scheduleArchiveStatus{
   color:var(--color-header);
   font-size:13px;
-  font-weight:700;
+  font-weight:900;
+  line-height:1.15;
+  align-self:stretch;
+  text-align:center;
 }
 
 #scheduleArchiveStatus.archive-status-strong{
@@ -827,29 +918,103 @@ th.today-column::before {
   font-weight:900;
 }
 
+#scheduleArchiveStatus.week-closed-status{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:36px;
+  max-width:190px;
+  padding:6px 10px;
+  border-radius:8px;
+  background:#dcfce7;
+  border:1px solid #22c55e;
+  color:#166534;
+  font-size:13px;
+  font-weight:900;
+  line-height:1.15;
+  text-align:center;
+  text-transform:uppercase;
+  white-space:normal;
+}
+
+#scheduleArchiveStatus.week-open-status{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:36px;
+  max-width:190px;
+  padding:6px 10px;
+  border-radius:8px;
+  background:#fff7ed;
+  border:1px solid #f97316;
+  color:#9a3412;
+  font-size:13px;
+  font-weight:900;
+  line-height:1.15;
+  text-align:center;
+  white-space:normal;
+}
+
+#scheduleArchiveStatus.week-locked-status{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:78px;
+  width:100%;
+  max-width:172px;
+  padding:8px 12px;
+  border-radius:8px;
+  background:#fee2e2;
+  border:1px solid #ef4444;
+  color:#991b1b;
+  font-size:15px;
+  font-weight:900;
+  line-height:1.15;
+  text-align:center;
+  text-transform:uppercase;
+  white-space:pre-line;
+}
+
+#group-schedule-controls .week-nav-button{
+  min-width:46px;
+  padding:0 14px;
+  background:#168da0;
+  border-color:#116f7e;
+  color:#ffffff;
+  font-size:20px;
+  font-weight:900;
+}
+
+#group-schedule-controls .week-nav-button:hover,
+#group-schedule-controls .week-nav-button:focus{
+  background:#0f6f80;
+  border-color:#0f6f80;
+  color:#ffffff;
+}
+
 #group-caretaker-mode-body{
   display:block;
 }
 
 .caretaker-fields-grid{
   display:grid;
-  grid-template-columns:minmax(180px, 0.85fr) minmax(260px, 1.2fr) minmax(160px, 0.65fr) auto;
+  grid-template-columns:minmax(160px, 0.9fr) minmax(220px, 1.1fr) minmax(140px, 0.8fr) auto;
   grid-template-areas:
     "caretaker school city action";
-  gap:8px 12px;
+  gap:6px 10px;
   align-items:end;
 }
 
 .caretaker-field{
   display:flex;
   flex-direction:column;
-  gap:4px;
+  gap:3px;
 }
 
 .caretaker-field-label{
-  font-weight:700;
   color:#000000;
   font-size:13px;
+  font-weight:900;
   line-height:1.2;
 }
 
@@ -868,7 +1033,7 @@ th.today-column::before {
 }
 
 .caretaker-field-surface{
-  min-height:34px;
+  min-height:36px;
   padding:0 12px;
   display:flex;
   align-items:center;
@@ -876,26 +1041,28 @@ th.today-column::before {
   border:1px solid rgba(0,0,0,0.12);
   background:#ffffff;
   color:var(--color-header);
-  font-size:16px;
-  font-weight:900;
+  font-family:Arial, sans-serif;
+  font-size:14px;
+  font-weight:800;
   box-sizing:border-box;
 }
 
 #city{
   justify-content:flex-start;
   font-weight:800;
+  height:36px;
 }
 
 #caretaker{
-  font-weight:900;
-  font-size:16px;
+  font-weight:800;
+  font-size:14px;
   line-height:1.2;
   color:#000000;
   justify-content:flex-start;
   width:100%;
-  height:34px;
-  min-height:34px;
-  max-height:34px;
+  height:36px;
+  min-height:36px;
+  max-height:36px;
   padding-top:0;
   padding-bottom:0;
   gap:8px;
@@ -905,14 +1072,15 @@ th.today-column::before {
 #group-caretaker-mode #yearSelect,
 #group-caretaker-mode #classSelect{
   width:100%;
-  min-height:34px;
-  height:34px;
+  min-height:36px;
+  height:36px;
   padding:0 12px;
   border-radius:6px;
   box-sizing:border-box;
   color:var(--color-header);
-  font-size:16px;
-  font-weight:900;
+  font-family:Arial, sans-serif;
+  font-size:14px;
+  font-weight:800;
 }
 
 .caretaker-field-school{
@@ -940,14 +1108,18 @@ th.today-column::before {
 .toolbar-field {
   display:inline-flex;
   align-items:center;
-  gap:6px;
-  font-size:13px;
-  font-weight:600;
+  gap:8px;
+  font-family:Arial, sans-serif;
+  font-size:14px;
+  font-weight:800;
+  line-height:1;
   color:var(--color-header);
 }
 
 .week-number-value {
-  min-width:28px;
+  min-width:32px;
+  font-size:14px;
+  font-weight:800;
 }
 
 #scheduleArea {
@@ -1013,21 +1185,22 @@ th.today-column::before {
 }
 
 #group-schedule-controls #editWeekButton{
-  height:34px;
-  min-height:34px;
+  height:36px;
+  min-height:36px;
   padding:0 18px;
   display:inline-flex;
   align-items:center;
   justify-content:center;
   box-sizing:border-box;
+  font-family:Arial, sans-serif;
   font-size:14px;
   font-weight:800;
   line-height:1;
-  border-radius:6px;
-  border:1px solid rgba(0,0,0,0.2);
+  border-radius:8px;
+  border:1px solid rgba(0,0,0,0.22);
   background:var(--color-primary);
-  color:#000000;
-  box-shadow:0 2px 6px rgba(0,0,0,0.2);
+  color:#062b25;
+  box-shadow:0 2px 6px rgba(0,0,0,0.18);
 }
 
 #group-schedule-controls #editWeekButton:hover,
@@ -1043,7 +1216,7 @@ th.today-column::before {
 
 button[style*="var(--color-primary)"],
 #group-schedule-controls button{
-  color:#000000;
+  color:#062b25;
 }
 
 #group-caretaker-mode .toolbar-group-title{
@@ -1139,19 +1312,22 @@ button[style*="var(--color-primary)"],
 }
 
 #exitCaretakerModeButton{
-  height:34px;
-  padding:0 14px;
+  height:36px;
+  min-height:36px;
+  padding:0 12px;
   display:inline-flex;
   align-items:center;
   justify-content:center;
   white-space:nowrap;
   box-sizing:border-box;
-  border-radius:6px;
+  border-radius:8px;
   border:1px solid rgba(0,0,0,0.2);
   background:#3a4d63;
   color:var(--color-primary);
   font-weight:800;
-  font-size:13px;
+  font-size:14px;
+  font-family:Arial, sans-serif;
+  line-height:1;
 }
 
 /* unified keyboard focus for CTA & toggle buttons */
@@ -1161,7 +1337,7 @@ button[style*="var(--color-primary)"],
   box-shadow:
     0 0 0 2px var(--color-primary),
     0 4px 10px rgba(0,0,0,0.24);
-  border-radius:6px;
+  border-radius:8px;
 }
 
 /* ensure focus ring is visible on primary CTA in A */
@@ -1177,10 +1353,14 @@ button[style*="var(--color-primary)"],
   box-shadow:
     0 0 0 2px var(--color-primary),
     0 2px 6px rgba(0,0,0,0.18);
-  border-radius:4px;
+  border-radius:8px;
 }
 
 @media (max-width: 980px){
+  .schedule-toolbar{
+    grid-template-columns:1fr;
+  }
+
   .schedule-controls-grid{
     grid-template-columns:1fr;
   }
@@ -1194,6 +1374,14 @@ button[style*="var(--color-primary)"],
     margin-bottom:14px;
     border-right:0;
     border-bottom:2px solid rgba(44,62,85,0.22);
+  }
+
+  .week-control-layout{
+    grid-template-columns:1fr;
+  }
+
+  .week-control-status-slot{
+    justify-content:flex-start;
   }
 }
 </style>
@@ -1230,7 +1418,6 @@ button[style*="var(--color-primary)"],
 </div>
 
 <div class="schedule-toolbar grouped-toolbar">
-
   <div class="toolbar-group" id="group-caretaker-mode">
     <div class="toolbar-group-title">Přihlášení a výběr</div>
     <div class="toolbar-group-body" id="group-caretaker-mode-body">
@@ -1282,34 +1469,30 @@ button[style*="var(--color-primary)"],
     <div class="schedule-controls-grid">
       <section class="schedule-control-column" id="group-week">
         <h3 class="schedule-control-title">Práce s týdnem</h3>
-        <div class="schedule-control-body schedule-control-body-primary" id="group-week-body">
-          <label class="toolbar-field" for="dateInput">
-            <span id="weekFromHeader"></span>
-            <input type="date" id="dateInput">
-          </label>
-          <div class="toolbar-field">
-            <span id="weekNumberHeader"></span>
-            <span id="weekNumber" class="week-number-value"></span>
+        <div class="week-control-layout">
+          <div class="week-control-main">
+            <div class="schedule-control-body schedule-control-body-primary" id="group-week-body">
+              <label class="toolbar-field" for="dateInput">
+                <span id="weekFromHeader"></span>
+                <input type="date" id="dateInput">
+              </label>
+              <div class="toolbar-field">
+                <span id="weekNumberHeader"></span>
+                <span id="weekNumber" class="week-number-value"></span>
+              </div>
+              <button class="week-nav-button" type="button" onclick="changeWeek(-7)" aria-label="Předchozí týden">←</button>
+              <button class="week-nav-button" type="button" onclick="changeWeek(7)" aria-label="Další týden">→</button>
+              <button id="todayButton" onclick="goToday()"></button>
+            </div>
+            <div class="schedule-control-body schedule-control-body-secondary">
+              <button id="applyRecurringWeekButton" type="button">Doplnit ze školního rozvrhu</button>
+              <button id="editWeekButton" class="edit-week-button" type="button">Upravit tento týden</button>
+              <button id="saveWeekArchiveButton" type="button">Uzavřít týden</button>
+            </div>
           </div>
-          <button onclick="changeWeek(-7)">←</button>
-          <button onclick="changeWeek(7)">→</button>
-          <button id="todayButton" onclick="goToday()"></button>
-        </div>
-        <div class="schedule-control-body schedule-control-body-secondary">
-          <button id="applyRecurringWeekButton" type="button">Doplnit ze školního rozvrhu</button>
-          <button id="copyWeekButton" onclick="copyWeek()"></button>
-          <button id="editWeekButton" class="edit-week-button" type="button">Upravit tento týden</button>
-        </div>
-      </section>
-
-      <section class="schedule-control-column" id="group-schedule-archive">
-        <h3 class="schedule-control-title">Archiv rozvrhů</h3>
-        <div class="schedule-control-body">
-          <button id="saveWeekArchiveButton" type="button">Uzavřít týden</button>
-          <button id="saveMonthArchiveButton" type="button">Uložit měsíc</button>
-          <select id="scheduleArchiveSelect"></select>
-          <button id="loadArchiveButton" type="button">Načíst archiv</button>
-          <span id="scheduleArchiveStatus"></span>
+          <div class="week-control-status-slot">
+            <span id="scheduleArchiveStatus"></span>
+          </div>
         </div>
       </section>
     </div>
@@ -1328,6 +1511,17 @@ button[style*="var(--color-primary)"],
       <button id="leaveEditConfirmButton" type="button">Uložit a pokračovat</button>
       <button id="leaveEditDiscardButton" class="leave-edit-discard" type="button">Pokračovat bez uložení</button>
       <button id="leaveEditCancelButton" type="button">Pokračovat v editaci</button>
+    </div>
+  </div>
+</div>
+
+<div id="weekWarningModal" class="leave-edit-modal" hidden>
+  <div class="leave-edit-dialog week-warning-dialog">
+    <h2 id="weekWarningTitle" class="week-warning-title">Pozor</h2>
+    <p id="weekWarningMessage" class="week-warning-message"></p>
+    <div class="leave-edit-actions">
+      <button id="weekWarningConfirmButton" type="button">Pokračovat</button>
+      <button id="weekWarningCancelButton" type="button">Zrušit</button>
     </div>
   </div>
 </div>
@@ -1360,12 +1554,8 @@ const yearSelect = document.getElementById("yearSelect");
 const classSelect = document.getElementById("classSelect");
 const dateInput = document.getElementById("dateInput");
 const weekNumber = document.getElementById("weekNumber");
-const copyWeekButton = document.getElementById("copyWeekButton");
 const todayButton = document.getElementById("todayButton");
 const saveWeekArchiveButton = document.getElementById("saveWeekArchiveButton");
-const saveMonthArchiveButton = document.getElementById("saveMonthArchiveButton");
-const scheduleArchiveSelect = document.getElementById("scheduleArchiveSelect");
-const loadArchiveButton = document.getElementById("loadArchiveButton");
 const scheduleArchiveStatus = document.getElementById("scheduleArchiveStatus");
 const applyRecurringWeekButton = document.getElementById("applyRecurringWeekButton");
 const scheduleOverlayMessage = document.getElementById("scheduleOverlayMessage");
@@ -1374,6 +1564,11 @@ const leaveEditModal = document.getElementById("leaveEditModal");
 const leaveEditConfirmButton = document.getElementById("leaveEditConfirmButton");
 const leaveEditDiscardButton = document.getElementById("leaveEditDiscardButton");
 const leaveEditCancelButton = document.getElementById("leaveEditCancelButton");
+const weekWarningModal = document.getElementById("weekWarningModal");
+const weekWarningTitle = document.getElementById("weekWarningTitle");
+const weekWarningMessage = document.getElementById("weekWarningMessage");
+const weekWarningConfirmButton = document.getElementById("weekWarningConfirmButton");
+const weekWarningCancelButton = document.getElementById("weekWarningCancelButton");
 const table = document.getElementById("table");
 const CARETAKER_ID_STORAGE_KEY = "caretakerId";
 const CARETAKER_SESSION_KEY = "caretakerModeUnlocked";
@@ -1419,6 +1614,8 @@ let lastDateValue = "";
 let lastClassValue = "";
 let pendingLeaveEditConfirm = null;
 let pendingLeaveEditCancel = null;
+let pendingWeekWarningConfirm = null;
+let pendingWeekWarningCancel = null;
 let statusMessageTimeout = null;
 let suppressMenuAutoCloseUntil = 0;
 let reopenAvailableOnlyContext = null;
@@ -1714,7 +1911,6 @@ function initStaticTexts(){
   classHeader.textContent = "Třída";
   weekFromHeader.textContent = "Týden od";
   weekNumberHeader.textContent = "Týden č.";
-  copyWeekButton.textContent = TEXTS.schedule.copyWeek;
   todayButton.textContent = "Dnes";
 }
 
@@ -1825,8 +2021,6 @@ function init(){
 
   renderScheduleSafe();
   console.log("[INIT] renderScheduleSafe OK");
-  refreshScheduleArchiveSelect();
-  console.log("[INIT] refreshScheduleArchiveSelect OK");
 
   console.log("[INIT] done");
 }
@@ -1935,6 +2129,7 @@ function setEditMode(enabled){
   isEditMode = enabled;
   table.classList.toggle("schedule-edit-mode", isEditMode);
   editWeekButton.classList.toggle("edit-mode-active", isEditMode);
+  editWeekButton.classList.toggle("edit-active", isEditMode);
   editWeekButton.textContent = isEditMode ? "Ukončit editaci" : "Upravit tento týden";
   if(!isEditMode) closeMenu();
 }
@@ -1945,6 +2140,19 @@ function confirmLeaveEditMode(onConfirm, onCancel){
   pendingLeaveEditCancel = onCancel || null;
   leaveEditModal.hidden = false;
   return false;
+}
+
+function showWeekWarning({ title, message, confirmText = "Pokračovat", cancelText = "Zrušit", onConfirm = null, onCancel = null } = {}){
+  if(!weekWarningModal) return;
+
+  pendingWeekWarningConfirm = onConfirm;
+  pendingWeekWarningCancel = onCancel;
+  weekWarningTitle.textContent = title || "Pozor";
+  weekWarningMessage.textContent = message || "";
+  weekWarningConfirmButton.textContent = confirmText;
+  weekWarningCancelButton.textContent = cancelText;
+  weekWarningCancelButton.hidden = !cancelText;
+  weekWarningModal.hidden = false;
 }
 
 function saveEditedWeek(){
@@ -1961,6 +2169,7 @@ function applySchoolChange(){
   }
   updateSchoolUI();
   renderTrainerPanel();
+  updateCurrentWeekStatus();
   renderScheduleSafe();
 }
 
@@ -2102,6 +2311,7 @@ document.addEventListener("click", (e) => {
 document.addEventListener("visibilitychange", () => {
   if(document.visibilityState === "visible"){
     renderTrainerPanel();
+    updateCurrentWeekStatus();
     renderScheduleSafe();
   }
 });
@@ -2838,6 +3048,7 @@ function updateWeekInfo(){
   let m = getMonday(currentDate);
   dateInput.valueAsDate = m;
   weekNumber.textContent = getWeekNumber(m);
+  updateCurrentWeekStatus();
 }
 
 function formatDate(d){ return d.toISOString().split("T")[0]; }
@@ -2996,16 +3207,163 @@ function saveScheduleArchives(archives){
   localStorage.setItem(SCHEDULE_ARCHIVE_KEY, JSON.stringify(archives.slice(0, 80)));
 }
 
-function getScheduleArchiveRange(type){
-  return type === "month" ? getMonthRange(currentDate) : getWeekRange(currentDate);
+function getScheduleArchiveRange(){
+  return getWeekRange(currentDate);
 }
 
-function getScheduleArchiveLabel(type, range){
+function getScheduleArchiveIdentity(archive = {}){
+  const schoolYear = archive.schoolYear || getSchoolYearValueForDate(new Date(archive.startDate || currentDate));
+  return [
+    archive.type || "week",
+    archive.startDate || "",
+    archive.endDate || "",
+    String(archive.schoolId || ""),
+    String(schoolYear || "")
+  ].join("|");
+}
+
+function getCurrentWeekArchiveIdentity(){
+  const range = getScheduleArchiveRange();
+  return getScheduleArchiveIdentity({
+    type: "week",
+    startDate: formatDate(range.start),
+    endDate: formatDate(range.end),
+    schoolId: schoolSelect?.value || "",
+    schoolYear: getSchoolYearValueForDate(range.start)
+  });
+}
+
+function getCurrentWeekClosedArchive(){
+  const identity = getCurrentWeekArchiveIdentity();
+  return getScheduleArchives().find(archive =>
+    Boolean(archive?.closed) &&
+    getScheduleArchiveIdentity(archive) === identity
+  ) || null;
+}
+
+function loadReportArchiveForSchedule(){
+  try{
+    return JSON.parse(localStorage.getItem("reportsArchive") || "[]");
+  }catch(e){
+    return [];
+  }
+}
+
+function isCurrentSchoolMonthInvoiced(){
+  const selectedSchoolId = String(schoolSelect?.value || "");
+  if(!selectedSchoolId) return false;
+
+  const range = getScheduleArchiveRange();
+  const monthKeys = new Set();
+  const cursor = new Date(range.start);
+  while(cursor <= range.end){
+    monthKeys.add(`${cursor.getFullYear()}-${cursor.getMonth() + 1}`);
+    cursor.setDate(cursor.getDate() + 1);
+  }
+
+  return loadReportArchiveForSchedule().some(item => {
+    const itemMonthKey = `${item.yearValue || ""}-${Number(item.monthValue || 0)}`;
+    return (item.group || "schools") === "schools" &&
+      String(item.schoolFilter || "") === selectedSchoolId &&
+      monthKeys.has(itemMonthKey) &&
+      (item.processedStatus === "invoiced" || Boolean(item.processedAt));
+  });
+}
+
+function isCurrentWeekEditLocked(){
+  return Boolean(getCurrentWeekClosedArchive() && isCurrentSchoolMonthInvoiced());
+}
+
+function removeCurrentWeekClosedArchive(){
+  const identity = getCurrentWeekArchiveIdentity();
+  const archives = getScheduleArchives();
+  const nextArchives = archives.filter(archive => getScheduleArchiveIdentity(archive) !== identity);
+
+  if(nextArchives.length !== archives.length){
+    saveScheduleArchives(nextArchives);
+  }
+
+  return nextArchives.length !== archives.length;
+}
+
+function updateCurrentWeekStatus(){
+  if(isCurrentWeekEditLocked()){
+    if(isEditMode) setEditMode(false);
+    setScheduleArchiveStatus("Vyfakturováno\neditace uzamčena", "week-locked-status");
+    return;
+  }
+
+  if(getCurrentWeekClosedArchive()){
+    setScheduleArchiveStatus("Uzavřený týden", "week-closed-status");
+    return;
+  }
+
+  setScheduleArchiveStatus("");
+}
+
+function openCurrentWeekForEdit(){
+  if(isCurrentWeekEditLocked()){
+    showWeekWarning({
+      title: "Týden je uzamčen",
+      message: "Tento týden patří do měsíce, který je pro vybranou školu už označený jako VYFAKTUROVÁNO. Editace už není povolená.",
+      confirmText: "Rozumím",
+      cancelText: ""
+    });
+    return;
+  }
+
+  if(getCurrentWeekClosedArchive()){
+    showWeekWarning({
+      title: "POZOR - ZÁSAH DO ULOŽENÉHO TÝDNE",
+      message: "Otevíráš už uzavřený týden. Po opravě bude potřeba týden znovu uzavřít, aby byl vedený jako hotový.",
+      confirmText: "Otevřít editaci",
+      cancelText: "Zrušit",
+      onConfirm: () => {
+        removeCurrentWeekClosedArchive();
+        setEditMode(true);
+        setScheduleArchiveStatus("Týden otevřen k úpravě - po opravě jej znovu uzavři.", "week-open-status");
+      }
+    });
+    return;
+  }
+
+  setEditMode(true);
+}
+
+function prepareCurrentWeekWriteAction(onReady){
+  if(isCurrentWeekEditLocked()){
+    showWeekWarning({
+      title: "Týden je uzamčen",
+      message: "Tento týden patří do měsíce, který je pro vybranou školu už označený jako VYFAKTUROVÁNO. Změny už nejsou povolené.",
+      confirmText: "Rozumím",
+      cancelText: ""
+    });
+    return;
+  }
+
+  if(getCurrentWeekClosedArchive()){
+    showWeekWarning({
+      title: "POZOR - ZÁSAH DO ULOŽENÉHO TÝDNE",
+      message: "Tato akce upraví už uzavřený týden. Po změně bude potřeba týden znovu uzavřít.",
+      confirmText: "Pokračovat",
+      cancelText: "Zrušit",
+      onConfirm: () => {
+        removeCurrentWeekClosedArchive();
+        setScheduleArchiveStatus("Týden otevřen k úpravě - po opravě jej znovu uzavři.", "week-open-status");
+        if(onReady) onReady();
+      }
+    });
+    return;
+  }
+
+  if(onReady) onReady();
+}
+
+function getScheduleArchiveLabel(range){
   const startLabel = range.start.toLocaleDateString("cs-CZ");
   const endLabel = range.end.toLocaleDateString("cs-CZ");
   const schoolName = getSelectedSchool()?.nazev || "všechny školy";
-  const prefix = type === "month" ? "Měsíc" : "Týden";
-  return `${prefix} ${startLabel} - ${endLabel} | ${schoolName}`;
+  return `Týden ${startLabel} - ${endLabel} | ${schoolName}`;
 }
 
 function isStoredEntryInRange(key, value, range){
@@ -3104,23 +3462,7 @@ function closeCurrentWeekArchive(){
 
   saveScheduleArchive("week", { closed: true });
   setScheduleArchiveStatus("Týden uzavřen do archivu.", "archive-status-strong");
-}
-
-function removeArchivedRangeFromStore(store, archive){
-  const range = {
-    start: new Date(archive.startDate),
-    end: new Date(archive.endDate)
-  };
-
-  Object.entries(store).forEach(([key, value]) => {
-    const parsed = parseKey(key);
-    if(!parsed?.date || !isDateInRange(parsed.date, range.start, range.end)) return;
-
-    const entryYear = typeof value === "object" ? value?.year : parsed.year;
-    if(!entryYear || String(entryYear) === String(archive.year)){
-      delete store[key];
-    }
-  });
+  setTimeout(updateCurrentWeekStatus, 1800);
 }
 
 function setScheduleArchiveStatus(message, className = ""){
@@ -3129,38 +3471,15 @@ function setScheduleArchiveStatus(message, className = ""){
   scheduleArchiveStatus.className = className;
 }
 
-function refreshScheduleArchiveSelect(){
-  if(!scheduleArchiveSelect) return;
-  const archives = getScheduleArchives();
-  scheduleArchiveSelect.innerHTML = "";
-
-  if(!archives.length){
-    const option = document.createElement("option");
-    option.value = "";
-    option.textContent = "Žádný uložený archiv";
-    scheduleArchiveSelect.appendChild(option);
-    if(loadArchiveButton) loadArchiveButton.disabled = true;
-    return;
-  }
-
-  archives.forEach((archive) => {
-    const option = document.createElement("option");
-    option.value = archive.id;
-    option.textContent = archive.label;
-    scheduleArchiveSelect.appendChild(option);
-  });
-
-  if(loadArchiveButton) loadArchiveButton.disabled = false;
-}
-
 function saveScheduleArchive(type, options = {}){
-  const range = getScheduleArchiveRange(type);
+  const range = getScheduleArchiveRange();
   const archive = {
     id: `${Date.now()}-${type}`,
     type,
-    label: getScheduleArchiveLabel(type, range),
+    label: getScheduleArchiveLabel(range),
     startDate: formatDate(range.start),
     endDate: formatDate(range.end),
+    schoolYear: getSchoolYearValueForDate(range.start),
     year: getSelectedYear(),
     schoolId: schoolSelect?.value || "",
     savedAt: new Date().toISOString(),
@@ -3169,43 +3488,13 @@ function saveScheduleArchive(type, options = {}){
     reality: collectScheduleArchiveStore(reality, range)
   };
 
-  const archives = [archive, ...getScheduleArchives()];
+  const archiveIdentity = getScheduleArchiveIdentity(archive);
+  const archives = [
+    archive,
+    ...getScheduleArchives().filter(item => getScheduleArchiveIdentity(item) !== archiveIdentity)
+  ];
   saveScheduleArchives(archives);
-  refreshScheduleArchiveSelect();
-  scheduleArchiveSelect.value = archive.id;
-  setScheduleArchiveStatus("Archiv uložen.");
-}
-
-function loadScheduleArchive(){
-  if(!scheduleArchiveSelect?.value) return;
-  const archive = getScheduleArchives().find(item => item.id === scheduleArchiveSelect.value);
-  if(!archive) return;
-
-  removeArchivedRangeFromStore(plans, archive);
-  removeArchivedRangeFromStore(reality, archive);
-  Object.assign(plans, archive.plans || {});
-  Object.assign(reality, archive.reality || {});
-  localStorage.setItem("plans", JSON.stringify(plans));
-  localStorage.setItem("reality", JSON.stringify(reality));
-
-  if(archive.schoolId && schoolSelect){
-    schoolSelect.value = archive.schoolId;
-    localStorage.setItem("selectedSchool", schoolSelect.value);
-    activeSchoolId = schoolSelect.value;
-    lastSchoolValue = schoolSelect.value;
-    updateSchoolUI();
-  }
-
-  if(archive.year && yearSelect){
-    yearSelect.value = String(archive.year);
-    lastYearValue = yearSelect.value;
-  }
-
-  currentDate = new Date(archive.startDate);
-  updateWeekInfo();
-  lastDateValue = dateInput.value;
-  renderScheduleSafe();
-  setScheduleArchiveStatus("Archiv načten.");
+  return archive;
 }
 
 function isDateInRange(dateStr, start, end){
@@ -3657,6 +3946,7 @@ function renderScheduleCore(){
     activeSchoolId = "";
     table.replaceChildren();
     renderTrainerPanel();
+    setScheduleArchiveStatus("");
     showScheduleLoginGate("Nejprve se přihlas jako školník nebo manažer na rozcestníku.");
     return;
   }
@@ -3670,6 +3960,7 @@ function renderScheduleCore(){
     activeSchoolId = "";
     table.replaceChildren();
     renderTrainerPanel();
+    setScheduleArchiveStatus("");
     showScheduleLoginGate(isManagerRoleMode()
       ? "Zatím nejsou založené žádné školy."
       : "Přihlášený školník zatím nemá přiřazenou žádnou školu. Přiřazení nastaví manažer.");
@@ -3693,6 +3984,7 @@ function renderScheduleCore(){
   }
 
   renderTrainerPanel();
+  updateCurrentWeekStatus();
 
   let mondayDate = getMonday(currentDate);
   const todayDayIndex = getTodayDayIndexInDisplayedWeek(mondayDate);
@@ -3833,37 +4125,7 @@ function renderScheduleSafe(){
   }
 }
 
-function copyWeek(){
-  let monday = getMonday(currentDate);
-  const selectedSchoolId = String(schoolSelect?.value || "");
-
-  for(let d = 0; d < 5; d++){
-    let date = new Date(monday);
-    date.setDate(date.getDate() + d);
-
-    let next = new Date(date);
-    next.setDate(next.getDate() + 7);
-
-    Object.entries(plans).forEach(([key, value]) => {
-      const parsed = parseKey(key);
-      if(!parsed || parsed.date !== formatDate(date)) return;
-      const entrySchoolId = typeof value === "object" ? String(value?.schoolId || "") : "";
-      if(entrySchoolId && selectedSchoolId && entrySchoolId !== selectedSchoolId) return;
-      const year = typeof value === "object" && value?.year ? String(value.year) : String(parsed.year || getSelectedYear());
-      const cls = typeof value === "object" && value?.className ? String(value.className) : String(parsed.cls || "");
-      if(!cls || !parsed.hour) return;
-      const trainerId = getStoredTrainerId(value);
-      if(!trainerId) return;
-      plans[getKey(next, cls, parsed.hour, year)] = createPlanStoredValue(trainerId, next, cls, parsed.hour, year);
-    });
-  }
-
-  localStorage.setItem("plans", JSON.stringify(plans));
-  alert(TEXTS.schedule.copied);
-}
-
 window.changeWeek = changeWeek;
-window.copyWeek = copyWeek;
 window.goToday = goToday;
 window.onYearChange = onYearChange;
 window.onClassChange = onClassChange;
@@ -3875,21 +4137,38 @@ window.render = renderScheduleSafe;
 if(saveWeekArchiveButton){
   saveWeekArchiveButton.addEventListener("click", closeCurrentWeekArchive);
 }
-if(saveMonthArchiveButton){
-  saveMonthArchiveButton.addEventListener("click", () => saveScheduleArchive("month"));
-}
-if(loadArchiveButton){
-  loadArchiveButton.addEventListener("click", loadScheduleArchive);
-}
 if(classSelect){
   classSelect.addEventListener("change", onClassChange);
 }
 if(applyRecurringWeekButton){
-  applyRecurringWeekButton.addEventListener("click", applyRecurringPlanToCurrentWeek);
+  applyRecurringWeekButton.addEventListener("click", () => {
+    prepareCurrentWeekWriteAction(applyRecurringPlanToCurrentWeek);
+  });
 }
 editWeekButton.addEventListener("click", () => {
-  editWeekButton.classList.toggle("edit-active");
-  setEditMode(!isEditMode);
+  if(isEditMode){
+    setEditMode(false);
+    return;
+  }
+
+  openCurrentWeekForEdit();
+});
+weekWarningConfirmButton.addEventListener("click", () => {
+  const onConfirm = pendingWeekWarningConfirm;
+  pendingWeekWarningConfirm = null;
+  pendingWeekWarningCancel = null;
+  weekWarningModal.hidden = true;
+  if(onConfirm) onConfirm();
+});
+weekWarningCancelButton.addEventListener("click", () => {
+  const onCancel = pendingWeekWarningCancel;
+  pendingWeekWarningConfirm = null;
+  pendingWeekWarningCancel = null;
+  weekWarningModal.hidden = true;
+  if(onCancel) onCancel();
+});
+weekWarningModal.addEventListener("click", (event) => {
+  if(event.target === weekWarningModal) weekWarningCancelButton.click();
 });
 leaveEditConfirmButton.addEventListener("click", () => {
   const onConfirm = pendingLeaveEditConfirm;

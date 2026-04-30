@@ -18,10 +18,8 @@ export const TEXTS = {
     reality: "S",
     hourShort: "H",
     days: ["Po", "Út", "St", "Čt", "Pá"],
-    copyWeek: "Kopírovat týden",
     allTrainers: "Všichni trenéři",
     searchTrainer: "Hledat trenéra",
-    copied: "Týden zkopírován",
     conflict: "Trenér už je v tento čas jinde!",
     noEmail: "Škola nemá email"
   },
