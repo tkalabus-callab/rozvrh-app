@@ -1993,13 +1993,13 @@ function init(){
   loadSchools();
   console.log("[INIT] loadSchools OK");
 
-  restoreScheduleReturnContext();
+  const restoredScheduleDate = restoreScheduleReturnContext();
   console.log("[INIT] restoreScheduleReturnContext OK");
 
   activeSchoolId = schoolSelect.value;
   console.log("[INIT] activeSchoolId =", activeSchoolId);
 
-  if (isCaretakerRoleMode() && !sessionStorage.getItem("recentlyUpdatedScheduleCell")) {
+  if (isCaretakerRoleMode() && !restoredScheduleDate && !sessionStorage.getItem("recentlyUpdatedScheduleCell")) {
     const savedDate = getLastDateForCaretaker(getRoleCaretakerId());
     if (savedDate && !Number.isNaN(new Date(savedDate).getTime())) {
       currentDate = new Date(savedDate);
@@ -2027,9 +2027,10 @@ function init(){
 
 function restoreScheduleReturnContext(){
   const context = JSON.parse(sessionStorage.getItem("scheduleReturnContext") || "null");
-  if(!context) return;
+  if(!context) return false;
 
   sessionStorage.removeItem("scheduleReturnContext");
+  let restoredDate = false;
 
   if(context.schoolId){
     schoolSelect.value = String(context.schoolId);
@@ -2044,7 +2045,10 @@ function restoreScheduleReturnContext(){
 
   if(context.date && !Number.isNaN(new Date(context.date).getTime())){
     currentDate = new Date(context.date);
+    restoredDate = true;
   }
+
+  return restoredDate;
 }
 
 function loadSchools(){

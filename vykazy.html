@@ -680,19 +680,6 @@
       margin-left:auto;
     }
 
-    .archive-clear{
-      min-height:34px;
-      padding:0 12px;
-      border:1px solid #ef4444;
-      border-radius:8px;
-      background:#fff1f2;
-      color:#991b1b;
-      font-size:13px;
-      font-weight:900;
-      text-transform:uppercase;
-      cursor:pointer;
-    }
-
     .archive-close-text{
       min-height:34px;
       padding:0 12px;
@@ -1215,7 +1202,6 @@
       <div class="archive-header">
         <h2 id="reportArchiveTitle" class="archive-title">Archiv výkazů</h2>
         <div class="archive-header-actions">
-          <button id="clearArchiveButton" class="archive-clear" type="button" hidden>Smazat archiv</button>
           <button id="saveSchoolYearArchiveButton" class="archive-close-text" type="button">Uložit školní rok</button>
           <button id="toggleSchoolYearArchiveButton" class="archive-close-text" type="button">Archiv školních roků</button>
           <button id="closeArchiveTextButton" class="archive-close-text" type="button">Zavřít archiv</button>
@@ -1296,7 +1282,6 @@
       const emailReportButton = document.getElementById("emailReportButton");
       const archiveReportButton = document.getElementById("archiveReportButton");
       const reportArchiveModal = document.getElementById("reportArchiveModal");
-      const clearArchiveButton = document.getElementById("clearArchiveButton");
       const closeArchiveTextButton = document.getElementById("closeArchiveTextButton");
       const closeArchiveButton = document.getElementById("closeArchiveButton");
       const schoolArchiveList = document.getElementById("schoolArchiveList");
@@ -1306,7 +1291,7 @@
       const reportConfirmMessage = document.getElementById("reportConfirmMessage");
       const reportConfirmCancelButton = document.getElementById("reportConfirmCancelButton");
       const reportConfirmSubmitButton = document.getElementById("reportConfirmSubmitButton");
-      if(!yearSelect || !monthSelect || !filtersBox || !filtersBoxTitle || !yearFilterItem || !monthFilterItem || !filtersControlSummary || !reportModeButtons.length || !evaluationPanel || !actionsBox || !reportTableWrap || !openArchiveModeButton || !reportGroupSelect || !schoolFilterWrap || !trainerFilterWrap || !schoolFilter || !trainerFilter || !reportSummaryTitle || !reportFocusMode || !reportArchiveBadge || !reportFocusSubject || !reportFocusHours || !reportStatusMessage || !summaryPeriod || !summarySchoolHours || !summaryTrainerHours || !summaryHoursCheck || !evaluationPeriod || !evaluationYear || !evaluationMonth || !evaluationMonthWrap || !saveSchoolYearArchiveButton || !toggleSchoolYearArchiveButton || !schoolYearArchiveList || !evaluationSummary || !evaluationBody || !evaluationSearch || !evaluationViewButtons.length || !reportBody || !printReport || !exportExcelButton || !exportPdfButton || !emailReportButton || !archiveReportButton || !reportArchiveModal || !clearArchiveButton || !closeArchiveTextButton || !closeArchiveButton || !schoolArchiveList || !trainerArchiveList || !reportConfirmModal || !reportConfirmTitle || !reportConfirmMessage || !reportConfirmCancelButton || !reportConfirmSubmitButton) return;
+      if(!yearSelect || !monthSelect || !filtersBox || !filtersBoxTitle || !yearFilterItem || !monthFilterItem || !filtersControlSummary || !reportModeButtons.length || !evaluationPanel || !actionsBox || !reportTableWrap || !openArchiveModeButton || !reportGroupSelect || !schoolFilterWrap || !trainerFilterWrap || !schoolFilter || !trainerFilter || !reportSummaryTitle || !reportFocusMode || !reportArchiveBadge || !reportFocusSubject || !reportFocusHours || !reportStatusMessage || !summaryPeriod || !summarySchoolHours || !summaryTrainerHours || !summaryHoursCheck || !evaluationPeriod || !evaluationYear || !evaluationMonth || !evaluationMonthWrap || !saveSchoolYearArchiveButton || !toggleSchoolYearArchiveButton || !schoolYearArchiveList || !evaluationSummary || !evaluationBody || !evaluationSearch || !evaluationViewButtons.length || !reportBody || !printReport || !exportExcelButton || !exportPdfButton || !emailReportButton || !archiveReportButton || !reportArchiveModal || !closeArchiveTextButton || !closeArchiveButton || !schoolArchiveList || !trainerArchiveList || !reportConfirmModal || !reportConfirmTitle || !reportConfirmMessage || !reportConfirmCancelButton || !reportConfirmSubmitButton) return;
 
       let loadedArchiveContext = null;
       const openArchiveMonthKeys = new Set();
@@ -2731,26 +2716,6 @@
         reportArchiveModal.hidden = true;
       }
 
-      function clearReportArchive(){
-        if(!loadReportArchive().length){
-          showStatusMessage("Archiv výkazů je už prázdný.", "live");
-          renderArchiveList();
-          return;
-        }
-
-        const shouldClear = window.confirm("Opravdu smazat celý archiv výkazů? Tuto akci nelze vrátit zpět.");
-        if(!shouldClear) return;
-
-        localStorage.removeItem("reportsArchive");
-        loadedArchiveContext = null;
-        openArchiveMonthKeys.clear();
-        renderArchiveList();
-        updateReportSummaryTitle();
-        updateReportSummaryCards();
-        renderReportTable();
-        showStatusMessage("Archiv výkazů byl smazán.", "success");
-      }
-
       function loadArchivedReport(index){
         const item = loadReportArchive()[index];
         if(!item) return;
@@ -3007,7 +2972,6 @@
       exportPdfButton.addEventListener("click", () => exportReportPdf());
       emailReportButton.addEventListener("click", emailReport);
       archiveReportButton.addEventListener("click", markCurrentReportProcessed);
-      clearArchiveButton.addEventListener("click", clearReportArchive);
       closeArchiveTextButton.addEventListener("click", closeArchive);
       closeArchiveButton.addEventListener("click", closeArchive);
       reportArchiveModal.addEventListener("click", (event) => {

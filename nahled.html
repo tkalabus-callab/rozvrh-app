@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Náhled rozvrhu</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  body {
+    margin: 0;
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-family: Arial, sans-serif;
+  }
+
+  .preview-wrap {
+    width: min(1200px, calc(100vw - 20px));
+    margin: 16px auto 28px;
+  }
+
+  .preview-panel {
+    border: 1px solid var(--color-primary);
+    border-radius: 10px;
+    background: #ffffff;
+    box-shadow: 0 10px 28px rgba(36,54,75,0.08);
+    overflow: hidden;
+  }
+
+  .preview-toolbar {
+    display: grid;
+    grid-template-columns: minmax(220px, 1fr) auto auto auto;
+    gap: 10px;
+    align-items: end;
+    padding: 14px;
+    background: var(--color-primary);
+  }
+
+  .preview-field {
+    display: grid;
+    gap: 5px;
+    min-width: 0;
+  }
+
+  .preview-field label {
+    font-size: 13px;
+    font-weight: 900;
+    color: #001f2a;
+  }
+
+  .preview-field select,
+  .preview-field input {
+    height: 38px;
+    min-width: 0;
+    padding: 0 10px;
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    background: #ffffff;
+    color: var(--color-text);
+    font-size: 14px;
+    font-weight: 800;
+    box-sizing: border-box;
+  }
+
+  .preview-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .preview-button {
+    height: 38px;
+    min-width: 48px;
+    padding: 0 14px;
+    border: 1px solid rgba(0,0,0,0.35);
+    border-radius: 7px;
+    background: var(--color-header);
+    color: #ffffff;
+    font-weight: 900;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.18);
+  }
+
+  .preview-button.secondary {
+    background: #ffffff;
+    color: var(--color-header);
+    border-color: var(--color-border);
+  }
+
+  .preview-status {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    font-weight: 900;
+  }
+
+  .preview-status-main {
+    font-size: 20px;
+    color: var(--color-header);
+  }
+
+  .preview-status-meta {
+    font-size: 13px;
+    color: #4b5c70;
+  }
+
+  .readonly-badge {
+    display: inline-flex;
+    align-items: center;
+    min-height: 28px;
+    padding: 0 12px;
+    border-radius: 999px;
+    background: #e7f8fb;
+    color: var(--color-primary-dark);
+    border: 1px solid rgba(27,179,200,0.35);
+    font-size: 12px;
+    font-weight: 900;
+    text-transform: uppercase;
+  }
+
+  .preview-table-wrap {
+    overflow-x: auto;
+    padding: 10px;
+  }
+
+  .preview-table {
+    width: 100%;
+    min-width: 860px;
+    border-collapse: separate;
+    border-spacing: 0;
+    table-layout: fixed;
+    border: 1px solid #111827;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .preview-table th {
+    background: var(--color-header);
+    color: #ffffff;
+    padding: 8px 6px;
+    font-size: 13px;
+    line-height: 1.2;
+    text-align: center;
+    border-right: 1px solid rgba(255,255,255,0.2);
+  }
+
+  .preview-table td {
+    height: 62px;
+    padding: 6px;
+    border-top: 1px solid #d9e0e8;
+    border-right: 1px solid #d9e0e8;
+    vertical-align: top;
+    background: #ffffff;
+  }
+
+  .preview-table .hour-cell {
+    width: 120px;
+    background: #eaf4fb;
+    color: var(--color-header);
+    font-weight: 900;
+    text-align: center;
+    vertical-align: middle;
+    white-space: nowrap;
+  }
+
+  .preview-slot {
+    display: grid;
+    gap: 5px;
+  }
+
+  .preview-entry {
+    min-height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 6px;
+    border-radius: 6px;
+    background: #d9f3f7;
+    color: var(--color-header);
+    font-size: 12px;
+    line-height: 1.15;
+    font-weight: 900;
+    text-align: center;
+  }
+
+  .preview-entry.unassigned {
+    background: #ffe3e3;
+    color: #9b1111;
+  }
+
+  .preview-entry.actual {
+    background: #dff4e5;
+    border: 1px solid #9ad4a9;
+  }
+
+  .preview-empty {
+    min-height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #8a98a8;
+    font-size: 12px;
+    font-weight: 800;
+  }
+
+  .preview-exception {
+    height: 100%;
+    min-height: 46px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 7px;
+    background: #fff3cd;
+    color: #7c2d12;
+    font-size: 12px;
+    line-height: 1.25;
+    font-weight: 900;
+    text-align: center;
+  }
+
+  .mobile-days {
+    display: none;
+    padding: 10px;
+    gap: 12px;
+  }
+
+  .day-card {
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    background: #ffffff;
+    overflow: hidden;
+  }
+
+  .day-card-header {
+    background: var(--color-header);
+    color: #ffffff;
+    padding: 10px 12px;
+    font-size: 16px;
+    font-weight: 900;
+    text-transform: uppercase;
+  }
+
+  .day-card-body {
+    display: grid;
+  }
+
+  .mobile-hour {
+    display: grid;
+    grid-template-columns: 92px 1fr;
+    gap: 8px;
+    padding: 8px 10px;
+    border-bottom: 1px solid #e3e9ef;
+  }
+
+  .mobile-hour:last-child {
+    border-bottom: 0;
+  }
+
+  .mobile-time {
+    font-size: 13px;
+    color: var(--color-header);
+    font-weight: 900;
+    align-self: center;
+  }
+
+  .login-required {
+    margin: 16px auto;
+    padding: 18px;
+    border: 2px solid #f59e0b;
+    border-top: 7px solid #f97316;
+    border-radius: 12px;
+    background: #fff3cd;
+    color: #7c2d12;
+    text-align: center;
+    font-weight: 900;
+    box-shadow: 0 14px 34px rgba(124,45,18,0.16);
+  }
+
+  .login-required a {
+    color: #7c2d12;
+    font-weight: 900;
+  }
+
+  @media (max-width: 760px) {
+    .top-nav {
+      gap: 8px;
+      padding: 10px;
+    }
+
+    .top-nav a {
+      min-width: 0;
+      flex: 1 1 120px;
+      height: 40px;
+      font-size: 14px;
+    }
+
+    #pageTitle {
+      font-size: 24px;
+      padding: 12px;
+    }
+
+    .preview-wrap {
+      width: calc(100vw - 12px);
+      margin-top: 8px;
+    }
+
+    .preview-toolbar {
+      grid-template-columns: 1fr;
+      padding: 10px;
+    }
+
+    .preview-actions {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .preview-button {
+      width: 100%;
+      padding: 0 8px;
+    }
+
+    .preview-status {
+      padding: 10px;
+      align-items: flex-start;
+    }
+
+    .preview-status-main {
+      font-size: 18px;
+    }
+
+    .preview-table-wrap {
+      display: none;
+    }
+
+    .mobile-days {
+      display: grid;
+    }
+  }
+</style>
+</head>
+<body>
+<header class="page-header">
+  <h1 id="pageTitle">Náhled rozvrhu</h1>
+  <nav class="top-nav">
+    <a href="home.html">Domů</a>
+    <a href="index.html">Rozvrh</a>
+  </nav>
+</header>
+
+<main class="preview-wrap">
+  <section id="loginRequired" class="login-required" hidden>
+    Pro zobrazení náhledu se nejprve přihlas na rozcestníku jako školník nebo manažer.
+    <br><a href="home.html">Přejít na rozcestník</a>
+  </section>
+
+  <section id="previewPanel" class="preview-panel" hidden>
+    <div class="preview-toolbar">
+      <div class="preview-field">
+        <label for="previewSchoolSelect">Škola</label>
+        <select id="previewSchoolSelect"></select>
+      </div>
+      <div class="preview-field">
+        <label for="previewWeekInput">Týden od</label>
+        <input id="previewWeekInput" type="date">
+      </div>
+      <div class="preview-actions" aria-label="Pohyb v týdnech">
+        <button id="previewPrevWeek" class="preview-button" type="button">←</button>
+        <button id="previewToday" class="preview-button" type="button">Dnes</button>
+        <button id="previewNextWeek" class="preview-button" type="button">→</button>
+      </div>
+      <span class="readonly-badge">Jen pro čtení</span>
+    </div>
+
+    <div class="preview-status">
+      <div>
+        <div id="previewTitle" class="preview-status-main">Rozvrh</div>
+        <div id="previewMeta" class="preview-status-meta">-</div>
+      </div>
+      <div id="previewRole" class="readonly-badge">-</div>
+    </div>
+
+    <div class="preview-table-wrap">
+      <table class="preview-table" aria-label="Týdenní náhled rozvrhu">
+        <thead id="previewTableHead"></thead>
+        <tbody id="previewTableBody"></tbody>
+      </table>
+    </div>
+
+    <div id="mobileDays" class="mobile-days"></div>
+  </section>
+</main>
+
+<script>
+(function(){
+  const CARETAKER_ID_STORAGE_KEY = "caretakerId";
+  const CARETAKER_SESSION_KEY = "caretakerModeUnlocked";
+  const MANAGER_SESSION_KEY = "managerModeUnlocked";
+  const DAY_NAMES = ["Pondělí", "Úterý", "Středa", "Čtvrtek", "Pátek"];
+
+  const schoolSelect = document.getElementById("previewSchoolSelect");
+  const weekInput = document.getElementById("previewWeekInput");
+  const prevButton = document.getElementById("previewPrevWeek");
+  const todayButton = document.getElementById("previewToday");
+  const nextButton = document.getElementById("previewNextWeek");
+  const loginRequired = document.getElementById("loginRequired");
+  const previewPanel = document.getElementById("previewPanel");
+  const previewTitle = document.getElementById("previewTitle");
+  const previewMeta = document.getElementById("previewMeta");
+  const previewRole = document.getElementById("previewRole");
+  const tableHead = document.getElementById("previewTableHead");
+  const tableBody = document.getElementById("previewTableBody");
+  const mobileDays = document.getElementById("mobileDays");
+
+  const schools = loadJson("schools", []);
+  const trainers = loadJson("trainers", []);
+  const caretakers = loadJson("caretakers", []);
+  const plans = loadJson("plans", {});
+  const schoolYearPlan = loadJson("schoolYearPlan", []);
+  const schoolYearExceptions = loadJson("schoolYearExceptions", []);
+
+  let currentMonday = getMonday(new Date());
+  let visibleSchools = [];
+
+  init();
+
+  function init(){
+    const role = getCurrentRole();
+    visibleSchools = getVisibleSchools(role);
+
+    if(!role || !visibleSchools.length){
+      loginRequired.hidden = false;
+      previewPanel.hidden = true;
+      return;
+    }
+
+    previewPanel.hidden = false;
+    loginRequired.hidden = true;
+    previewRole.textContent = role.type === "manager" ? "Manažer" : `Školník: ${role.name}`;
+
+    fillSchoolSelect();
+    const preferredSchoolId = sessionStorage.getItem("scheduleReturnSchoolId") || localStorage.getItem("scheduleLastSchoolId") || "";
+    if(preferredSchoolId && visibleSchools.some(school => String(school.id) === String(preferredSchoolId))){
+      schoolSelect.value = String(preferredSchoolId);
+    }
+
+    weekInput.value = toDateInputValue(currentMonday);
+    render();
+
+    schoolSelect.addEventListener("change", render);
+    weekInput.addEventListener("change", () => {
+      currentMonday = getMonday(parseDateInput(weekInput.value) || new Date());
+      weekInput.value = toDateInputValue(currentMonday);
+      render();
+    });
+    prevButton.addEventListener("click", () => moveWeek(-7));
+    nextButton.addEventListener("click", () => moveWeek(7));
+    todayButton.addEventListener("click", () => {
+      currentMonday = getMonday(new Date());
+      weekInput.value = toDateInputValue(currentMonday);
+      render();
+    });
+  }
+
+  function loadJson(key, fallback){
+    try {
+      const raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : fallback;
+    } catch(error) {
+      return fallback;
+    }
+  }
+
+  function getCurrentRole(){
+    if(sessionStorage.getItem(MANAGER_SESSION_KEY) === "1"){
+      return { type: "manager", name: "Manažer" };
+    }
+    const caretakerId = localStorage.getItem(CARETAKER_ID_STORAGE_KEY);
+    if(!caretakerId || sessionStorage.getItem(CARETAKER_SESSION_KEY) !== String(caretakerId)){
+      return null;
+    }
+    const caretaker = caretakers.find(item => String(item.id) === String(caretakerId));
+    if(!caretaker){
+      return null;
+    }
+    return { type: "caretaker", id: String(caretaker.id), name: getCaretakerName(caretaker) };
+  }
+
+  function getVisibleSchools(role){
+    if(!role){
+      return [];
+    }
+    if(role.type === "manager"){
+      return schools.slice().sort(compareSchools);
+    }
+    return schools
+      .filter(school => String(school.assignedCaretakerId || "") === String(role.id))
+      .sort(compareSchools);
+  }
+
+  function compareSchools(a, b){
+    return String(a.nazev || a.name || "").localeCompare(String(b.nazev || b.name || ""), "cs", { sensitivity: "base" });
+  }
+
+  function getCaretakerName(caretaker){
+    return [caretaker.prijmeni, caretaker.jmeno].filter(Boolean).join(" ") || caretaker.name || "Školník";
+  }
+
+  function fillSchoolSelect(){
+    schoolSelect.innerHTML = "";
+    visibleSchools.forEach(school => {
+      const option = document.createElement("option");
+      option.value = school.id;
+      option.textContent = getSchoolName(school);
+      schoolSelect.appendChild(option);
+    });
+  }
+
+  function moveWeek(deltaDays){
+    currentMonday = addDays(currentMonday, deltaDays);
+    weekInput.value = toDateInputValue(currentMonday);
+    render();
+  }
+
+  function render(){
+    const school = visibleSchools.find(item => String(item.id) === String(schoolSelect.value));
+    if(!school){
+      previewTitle.textContent = "Vyber školu";
+      previewMeta.textContent = "Pro náhled není vybraná žádná škola.";
+      tableHead.innerHTML = "";
+      tableBody.innerHTML = "";
+      mobileDays.innerHTML = "";
+      return;
+    }
+
+    const days = Array.from({ length: 5 }, (_, index) => addDays(currentMonday, index));
+    const weekEnd = addDays(currentMonday, 4);
+    previewTitle.textContent = getSchoolName(school);
+    previewMeta.textContent = `Týden ${formatCzechDate(currentMonday)} - ${formatCzechDate(weekEnd)} | ${getSchoolPlace(school)}`;
+
+    renderTable(school, days);
+    renderMobile(school, days);
+  }
+
+  function renderTable(school, days){
+    tableHead.innerHTML = "";
+    const headRow = document.createElement("tr");
+    const hourHead = document.createElement("th");
+    hourHead.textContent = "H";
+    hourHead.style.width = "120px";
+    headRow.appendChild(hourHead);
+    days.forEach((day, index) => {
+      const th = document.createElement("th");
+      th.textContent = `${DAY_NAMES[index]} ${formatCzechDate(day)}`;
+      headRow.appendChild(th);
+    });
+    tableHead.appendChild(headRow);
+
+    tableBody.innerHTML = "";
+    for(let hour = 1; hour <= 8; hour += 1){
+      const row = document.createElement("tr");
+      const hourCell = document.createElement("td");
+      hourCell.className = "hour-cell";
+      hourCell.textContent = getLessonTimeLabel(school, hour);
+      row.appendChild(hourCell);
+
+      days.forEach(day => {
+        const td = document.createElement("td");
+        const exception = getExceptionForDate(school.id, day);
+        if(exception){
+          td.appendChild(renderException(exception));
+        } else {
+          td.appendChild(renderEntries(getEntriesForCell(school, day, hour)));
+        }
+        row.appendChild(td);
+      });
+      tableBody.appendChild(row);
+    }
+  }
+
+  function renderMobile(school, days){
+    mobileDays.innerHTML = "";
+    days.forEach((day, dayIndex) => {
+      const card = document.createElement("section");
+      card.className = "day-card";
+      const header = document.createElement("div");
+      header.className = "day-card-header";
+      header.textContent = `${DAY_NAMES[dayIndex]} ${formatCzechDate(day)}`;
+      const body = document.createElement("div");
+      body.className = "day-card-body";
+      const exception = getExceptionForDate(school.id, day);
+
+      for(let hour = 1; hour <= 8; hour += 1){
+        const line = document.createElement("div");
+        line.className = "mobile-hour";
+        const time = document.createElement("div");
+        time.className = "mobile-time";
+        time.textContent = getLessonTimeLabel(school, hour);
+        const content = document.createElement("div");
+        content.className = "preview-slot";
+        if(exception){
+          content.appendChild(renderException(exception));
+        } else {
+          content.appendChild(renderEntries(getEntriesForCell(school, day, hour)));
+        }
+        line.appendChild(time);
+        line.appendChild(content);
+        body.appendChild(line);
+      }
+
+      card.appendChild(header);
+      card.appendChild(body);
+      mobileDays.appendChild(card);
+    });
+  }
+
+  function renderEntries(entries){
+    const slot = document.createElement("div");
+    slot.className = "preview-slot";
+    if(!entries.length){
+      const empty = document.createElement("div");
+      empty.className = "preview-empty";
+      empty.textContent = "Bez výuky";
+      slot.appendChild(empty);
+      return slot;
+    }
+    entries.forEach(entry => {
+      const item = document.createElement("div");
+      item.className = `preview-entry ${entry.trainerId === "X" ? "unassigned" : ""} ${entry.source === "actual" ? "actual" : ""}`.trim();
+      item.textContent = formatEntry(entry);
+      slot.appendChild(item);
+    });
+    return slot;
+  }
+
+  function renderException(exception){
+    const item = document.createElement("div");
+    item.className = "preview-exception";
+    item.textContent = exception.reason || exception.type || "Výjimka - není výuka";
+    return item;
+  }
+
+  function getEntriesForCell(school, day, hour){
+    const dateKey = toDateInputValue(day);
+    const recurringEntries = getRecurringEntries(school, day, hour);
+    const actualEntries = Object.entries(plans)
+      .map(([key, value]) => normalizePlanEntry(key, value))
+      .filter(entry => {
+        if(!entry || entry.date !== dateKey || Number(entry.hour) !== Number(hour)){
+          return false;
+        }
+        return !entry.schoolId || String(entry.schoolId) === String(school.id);
+      });
+
+    if(actualEntries.length){
+      return sortEntries(actualEntries);
+    }
+    return sortEntries(recurringEntries);
+  }
+
+  function normalizePlanEntry(key, value){
+    const parsed = parsePlanKey(key);
+    if(!parsed){
+      return null;
+    }
+    const data = value && typeof value === "object" ? value : { trainerId: value };
+    return {
+      source: "actual",
+      date: parsed.date,
+      schoolId: data.schoolId || "",
+      year: data.year || parsed.year || "",
+      className: data.className || parsed.className || "",
+      hour: data.hour || parsed.hour,
+      trainerId: data.trainerId || value || "",
+      lessonTime: data.lessonTime || ""
+    };
+  }
+
+  function getRecurringEntries(school, day, hour){
+    const dayIndex = (day.getDay() + 6) % 7;
+    const schoolYear = getSchoolYearValue(day);
+    return schoolYearPlan
+      .filter(item => {
+        return String(item.schoolId || "") === String(school.id)
+          && String(item.schoolYear || "") === String(schoolYear)
+          && Number(item.dayIndex) === Number(dayIndex)
+          && Number(item.hour) === Number(hour);
+      })
+      .map(item => ({
+        source: "recurring",
+        date: toDateInputValue(day),
+        schoolId: item.schoolId,
+        year: item.year,
+        className: item.className,
+        hour: item.hour,
+        trainerId: item.trainerId,
+        lessonTime: ""
+      }));
+  }
+
+  function parsePlanKey(key){
+    const parts = String(key).split("_");
+    if(parts.length >= 4){
+      return {
+        date: parts[0],
+        year: parts[1],
+        className: parts[2],
+        hour: Number(parts[3])
+      };
+    }
+    if(parts.length === 3){
+      return {
+        date: parts[0],
+        year: "",
+        className: parts[1],
+        hour: Number(parts[2])
+      };
+    }
+    return null;
+  }
+
+  function sortEntries(entries){
+    return entries.slice().sort((a, b) => {
+      const yearA = normalizeYearOrder(a.year);
+      const yearB = normalizeYearOrder(b.year);
+      if(yearA !== yearB){
+        return yearA - yearB;
+      }
+      return String(a.className || "").localeCompare(String(b.className || ""), "cs", { sensitivity: "base" });
+    });
+  }
+
+  function normalizeYearOrder(year){
+    if(String(year).toLowerCase() === "skolka"){
+      return 0;
+    }
+    const number = Number(year);
+    return Number.isFinite(number) ? number : 99;
+  }
+
+  function formatEntry(entry){
+    const trainer = getTrainerName(entry.trainerId);
+    const year = String(entry.year || "").toLowerCase() === "skolka" ? "Školka" : `${entry.year}. ročník`;
+    const cls = entry.className ? ` ${entry.className}` : "";
+    return `${year}${cls} ${trainer}`.trim();
+  }
+
+  function getTrainerName(id){
+    if(String(id) === "X"){
+      return "Neobsazeno";
+    }
+    const trainer = trainers.find(item => String(item.id) === String(id));
+    if(!trainer){
+      return "-";
+    }
+    return trainer.prijmeni || trainer.name || [trainer.jmeno, trainer.prijmeni].filter(Boolean).join(" ") || "-";
+  }
+
+  function getExceptionForDate(schoolId, day){
+    const dateKey = toDateInputValue(day);
+    return schoolYearExceptions.find(item => {
+      return String(item.schoolId || "") === String(schoolId)
+        && String(item.date || "") === String(dateKey);
+    });
+  }
+
+  function getLessonTimeLabel(school, hour){
+    const times = Array.isArray(school.lessonTimes) ? school.lessonTimes : [];
+    return times[hour - 1] || `${hour}. hodina`;
+  }
+
+  function getSchoolName(school){
+    return school.nazev || school.name || "Bez názvu";
+  }
+
+  function getSchoolPlace(school){
+    return school.misto || school.city || "-";
+  }
+
+  function getSchoolYearValue(date){
+    const year = date.getFullYear();
+    return String(date.getMonth() >= 8 ? year : year - 1);
+  }
+
+  function getMonday(date){
+    const result = new Date(date);
+    result.setHours(0, 0, 0, 0);
+    const day = result.getDay();
+    const diff = result.getDate() - day + (day === 0 ? -6 : 1);
+    result.setDate(diff);
+    return result;
+  }
+
+  function addDays(date, days){
+    const result = new Date(date);
+    result.setDate(result.getDate() + days);
+    return result;
+  }
+
+  function parseDateInput(value){
+    if(!value){
+      return null;
+    }
+    const parts = value.split("-").map(Number);
+    if(parts.length !== 3 || parts.some(part => !Number.isFinite(part))){
+      return null;
+    }
+    return new Date(parts[0], parts[1] - 1, parts[2]);
+  }
+
+  function toDateInputValue(date){
+    return [
+      date.getFullYear(),
+      String(date.getMonth() + 1).padStart(2, "0"),
+      String(date.getDate()).padStart(2, "0")
+    ].join("-");
+  }
+
+  function formatCzechDate(date){
+    return `${date.getDate()}. ${date.getMonth() + 1}. ${date.getFullYear()}`;
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <title>Kontrola práce</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body{
+      margin:0;
+      font-family:Arial, sans-serif;
+      background:var(--color-bg);
+      color:var(--color-text);
+    }
+
+    .page-header{
+      background:var(--color-header);
+      color:#fff;
+      margin-bottom:20px;
+    }
+
+    .page-title{
+      margin:0;
+      padding:16px;
+      background:var(--color-header);
+      text-align:center;
+      font-size:30px;
+      font-weight:900;
+      letter-spacing:1px;
+      text-transform:uppercase;
+      text-shadow:0 2px 4px rgba(0,0,0,0.35);
+      border-bottom:5px solid var(--color-primary);
+      box-shadow:0 4px 14px rgba(0,0,0,0.18);
+    }
+
+    .topbar-nav{
+      display:flex;
+      justify-content:center;
+      gap:10px;
+      flex-wrap:wrap;
+      padding:14px 16px;
+    }
+
+    .topbar-link{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:150px;
+      height:46px;
+      padding:0 18px;
+      border-radius:8px;
+      border:1px solid rgba(0,0,0,0.35);
+      background:var(--color-primary);
+      color:#062b25;
+      text-decoration:none;
+      font-weight:800;
+      box-shadow:0 3px 8px rgba(0,0,0,0.18);
+      box-sizing:border-box;
+    }
+
+    .topbar-link:hover{
+      background:#31c0d4;
+    }
+
+    .container{
+      max-width:1280px;
+      margin:0 auto 24px;
+      padding:0 16px;
+      box-sizing:border-box;
+    }
+
+    .check-panel{
+      padding:16px 18px;
+      border-radius:12px;
+      border-top:5px solid var(--color-primary);
+      background:#ffffff;
+      box-shadow:0 10px 24px rgba(36,54,75,0.12);
+    }
+
+    .check-header{
+      display:grid;
+      grid-template-columns:minmax(0, 1fr) auto;
+      gap:16px;
+      align-items:start;
+      margin-bottom:14px;
+    }
+
+    .check-title{
+      margin:0 0 6px;
+      color:var(--color-header);
+      font-size:24px;
+      font-weight:900;
+      text-transform:uppercase;
+      letter-spacing:0.3px;
+    }
+
+    .check-meta{
+      margin:0;
+      color:#4b5c70;
+      font-size:15px;
+      line-height:1.35;
+      font-weight:800;
+    }
+
+    .check-filters{
+      display:flex;
+      align-items:center;
+      justify-content:flex-end;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    .check-filters label{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      color:var(--color-header);
+      font-weight:900;
+      white-space:nowrap;
+    }
+
+    .check-filters select{
+      height:40px;
+      min-height:40px;
+      padding:0 12px;
+      border:1px solid var(--color-border);
+      border-radius:8px;
+      background:#ffffff;
+      color:#0b2239;
+      font-size:15px;
+      font-weight:800;
+      box-sizing:border-box;
+    }
+
+    .check-summary{
+      display:grid;
+      grid-template-columns:repeat(4, minmax(0, 1fr));
+      gap:12px;
+      margin:14px 0;
+    }
+
+    .summary-card{
+      min-height:76px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      padding:12px 14px;
+      border-radius:8px;
+      background:var(--color-header);
+      box-sizing:border-box;
+    }
+
+    .summary-label{
+      color:#d9f7fb;
+      font-size:13px;
+      line-height:1.1;
+      font-weight:900;
+      text-transform:uppercase;
+    }
+
+    .summary-value{
+      margin-top:4px;
+      color:#ffffff;
+      font-size:30px;
+      line-height:1;
+      font-weight:900;
+    }
+
+    .check-table-wrap{
+      overflow:auto;
+      border:1px solid var(--color-border);
+      border-radius:10px;
+      background:#ffffff;
+    }
+
+    .check-table{
+      width:100%;
+      min-width:860px;
+      border-collapse:collapse;
+    }
+
+    .check-table th,
+    .check-table td{
+      padding:10px 12px;
+      border-bottom:1px solid var(--color-border);
+      color:var(--color-header);
+      font-size:15px;
+      line-height:1.25;
+      text-align:left;
+    }
+
+    .check-table th{
+      background:var(--color-header);
+      color:#ffffff;
+      font-weight:900;
+    }
+
+    .check-table tr:last-child td{
+      border-bottom:0;
+    }
+
+    .check-table .align-right{
+      text-align:right;
+    }
+
+    .check-status{
+      display:inline-flex;
+      align-items:center;
+      min-height:28px;
+      padding:0 10px;
+      border-radius:999px;
+      font-size:13px;
+      font-weight:900;
+      text-transform:uppercase;
+      white-space:nowrap;
+    }
+
+    .check-status.is-ready{
+      background:#dcfce7;
+      color:#166534;
+    }
+
+    .check-status.is-warning{
+      background:#fff7ed;
+      color:#9a3412;
+    }
+
+    .check-status.is-error{
+      background:#fee2e2;
+      color:#991b1b;
+    }
+
+    .check-status.is-done{
+      background:#e0f2fe;
+      color:#075985;
+    }
+
+    .check-status.is-muted{
+      background:#f8f2ea;
+      color:#9a3412;
+    }
+
+    .check-table tr.is-muted td{
+      color:#526276;
+    }
+
+    .check-action{
+      min-height:36px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:0 14px;
+      border-radius:8px;
+      background:var(--color-primary);
+      color:#062b25;
+      text-decoration:none;
+      font-weight:900;
+      box-shadow:0 3px 8px rgba(0,0,0,0.16);
+      white-space:nowrap;
+    }
+
+    .check-action:hover{
+      background:#31c0d4;
+    }
+
+    @media (max-width: 900px){
+      .check-header{
+        grid-template-columns:1fr;
+      }
+
+      .check-filters{
+        justify-content:flex-start;
+      }
+
+      .check-summary{
+        grid-template-columns:repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 620px){
+      .check-summary{
+        grid-template-columns:1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="page-header">
+    <h1 class="page-title">Kontrola práce</h1>
+    <nav class="topbar-nav" aria-label="Hlavní navigace">
+      <a class="topbar-link" href="home.html">Domů</a>
+      <a class="topbar-link" href="index.html">Rozvrh</a>
+      <a class="topbar-link" href="vykazy.html">Výkazy</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="check-panel" aria-labelledby="checkTitle">
+      <div class="check-header">
+        <div>
+          <h2 id="checkTitle" class="check-title">Kontrola práce</h2>
+          <p id="checkMeta" class="check-meta"></p>
+        </div>
+        <div class="check-filters">
+          <label for="checkYear">Rok
+            <select id="checkYear"></select>
+          </label>
+          <label for="checkMonth">Měsíc
+            <select id="checkMonth"></select>
+          </label>
+        </div>
+      </div>
+
+      <div class="check-summary" aria-label="Souhrn kontroly">
+        <div class="summary-card">
+          <span class="summary-label">Kontrolované školy</span>
+          <span id="schoolsCount" class="summary-value">0</span>
+        </div>
+        <div class="summary-card">
+          <span class="summary-label">Připraveno</span>
+          <span id="readyCount" class="summary-value">0</span>
+        </div>
+        <div class="summary-card">
+          <span class="summary-label">Chybí doplnit</span>
+          <span id="missingCount" class="summary-value">0</span>
+        </div>
+        <div class="summary-card">
+          <span class="summary-label">Týdny k uzavření</span>
+          <span id="openWeeksCount" class="summary-value">0</span>
+        </div>
+      </div>
+
+      <div class="check-table-wrap">
+        <table class="check-table">
+          <thead>
+            <tr>
+              <th>Škola</th>
+              <th class="align-right">Naplánováno</th>
+              <th class="align-right">Doplněno</th>
+              <th class="align-right">Chybí doplnit</th>
+              <th class="align-right">Týdny k uzavření</th>
+              <th>Stav</th>
+              <th>Akce</th>
+            </tr>
+          </thead>
+          <tbody id="checkBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script>
+  (() => {
+    const CARETAKER_ID_STORAGE_KEY = "caretakerId";
+    const CARETAKER_SESSION_KEY = "caretakerModeUnlocked";
+    const MANAGER_SESSION_KEY = "managerModeUnlocked";
+    const checkMeta = document.getElementById("checkMeta");
+    const checkYear = document.getElementById("checkYear");
+    const checkMonth = document.getElementById("checkMonth");
+    const schoolsCount = document.getElementById("schoolsCount");
+    const readyCount = document.getElementById("readyCount");
+    const missingCount = document.getElementById("missingCount");
+    const openWeeksCount = document.getElementById("openWeeksCount");
+    const checkBody = document.getElementById("checkBody");
+
+    function loadJson(key, fallback){
+      try{
+        return JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback));
+      }catch(e){
+        return fallback;
+      }
+    }
+
+    function escapeHtml(value){
+      return String(value ?? "").replace(/[&<>"']/g, char => ({
+        "&":"&amp;",
+        "<":"&lt;",
+        ">":"&gt;",
+        "\"":"&quot;",
+        "'":"&#39;"
+      }[char]));
+    }
+
+    function loadSchools(){
+      return loadJson("schools", []);
+    }
+
+    function loadCaretakers(){
+      return loadJson("caretakers", []);
+    }
+
+    function isManagerLoggedIn(){
+      return sessionStorage.getItem(MANAGER_SESSION_KEY) === "1";
+    }
+
+    function hasValidCaretakerLogin(caretakers = loadCaretakers()){
+      const activeId = localStorage.getItem(CARETAKER_ID_STORAGE_KEY) || "";
+      const sessionId = sessionStorage.getItem(CARETAKER_SESSION_KEY) || "";
+      return Boolean(
+        activeId &&
+        sessionId &&
+        String(activeId) === String(sessionId) &&
+        caretakers.some(caretaker => String(caretaker.id) === String(activeId))
+      );
+    }
+
+    function isLoggedIn(caretakers = loadCaretakers()){
+      return isManagerLoggedIn() || hasValidCaretakerLogin(caretakers);
+    }
+
+    function fillFilters(){
+      const now = new Date();
+      const currentYear = now.getFullYear();
+      const currentMonth = now.getMonth() + 1;
+      const lastYear = Math.max(2030, currentYear + 2);
+
+      if(!checkYear.options.length){
+        for(let year = 2026; year <= lastYear; year++){
+          const option = document.createElement("option");
+          option.value = String(year);
+          option.textContent = String(year);
+          checkYear.appendChild(option);
+        }
+        checkYear.value = String(Math.max(2026, Math.min(currentYear, lastYear)));
+      }
+
+      if(!checkMonth.options.length){
+        for(let month = 1; month <= 12; month++){
+          const option = document.createElement("option");
+          option.value = String(month);
+          option.textContent = new Date(2026, month - 1, 1).toLocaleDateString("cs-CZ", { month:"long" });
+          checkMonth.appendChild(option);
+        }
+        checkMonth.value = String(currentMonth);
+      }
+    }
+
+    function parseScheduleKey(key){
+      const parts = String(key).split("_");
+      if(parts.length === 4){
+        const [date, year, cls, hour] = parts;
+        return { date, year, className: cls, hour:Number(hour) };
+      }
+      const [date, cls, hour] = parts;
+      return { date, year:"", className: cls, hour:Number(hour) };
+    }
+
+    function getStoredTrainerId(value){
+      return value && typeof value === "object" ? value.trainerId : value;
+    }
+
+    function getStoredSchoolId(value){
+      if(!value || typeof value !== "object") return "";
+      return String(value.schoolId ?? value.school?.id ?? value.school?.schoolId ?? "");
+    }
+
+    function isUsableTrainerId(trainerId){
+      return Boolean(trainerId && trainerId !== "X");
+    }
+
+    function normalizeScheduleEntry(key, value, fallbackPlan = null){
+      const parsed = parseScheduleKey(key);
+      const isObjectValue = !!value && typeof value === "object";
+      return {
+        key,
+        trainerId: getStoredTrainerId(value),
+        schoolId: (isObjectValue ? getStoredSchoolId(value) : "") || fallbackPlan?.schoolId || "",
+        date: isObjectValue ? value.date || parsed.date || fallbackPlan?.date : parsed.date || fallbackPlan?.date,
+        year: isObjectValue ? value.year || parsed.year || fallbackPlan?.year || "" : parsed.year || fallbackPlan?.year || "",
+        className: isObjectValue ? value.className || parsed.className || fallbackPlan?.className : parsed.className || fallbackPlan?.className,
+        hour: isObjectValue ? Number(value.hour ?? parsed.hour ?? fallbackPlan?.hour) : Number(parsed.hour ?? fallbackPlan?.hour)
+      };
+    }
+
+    function getMonthRange(){
+      const year = Number(checkYear.value);
+      const month = Number(checkMonth.value);
+      const start = `${year}-${String(month).padStart(2, "0")}-01`;
+      const endDate = new Date(year, month, 0);
+      const end = `${year}-${String(month).padStart(2, "0")}-${String(endDate.getDate()).padStart(2, "0")}`;
+      return { start, end };
+    }
+
+    function isEntryInMonth(entry, range){
+      return Boolean(entry?.date && String(entry.date) >= range.start && String(entry.date) <= range.end);
+    }
+
+    function getMondayDateString(dateText){
+      const date = new Date(dateText);
+      if(Number.isNaN(date.getTime())) return "";
+      const day = date.getDay();
+      const diff = date.getDate() - day + (day === 0 ? -6 : 1);
+      const monday = new Date(date);
+      monday.setDate(diff);
+      return monday.toISOString().split("T")[0];
+    }
+
+    function getOldestWeekStart(entries){
+      return Array.from(new Set(entries.map(entry => getMondayDateString(entry.date)).filter(Boolean)))
+        .sort((a, b) => a.localeCompare(b))[0] || "";
+    }
+
+    function isSameLessonSlot(a, b){
+      return String(a?.date || "") === String(b?.date || "") &&
+        String(a?.schoolId || "") === String(b?.schoolId || "") &&
+        String(a?.year || "") === String(b?.year || "") &&
+        String(a?.className || "") === String(b?.className || "") &&
+        Number(a?.hour) === Number(b?.hour);
+    }
+
+    function isWeekClosedForSchool(schoolId, mondayDate){
+      if(!schoolId || !mondayDate) return false;
+      return loadJson("scheduleArchives", []).some(item =>
+        Boolean(item?.closed) &&
+        (item.type || "week") === "week" &&
+        String(item.schoolId || "") === String(schoolId) &&
+        String(item.startDate || "") === String(mondayDate)
+      );
+    }
+
+    function isSchoolMonthInvoiced(schoolId){
+      if(!schoolId) return false;
+      return loadJson("reportsArchive", []).some(item =>
+        (item.group || "schools") === "schools" &&
+        String(item.schoolFilter || "") === String(schoolId) &&
+        String(item.yearValue || "") === String(checkYear.value) &&
+        Number(item.monthValue || 0) === Number(checkMonth.value) &&
+        (item.processedStatus === "invoiced" || Boolean(item.processedAt))
+      );
+    }
+
+    function getVisibleSchools(caretakers = loadCaretakers()){
+      const schools = loadSchools();
+      if(isManagerLoggedIn()) return schools;
+
+      if(hasValidCaretakerLogin(caretakers)){
+        const activeId = localStorage.getItem(CARETAKER_ID_STORAGE_KEY) || "";
+        return schools.filter(school => String(school.assignedCaretakerId || "") === String(activeId));
+      }
+
+      return [];
+    }
+
+    function getRows(caretakers = loadCaretakers()){
+      const range = getMonthRange();
+      const plansStore = loadJson("plans", {});
+      const plansByKey = Object.fromEntries(
+        Object.entries(plansStore).map(([key, value]) => [key, normalizeScheduleEntry(key, value)])
+      );
+      const realityEntries = Object.entries(loadJson("reality", {}))
+        .map(([key, value]) => normalizeScheduleEntry(key, value, plansByKey[key]))
+        .filter(entry => isEntryInMonth(entry, range) && isUsableTrainerId(entry.trainerId));
+
+      return getVisibleSchools(caretakers).map(school => {
+        const schoolId = String(school.id || "");
+        const planEntries = Object.values(plansByKey).filter(entry =>
+          isEntryInMonth(entry, range) &&
+          isUsableTrainerId(entry.trainerId) &&
+          String(entry.schoolId || "") === schoolId
+        );
+        const schoolRealityEntries = realityEntries.filter(entry => String(entry.schoolId || "") === schoolId);
+        const missingReality = planEntries.filter(planEntry =>
+          !schoolRealityEntries.some(realityEntry => isSameLessonSlot(planEntry, realityEntry))
+        );
+        const plannedWeekStarts = new Set(planEntries.map(entry => getMondayDateString(entry.date)).filter(Boolean));
+        const openWeekStarts = Array.from(plannedWeekStarts).filter(monday => !isWeekClosedForSchool(schoolId, monday));
+        const openWeeks = openWeekStarts.length;
+        const invoiced = isSchoolMonthInvoiced(schoolId);
+        const hasPlan = planEntries.length > 0;
+        let targetDate = getOldestWeekStart(missingReality) || openWeekStarts.slice().sort((a, b) => a.localeCompare(b))[0] || "";
+
+        let statusClass = "is-muted";
+        let statusText = "Bez plánu";
+        let sortPriority = 4;
+        let actionText = "Otevřít školu";
+        let actionHref = "schools.html";
+        if(invoiced){
+          statusClass = "is-done";
+          statusText = "Vyfakturováno";
+          sortPriority = 3;
+          actionText = "Zobrazit";
+          actionHref = "index.html";
+        } else if(!hasPlan){
+          statusClass = "is-muted";
+          statusText = "Bez plánu";
+          sortPriority = 4;
+          actionText = "Otevřít školu";
+          actionHref = "index.html";
+          targetDate = range.start;
+        } else if(missingReality.length){
+          statusClass = "is-error";
+          statusText = "Chybí skutečnost";
+          sortPriority = 0;
+          actionText = "Doplnit skutečnost";
+          actionHref = "index.html";
+        } else if(openWeeks){
+          statusClass = "is-warning";
+          statusText = "Neuzavřené týdny";
+          sortPriority = 1;
+          actionText = "Uzavřít týden";
+          actionHref = "index.html";
+        } else {
+          statusClass = "is-ready";
+          statusText = "Připraveno";
+          sortPriority = 2;
+          actionText = "Zkontrolovat";
+          actionHref = "index.html";
+        }
+
+        return {
+          schoolId,
+          schoolName: school.nazev || school.name || "Bez názvu",
+          planCount: planEntries.length,
+          realityCount: schoolRealityEntries.length,
+          missingCount: missingReality.length,
+          openWeeks,
+          statusClass,
+          statusText,
+          sortPriority,
+          actionText,
+          actionHref,
+          targetDate,
+          rowClass: statusClass === "is-muted" ? "is-muted" : ""
+        };
+      }).sort((a, b) => {
+        if(a.sortPriority !== b.sortPriority) return a.sortPriority - b.sortPriority;
+        return a.schoolName.localeCompare(b.schoolName, "cs");
+      });
+    }
+
+    function render(){
+      const caretakers = loadCaretakers();
+      if(!isLoggedIn(caretakers)){
+        window.location.href = "home.html";
+        return;
+      }
+
+      fillFilters();
+      const rows = getRows(caretakers);
+      const readyTotal = rows.filter(row => row.statusClass === "is-ready" || row.statusClass === "is-done").length;
+      const missingTotal = rows.reduce((sum, row) => sum + row.missingCount, 0);
+      const openWeeksTotal = rows.reduce((sum, row) => sum + row.openWeeks, 0);
+      const roleText = isManagerLoggedIn() ? "Manažer vidí všechny školy." : "Školník vidí jen školy, které mu přidělil manažer.";
+
+      checkMeta.textContent = `${roleText} Kontrola vychází z plánu, skutečnosti, uzavřených týdnů a vyfakturovaných výkazů.`;
+      schoolsCount.textContent = String(rows.length);
+      readyCount.textContent = String(readyTotal);
+      missingCount.textContent = String(missingTotal);
+      openWeeksCount.textContent = String(openWeeksTotal);
+
+      if(!rows.length){
+        checkBody.innerHTML = '<tr><td colspan="7">Pro přihlášenou roli nejsou k dispozici žádné školy.</td></tr>';
+        return;
+      }
+
+      checkBody.innerHTML = rows.map(row => `
+        <tr class="${row.rowClass}">
+          <td>${escapeHtml(row.schoolName)}</td>
+          <td class="align-right">${row.planCount}</td>
+          <td class="align-right">${row.realityCount}</td>
+          <td class="align-right">${row.missingCount}</td>
+          <td class="align-right">${row.openWeeks}</td>
+          <td><span class="check-status ${row.statusClass}">${escapeHtml(row.statusText)}</span></td>
+          <td><a class="check-action" href="${escapeHtml(row.actionHref)}" data-school-id="${escapeHtml(row.schoolId)}" data-target-date="${escapeHtml(row.targetDate)}">${escapeHtml(row.actionText)}</a></td>
+        </tr>
+      `).join("");
+    }
+
+    checkYear.addEventListener("change", render);
+    checkMonth.addEventListener("change", render);
+    checkBody.addEventListener("click", event => {
+      const link = event.target.closest("[data-school-id]");
+      if(!link) return;
+      const schoolId = link.getAttribute("data-school-id") || "";
+      const targetDate = link.getAttribute("data-target-date") || "";
+      if(schoolId) localStorage.setItem("selectedSchool", schoolId);
+      if(link.getAttribute("href") === "index.html" && schoolId){
+        sessionStorage.setItem("scheduleReturnContext", JSON.stringify({
+          schoolId,
+          date: targetDate || undefined
+        }));
+      }
+    });
+
+    render();
+  })();
+  </script>
+</body>
+</html>
